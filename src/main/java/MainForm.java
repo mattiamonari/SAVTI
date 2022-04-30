@@ -1,18 +1,14 @@
 import org.apache.commons.io.FilenameUtils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.text.html.ImageView;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+
 public class MainForm extends JFrame {
     private JPanel mainPanel;
-    private BufferedImage image;
+    private JLabel lbImage;
+
 
     public MainForm() {
         super();
@@ -61,8 +57,6 @@ public class MainForm extends JFrame {
         if(!Objects.equals(FilenameUtils.getExtension(filename) , "jpg")){
             JOptionPane.showMessageDialog(this, "Erro");
         }
-        image = ImageIO.read(new File(filename));
-
+        lbImage.setIcon(new ImageIcon(filename));
     }
-
 }
