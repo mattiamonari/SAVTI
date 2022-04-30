@@ -1,6 +1,9 @@
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -18,10 +21,8 @@ public class MainForm extends JFrame {
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(500, 500);
-        setResizable(false);
+        setResizable(true);
         setVisible(true);
-
-
     }
 
 
@@ -30,7 +31,7 @@ public class MainForm extends JFrame {
         open.addActionListener(e -> {
             JFileChooser openFile = new JFileChooser();
             int option = openFile.showOpenDialog(null);
-            if(option == JFileChooser.APPROVE_OPTION){
+            if (option == JFileChooser.APPROVE_OPTION) {
                 try {
                     loadImage(openFile.getSelectedFile().getAbsolutePath());
                 } catch (IOException ex) {
@@ -54,9 +55,37 @@ public class MainForm extends JFrame {
     private void loadImage(String filename) throws IOException {
 
         //TODO ADD OTHER EXTENSIONS & IMPROVE ERROR MESSAGE
-        if(!Objects.equals(FilenameUtils.getExtension(filename) , "jpg")){
-            JOptionPane.showMessageDialog(this, "Erro");
+        if (!Objects.equals(FilenameUtils.getExtension(filename), "jpg")) {
+            JOptionPane.showMessageDialog(this, "Error");
         }
-        lbImage.setIcon(new ImageIcon(filename));
+        //TODO FIX CODE REPETITION
+        ImageIcon imageIcon = new ImageIcon(new ImageIcon(filename).getImage().getScaledInstance(mainPanel.getWidth(), mainPanel.getHeight(), Image.SCALE_DEFAULT));
+        lbImage.setIcon(imageIcon);
+        ComponentListener e = new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                ImageIcon imageIcon = new ImageIcon(new ImageIcon(filename).getImage().getScaledInstance(mainPanel.getWidth(), mainPanel.getHeight(), Image.SCALE_DEFAULT));
+                lbImage.setIcon(imageIcon);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+
+            }
+        };
+        mainPanel.addComponentListener(e);
+
     }
+
+
 }

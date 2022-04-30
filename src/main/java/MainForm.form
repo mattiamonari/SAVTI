@@ -7,11 +7,12 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="a61f3" class="javax.swing.JLabel" binding="lbImage">
+      <component id="709a8" class="javax.swing.JLabel" binding="lbImage">
         <constraints border-constraint="Center"/>
         <properties>
+          <font size="72"/>
           <horizontalAlignment value="0"/>
-          <text value="Label"/>
+          <text value=""/>
         </properties>
       </component>
     </children>
