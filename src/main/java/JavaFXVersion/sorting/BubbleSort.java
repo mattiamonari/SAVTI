@@ -4,7 +4,7 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-import mattia.Tail;
+import JavaFXVersion.Tail;
 
 import java.util.concurrent.FutureTask;
 
