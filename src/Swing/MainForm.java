@@ -1,4 +1,4 @@
-import org.apache.commons.io.FilenameUtils;
+package Swing;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,9 +55,9 @@ public class MainForm extends JFrame {
     private void loadImage(String filename) throws IOException {
 
         //TODO ADD OTHER EXTENSIONS & IMPROVE ERROR MESSAGE
-        if (!Objects.equals(FilenameUtils.getExtension(filename), "jpg")) {
-            JOptionPane.showMessageDialog(this, "Error");
-        }
+//        if (!Objects.equals(FilenameUtils.getExtension(filename), "jpg")) {
+//            JOptionPane.showMessageDialog(this, "Error");
+//        }
         //TODO FIX CODE REPETITION
         ImageIcon imageIcon = new ImageIcon(new ImageIcon(filename).getImage().getScaledInstance(mainPanel.getWidth(), mainPanel.getHeight(), Image.SCALE_DEFAULT));
         lbImage.setIcon(imageIcon);

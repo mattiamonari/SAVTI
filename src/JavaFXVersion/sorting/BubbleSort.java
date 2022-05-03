@@ -1,17 +1,22 @@
 package JavaFXVersion.sorting;
 
+import JavaFXVersion.Tail;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-import JavaFXVersion.Tail;
 
+import java.util.List;
 import java.util.concurrent.FutureTask;
 
-public class BubbleSort {
+public class BubbleSort implements SortAlgorithm{
 
     //Sequential transition which will group both the transitions of the swap
     SequentialTransition s;
+
+    FutureTask<Void> future;
+
+    Thread thread;
 
     //Random object used for lock the threads in this class
     //TODO Use the Lock class!
@@ -22,11 +27,27 @@ public class BubbleSort {
         s = new SequentialTransition();
     }
 
+    public boolean isThreadAlive(){
+        if(thread != null){
+            return thread.isAlive();
+        }
+        return false;
+    }
 
-    public void sort(Tail[] array, GridPane gridPane) {
+    @Override
+    public void killTask() {
+        if (thread.isAlive()) {
+            thread.interrupt();
+            future.cancel(true);
+        }
+
+    }
+
+    @Override
+    public void sort(Tail[] array , GridPane gridPane) {
 
         //We use a new thread to pause/resume its execution whenever we want
-        Thread thread = new Thread(() -> {
+        thread = new Thread(() -> {
 
             for (int i = 1, size = array.length; i < size; ++i) {
                 boolean swapped = false;
@@ -42,7 +63,7 @@ public class BubbleSort {
                          this class provides protected functionality that may be useful when creating customized task classes.
                          This class implements runnable
                          */
-                        FutureTask<Void> future = new FutureTask<>(
+                        future = new FutureTask<>(
                                 () -> {
                                     swapNodes( gridPane, array[finalJ], array[finalJ +1]);
                                     return null;
@@ -55,8 +76,9 @@ public class BubbleSort {
 
                                 lock.wait();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                break;
+                                //e.printStackTrace();
+                                //break;
+                                Thread.currentThread().interrupt();
                             }
                         }
 
@@ -112,5 +134,15 @@ public class BubbleSort {
         container.getChildren().removeAll(first,sec);
         container.add(sec, first_col, first_row);
         container.add(first, second_col, second_row);
+    }
+
+    @Override
+    public <T extends Comparable<T>> T[] sort(T[] unsorted) {
+        return null;
+    }
+
+    @Override
+    public <T extends Comparable<T>> List<T> sort(List<T> unsorted) {
+        return SortAlgorithm.super.sort(unsorted);
     }
 }

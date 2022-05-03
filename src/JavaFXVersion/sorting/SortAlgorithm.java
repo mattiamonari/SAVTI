@@ -1,5 +1,8 @@
 package JavaFXVersion.sorting;
 
+import JavaFXVersion.Tail;
+import javafx.scene.layout.GridPane;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +12,14 @@ import java.util.List;
  * @author Podshivalov Nikita (https://github.com/nikitap492)
  */
 public interface SortAlgorithm {
+
+    /*********
+     Methood that i added. Improve them!
+     **********/
+    void killTask();
+    boolean isThreadAlive();
+    void sort(Tail[] array , GridPane gridPane);
+
 
     /**
      * Main method arrays sorting algorithms
