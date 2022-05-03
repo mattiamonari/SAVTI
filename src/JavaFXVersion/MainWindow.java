@@ -97,7 +97,7 @@ public class MainWindow extends BorderPane {
         try {
             removeAllTails();
             splitImage(i, SCAPING_ROWS,SCRAPING_COLUMN);
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 2);
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 4);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -128,7 +128,7 @@ public class MainWindow extends BorderPane {
         try {
             removeAllTails();
             splitImage(i, SCAPING_ROWS,SCRAPING_COLUMN);
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 2);
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 4);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -154,7 +154,7 @@ public class MainWindow extends BorderPane {
             }
             removeAllTails();
             rand(main); //shuffle(writableimages)
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN,2 );
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN,4 );
         });
 
         backToTheStart.setOnAction(e -> Platform.runLater(() -> {
