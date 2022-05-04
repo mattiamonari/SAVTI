@@ -49,15 +49,25 @@
                </VBox.margin></Button>
             <Label text="Scegli la precisione del taglio immagine">
                <VBox.margin>
-                  <Insets left="10.0" />
+                  <Insets left="10.0" top="10.0" />
                </VBox.margin>
             </Label>
-            <Slider>
+            <HBox>
+               <children>
+                  <Slider fx:id="precisionSlider" />
+                  <Label fx:id="sliderValue" />
+               </children>
                <VBox.margin>
-                  <Insets left="10.0" />
+                  <Insets bottom="10.0" left="10.0" />
                </VBox.margin>
-            </Slider>
+            </HBox>
          </children>
       </VBox>
    </left>
+   <bottom>
+      <Separator prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </bottom>
+   <right>
+      <Separator orientation="VERTICAL" prefHeight="200.0" BorderPane.alignment="CENTER" />
+   </right>
 </fx:root>
