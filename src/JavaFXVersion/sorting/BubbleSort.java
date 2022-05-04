@@ -36,11 +36,12 @@ public class BubbleSort implements SortAlgorithm{
 
     @Override
     public void killTask() {
-        if (thread.isAlive()) {
-            thread.interrupt();
-            future.cancel(true);
+        if (thread != null) {
+            if (thread.isAlive()) {
+                thread.interrupt();
+                future.cancel(true);
+            }
         }
-
     }
 
     @Override
@@ -48,6 +49,8 @@ public class BubbleSort implements SortAlgorithm{
 
         //We use a new thread to pause/resume its execution whenever we want
         thread = new Thread(() -> {
+
+            long start = System.nanoTime();
 
             for (int i = 1, size = array.length; i < size; ++i) {
                 boolean swapped = false;
@@ -91,6 +94,8 @@ public class BubbleSort implements SortAlgorithm{
                     break;
                 }
             }
+            long end = System.nanoTime();
+            System.out.println(Math.floorDiv(end-start, 1000000));
         });
 
         thread.start();
