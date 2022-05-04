@@ -1,14 +1,17 @@
 package JavaFXVersion;
 
 import JavaFXVersion.sorting.BubbleSort;
+import JavaFXVersion.sorting.QuickSort;
 import JavaFXVersion.sorting.SortAlgorithm;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -17,8 +20,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,13 +34,13 @@ public class MainWindow extends BorderPane {
 
 
     //region Local variables decleration
-    int SCRAPING_COLUMN = 4;
-    int SCAPING_ROWS = 4;
+    int PRECISION;
     int CHUNK_WIDTH;
     int CHUNK_HEIGHT;
-    Tail[] main = new Tail[16];
+    Tail[] main;
     SortAlgorithm algorithm;
     Image i;
+    ToggleGroup tg;
     //endregion
 
     //region FXML variables declaration
@@ -53,6 +59,11 @@ public class MainWindow extends BorderPane {
     Button backToTheStart;
     @FXML
     Button cleanButton;
+    @FXML
+    Slider precisionSlider;
+    @FXML
+    Label sliderValue;
+
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -67,12 +78,18 @@ public class MainWindow extends BorderPane {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // enable the marks
+        precisionSlider.setShowTickMarks(true);
+
+        // enable the Labels
+        precisionSlider.setShowTickLabels(true);
 
         initComponents();
 
-        loadAndSplitImage("C:\\Users\\mmatt\\Documents\\bigimage.jpg");
+        loadAndSplitImage("res/bigimage.jpg");
 
         addEventListeners();
+
 
     }
 
@@ -85,19 +102,19 @@ public class MainWindow extends BorderPane {
             e.printStackTrace();
         }
 
-        i = SwingFXUtils.toFXImage(capture, null);
-        CHUNK_WIDTH = (int) (i.getWidth() / SCRAPING_COLUMN);
-        CHUNK_HEIGHT = (int) (i.getHeight() / SCAPING_ROWS);
+        BufferedImage dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, 1250, 700);
 
-        gridPane.setPrefSize(i.getWidth(),i.getHeight());
-        gridPane.setMaxSize(i.getWidth(),i.getHeight());
+        i = SwingFXUtils.toFXImage(dimg, null);
+        CHUNK_WIDTH = (int) (dimg.getWidth() / PRECISION);
+        CHUNK_HEIGHT = (int) (dimg.getHeight() / PRECISION);
+
         gridPane.setPadding(Insets.EMPTY);
 
 
         try {
             removeAllTails();
-            splitImage(i, SCAPING_ROWS,SCRAPING_COLUMN);
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 4);
+            splitImage(i, PRECISION,PRECISION);
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,PRECISION,PRECISION);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -105,8 +122,6 @@ public class MainWindow extends BorderPane {
 
     //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
     private void loadAndSplitImage(File file) {
-
-
 
         BufferedImage capture = null;
 
@@ -116,9 +131,11 @@ public class MainWindow extends BorderPane {
             e.printStackTrace();
         }
 
-        Image i = SwingFXUtils.toFXImage(capture, null);
-        CHUNK_WIDTH = (int) (i.getWidth() / SCRAPING_COLUMN);
-        CHUNK_HEIGHT = (int) (i.getHeight() / SCAPING_ROWS);
+        BufferedImage dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, 1250, 700);
+
+        Image i = SwingFXUtils.toFXImage(dimg, null);
+        CHUNK_WIDTH = (int) (dimg.getWidth() / PRECISION);
+        CHUNK_HEIGHT = (int) (dimg.getHeight() / PRECISION);
 
         gridPane.setPrefSize(i.getWidth(),i.getHeight());
         gridPane.setMaxSize(i.getWidth(),i.getHeight());
@@ -127,8 +144,8 @@ public class MainWindow extends BorderPane {
 
         try {
             removeAllTails();
-            splitImage(i, SCAPING_ROWS,SCRAPING_COLUMN);
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN, 4);
+            splitImage(i, PRECISION,PRECISION);
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,PRECISION,PRECISION);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -138,29 +155,30 @@ public class MainWindow extends BorderPane {
     private void addEventListeners() {
 
         cleanButton.setOnAction(e-> {
-            if (algorithm != null) {
-                algorithm.killTask();
-            }
             removeAllTails();
             Arrays.fill(main , null);
         });
 
         randomizeButton.setOnAction(e -> {
-            if (algorithm != null) {
-                algorithm.killTask();
-            }
+            algorithm.killTask();
             if(Arrays.stream(main).allMatch(Objects::isNull) && !(i ==null)){
-                splitImage(i, SCAPING_ROWS, SCRAPING_COLUMN);
+                splitImage(i, PRECISION, PRECISION);
             }
             removeAllTails();
             rand(main); //shuffle(writableimages)
-            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,SCAPING_ROWS,SCRAPING_COLUMN,4 );
+            fillImage(CHUNK_WIDTH,CHUNK_HEIGHT,PRECISION,PRECISION );
         });
 
         backToTheStart.setOnAction(e -> Platform.runLater(() -> {
-            if (algorithm == null) {
-                algorithm = new BubbleSort();
+            //Ha senso farlo sempre?
+            if (tg.getSelectedToggle() != null) {
+                if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
+                    algorithm = new QuickSort();
+                else
+                    algorithm = new BubbleSort();
             }
+            //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
+            // faccio partire l'ordinamento
             if(!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull))
                 algorithm.sort(main,gridPane);
         }));
@@ -177,6 +195,16 @@ public class MainWindow extends BorderPane {
                 loadAndSplitImage(chosenFile);
             }
         });
+
+        precisionSlider.valueProperty().addListener((observable, oldValue, newValue) ->
+        {
+            sliderValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            PRECISION = (int) Math.floor((Double) newValue)/2;
+            main = new Tail[(int)Math.pow(PRECISION, 2)];
+            CHUNK_WIDTH = (int) (i.getWidth() / PRECISION);
+            CHUNK_HEIGHT = (int) (i.getHeight() / PRECISION);
+        });
+
     }
 
     private void removeAllTails() {
@@ -185,8 +213,14 @@ public class MainWindow extends BorderPane {
 
     //Creazione dei componenti
     private void initComponents() {
-        //aggiunto Bg per debug
-        gridPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        algorithm = new BubbleSort();
+
+        tg = new ToggleGroup();
+
+        PRECISION = 8;
+
+        main = new Tail[64];
 
         createRadioButtons();
     }
@@ -197,26 +231,22 @@ public class MainWindow extends BorderPane {
 
         VBox r = new VBox();
 
-        // create a toggle group
-        ToggleGroup tg = new ToggleGroup();
-
         // create radiobuttons
         RadioButton r1 = new RadioButton("QuickSort");
         RadioButton r2 = new RadioButton("BubbleSort");
-        RadioButton r3 = new RadioButton("MergeSort");
 
         VBox.setMargin(r1, new Insets(10));
         VBox.setMargin(r2, new Insets(10));
-        VBox.setMargin(r3, new Insets(10));
 
         // add radiobuttons to toggle group
         r1.setToggleGroup(tg);
         r2.setToggleGroup(tg);
-        r3.setToggleGroup(tg);
 
         r.getChildren().add(r1);
         r.getChildren().add(r2);
-        r.getChildren().add(r3);
+
+        r2.setSelected(true);
+
         VBox leftVbox = (VBox) (cleanButton.getParent());
         leftVbox.getChildren().add(r);
 
@@ -248,12 +278,12 @@ public class MainWindow extends BorderPane {
      * @param rows Il numero di colonne in cui è stata divisa l'immagine
      * @param cols Il numero di righe in cui è stata divisa l'immagine
      */
-    public void fillImage(int chunkWidth, int chunkHeight, int rows, int cols, int scale){
+    public void fillImage(int chunkWidth, int chunkHeight, int rows, int cols){
         for (int x = 0; x < rows; x++) {
             for (int y = 0; y < cols; y++) {
                 main[x*rows+y].setPreserveRatio(true);
-                main[x*rows+y].setFitHeight(chunkHeight/scale);
-                main[x*rows+y].setFitWidth(chunkWidth/scale);
+                main[x*rows+y].setFitHeight(chunkHeight);
+                main[x*rows+y].setFitWidth(chunkWidth);
                 main[x*rows+y].setOpacity(0.8);
                 //Qua aggiungiamo la tail presa dal vettore
                 //Nella griglia nella riga x e alla colonna y
