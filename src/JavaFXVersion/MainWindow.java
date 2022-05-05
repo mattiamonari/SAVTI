@@ -123,8 +123,8 @@ public class MainWindow extends BorderPane {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        BufferedImage dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_HEIGHT , width,700);
-        Image i = SwingFXUtils.toFXImage(dimg , null);
+        BufferedImage dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_WIDTH , width,700);
+        i = SwingFXUtils.toFXImage(dimg , null);
         CHUNK_WIDTH = dimg.getWidth() / PRECISION;
         CHUNK_HEIGHT = dimg.getHeight() / PRECISION;
         gridPane.setPrefSize(i.getWidth() , i.getHeight());
@@ -144,6 +144,7 @@ public class MainWindow extends BorderPane {
         cleanButton.setOnAction(e -> {
             removeAllTails();
             Arrays.fill(main , null);
+            i = null;
         });
         randomizeButton.setOnAction(e -> {
             algorithm.killTask();
@@ -155,17 +156,18 @@ public class MainWindow extends BorderPane {
             fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , PRECISION , PRECISION , main , gridPane);
         });
         backToTheStart.setOnAction(e -> Platform.runLater(() -> {
-            //Ha senso farlo sempre?
-            if (tg.getSelectedToggle() != null) {
-                if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
-                    algorithm = new QuickSort();
-                else
-                    algorithm = new BubbleSort();
+            if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
+                //Ha senso farlo sempre?
+                if (tg.getSelectedToggle() != null) {
+                    if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
+                        algorithm = new QuickSort();
+                    else
+                        algorithm = new BubbleSort();
+                }
+                //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
+                // faccio partire l'ordinamento
+                algorithm.sort(main, gridPane);
             }
-            //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
-            // faccio partire l'ordinamento
-            if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull))
-                algorithm.sort(main , gridPane);
         }));
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
