@@ -64,10 +64,4 @@
          </children>
       </VBox>
    </left>
-   <bottom>
-      <Separator prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </bottom>
-   <right>
-      <Separator orientation="VERTICAL" prefHeight="200.0" BorderPane.alignment="CENTER" />
-   </right>
 </fx:root>
