@@ -140,6 +140,7 @@ public class MainWindow extends BorderPane {
     }
 
     //Aggiunge i listener agli eventi dei nodi/elementi
+    //TODO Risolvere vari bug relativi a combinazione di tasti e variazioni di paramteri (slider) durante l'esecuzione degli algoritmi
     private void addEventListeners() {
         cleanButton.setOnAction(e -> {
             removeAllTails();
