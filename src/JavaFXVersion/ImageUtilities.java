@@ -42,7 +42,6 @@ public class ImageUtilities {
                 array[x * rows + y].setPreserveRatio(true);
                 array[x * rows + y].setFitHeight(chunkHeight);
                 array[x * rows + y].setFitWidth(chunkWidth);
-                array[x * rows + y].setOpacity(0.8);
 
                 //Qua aggiungiamo la tail presa dal vettore
                 //Nella griglia nella riga x e alla colonna y

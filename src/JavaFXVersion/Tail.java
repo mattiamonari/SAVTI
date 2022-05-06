@@ -58,4 +58,9 @@ public class Tail extends ImageView implements Comparable<Tail>{
             return -1;
 
     }
+
+
+    public WritableImage getTail() {
+        return tail;
+    }
 }

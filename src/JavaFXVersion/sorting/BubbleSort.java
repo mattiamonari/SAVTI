@@ -3,9 +3,12 @@ package JavaFXVersion.sorting;
 import JavaFXVersion.Tail;
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.scene.image.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 
+import java.awt.image.BufferedImage;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
@@ -17,6 +20,8 @@ public class BubbleSort implements SortAlgorithm{
     FutureTask<Void> future;
 
     Thread thread;
+
+    int countComparison = 0, countSwaps = 0;
 
     //Random object used for lock the threads in this class
     //TODO Use the Lock class!
@@ -55,7 +60,10 @@ public class BubbleSort implements SortAlgorithm{
             for (int i = 1, size = array.length; i < size; ++i) {
                 boolean swapped = false;
                 for (int j = 0; j < size - i; ++j) {
+                    countComparison++;
                     if (SortUtils.greater(array[j], array[j + 1])) {
+
+
 
                         //So that j is effectively final
                         int finalJ = j;
@@ -74,16 +82,14 @@ public class BubbleSort implements SortAlgorithm{
                         );
                         synchronized (lock) {
                             try {
-                                //The future task gets run on the Javafx Thread (in order to perform gui action)
-                                Platform.runLater(future);
-
-                                lock.wait();
+                                    //The future task gets run on the Javafx Thread (in order to perform gui action)
+                                    Platform.runLater(future);
+                                    lock.wait();
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                             }
                         }
-
-
+                        countSwaps++;
                         SortUtils.swap(array , j , j + 1);
                         swapped = true;
                     }
@@ -94,11 +100,29 @@ public class BubbleSort implements SortAlgorithm{
             }
             long end = System.nanoTime();
             System.out.println(Math.floorDiv(end-start, 1000000));
+            System.out.println("Comparison: " + countComparison);
+            System.out.println("Swaps: " + countSwaps);
+            writeImage(array);
         });
 
         thread.start();
 
 
+    }
+
+    private void writeImage(Tail[] array, int chunkWidth, int chunkHeight, int cols, int rows){
+        //PixelWriter reader = imageToWrite.getPixelReader();
+        BufferedImage bufferedImage = new BufferedImage(cols*chunkWidth,rows*chunkHeight,BufferedImage.TYPE_INT_ARGB);
+        for (int i = 0; i < array.length; i++) {
+            WritableImage tmp = array[i].getTail();
+            IntBuffer buffer = IntBuffer.allocate(chunkHeight*chunkWidth);
+            tmp.getPixelReader().getPixels(0,0, chunkWidth, chunkHeight, PixelFormat.getIntArgbInstance(), buffer, 0);
+            for (int j = 0; j < buffer.array().length; j++) {
+                int col_to_write = i % 4, row_to_write = i/4;
+                //TODO FIND RIGHT X-Y COORDINATES
+                bufferedImage.setRGB(col_to_write*chunkWidth,row_to_write*chunkHeight, buffer.get(j));
+            }
+        }
     }
 
     private void swapNodes(GridPane container, Tail first, Tail sec) {

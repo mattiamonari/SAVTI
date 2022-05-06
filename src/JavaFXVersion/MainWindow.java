@@ -152,7 +152,7 @@ public class MainWindow extends BorderPane {
         });
 
         randomizeButton.setOnAction(e -> {
-            if (Arrays.stream(main).allMatch(Objects::isNull) && !(i == null)) {
+            if (!(i == null)) {
                 algorithm.killTask();
                 splitImage(i , PRECISION , PRECISION , main);
                 removeAllTails();
@@ -164,7 +164,7 @@ public class MainWindow extends BorderPane {
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
 
-                disableButtons();
+                //disableButtons();
 
                 //Ha senso farlo sempre?
                 if (tg.getSelectedToggle() != null) {
@@ -190,10 +190,10 @@ public class MainWindow extends BorderPane {
             }
         });
 
-        stopSorting.setOnAction(e -> {
-            algorithm.killTask();
-            enableButtons();
-        });
+//        stopSorting.setOnAction(e -> {
+//            algorithm.killTask();
+//            enableButtons();
+//        });
 
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
             sliderValue.setText(String.valueOf(Math.floor((Double) newValue)));
