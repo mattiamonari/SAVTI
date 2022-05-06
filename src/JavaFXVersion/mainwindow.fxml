@@ -39,7 +39,12 @@
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin></Button>
-            <Button fx:id="backToTheStart" mnemonicParsing="false" text="Ricomponi l'immgine">
+            <Button fx:id="stopSorting" disable="true" mnemonicParsing="false" text="Interrompi">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="sortingButton" mnemonicParsing="false" text="Ricomponi l'immgine">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin></Button>

@@ -62,6 +62,8 @@ public class MainWindow extends BorderPane {
     Slider precisionSlider;
     @FXML
     Label sliderValue;
+    @FXML
+    Button stopSorting;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -142,11 +144,13 @@ public class MainWindow extends BorderPane {
     //Aggiunge i listener agli eventi dei nodi/elementi
     //TODO Risolvere vari bug relativi a combinazione di tasti e variazioni di paramteri (slider) durante l'esecuzione degli algoritmi
     private void addEventListeners() {
+
         cleanButton.setOnAction(e -> {
             removeAllTails();
             Arrays.fill(main , null);
             i = null;
         });
+
         randomizeButton.setOnAction(e -> {
             if (Arrays.stream(main).allMatch(Objects::isNull) && !(i == null)) {
                 algorithm.killTask();
@@ -158,8 +162,10 @@ public class MainWindow extends BorderPane {
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            ErrorUtilities.noImageError();
             if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
+
+                disableButtons();
+
                 //Ha senso farlo sempre?
                 if (tg.getSelectedToggle() != null) {
                     if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
@@ -182,6 +188,11 @@ public class MainWindow extends BorderPane {
                 int width = (int) Math.round(this.getScene().getWidth() - ((VBox)cleanButton.getParent()).getWidth());
                 loadAndSplitImage(chosenFile, width);
             }
+        });
+
+        stopSorting.setOnAction(e -> {
+            algorithm.killTask();
+            enableButtons();
         });
 
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
@@ -212,6 +223,22 @@ public class MainWindow extends BorderPane {
 
     private void removeAllTails() {
         gridPane.getChildren().removeAll(gridPane.getChildren());
+    }
+
+    private void disableButtons(){
+        sortingButton.setDisable(true);
+        cleanButton.setDisable(true);
+        randomizeButton.setDisable(true);
+        precisionSlider.setDisable(true);
+        stopSorting.setDisable(false);
+    }
+
+    private void enableButtons(){
+        precisionSlider.setDisable(false);
+        sortingButton.setDisable(false);
+        cleanButton.setDisable(false);
+        randomizeButton.setDisable(false);
+        stopSorting.setDisable(true);
     }
 
     //region Utilities methods

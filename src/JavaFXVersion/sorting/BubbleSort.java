@@ -39,7 +39,7 @@ public class BubbleSort implements SortAlgorithm{
         if (thread != null) {
             if (thread.isAlive()) {
                 thread.interrupt();
-                future.cancel(true);
+                future.cancel(false);
             }
         }
     }
@@ -79,8 +79,6 @@ public class BubbleSort implements SortAlgorithm{
 
                                 lock.wait();
                             } catch (InterruptedException e) {
-                                //e.printStackTrace();
-                                //break;
                                 Thread.currentThread().interrupt();
                             }
                         }
