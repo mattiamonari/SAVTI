@@ -55,7 +55,7 @@ public class MainWindow extends BorderPane {
     @FXML
     Button randomizeButton;
     @FXML
-    Button backToTheStart;
+    Button sortingButton;
     @FXML
     Button cleanButton;
     @FXML
@@ -157,7 +157,7 @@ public class MainWindow extends BorderPane {
             }
         });
 
-        backToTheStart.setOnAction(e -> Platform.runLater(() -> {
+        sortingButton.setOnAction(e -> Platform.runLater(() -> {
             ErrorUtilities.noImageError();
             if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
                 //Ha senso farlo sempre?
