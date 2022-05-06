@@ -34,7 +34,7 @@ import static JavaFXVersion.sorting.SortAlgorithm.rand;
 
 public class MainWindow extends BorderPane {
     //region Local variables decleration
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    //? Question is, do we really need all these variables?
     int PRECISION;
     int CHUNK_WIDTH;
     int CHUNK_HEIGHT;
@@ -148,15 +148,17 @@ public class MainWindow extends BorderPane {
             i = null;
         });
         randomizeButton.setOnAction(e -> {
-            algorithm.killTask();
             if (Arrays.stream(main).allMatch(Objects::isNull) && !(i == null)) {
+                algorithm.killTask();
                 splitImage(i , PRECISION , PRECISION , main);
+                removeAllTails();
+                rand(main); //shuffle(writableimages)
+                fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , PRECISION , PRECISION , main , gridPane);
             }
-            removeAllTails();
-            rand(main); //shuffle(writableimages)
-            fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , PRECISION , PRECISION , main , gridPane);
         });
+
         backToTheStart.setOnAction(e -> Platform.runLater(() -> {
+            ErrorUtilities.noImageError();
             if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
                 //Ha senso farlo sempre?
                 if (tg.getSelectedToggle() != null) {
@@ -170,6 +172,7 @@ public class MainWindow extends BorderPane {
                 algorithm.sort(main, gridPane);
             }
         }));
+
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG" , "*.jpg") , new FileChooser.ExtensionFilter("PNG" , "*.png"));
@@ -180,6 +183,7 @@ public class MainWindow extends BorderPane {
                 loadAndSplitImage(chosenFile, width);
             }
         });
+
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
             sliderValue.setText(String.valueOf(Math.floor((Double) newValue)));
             PRECISION = (int) Math.floor((Double) newValue) / 2;
