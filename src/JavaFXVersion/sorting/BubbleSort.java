@@ -1,42 +1,39 @@
 package JavaFXVersion.sorting;
 
+import JavaFXVersion.FFMPEG;
 import JavaFXVersion.Tail;
-import javafx.animation.*;
+import JavaFXVersion.UserSettings;
+import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
-import javafx.scene.image.*;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Duration;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.nio.IntBuffer;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
-public class BubbleSort implements SortAlgorithm{
+import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.FileUtilities.writeImage;
 
-    //Sequential transition which will group both the transitions of the swap
-    SequentialTransition s;
-
-    FutureTask<Void> future;
-
-    Thread thread;
-
-    int countComparison = 0, countSwaps = 0;
-
+public class BubbleSort implements SortAlgorithm {
     //Random object used for lock the threads in this class
     //TODO Use the Lock class!
-    final Object lock = new String("Ciaoo");
+    private final UserSettings userSettings;
+    FutureTask<Void> future;
+    Thread thread;
+    int countComparison = 0, countSwaps = 0, i = 1;
 
-
-    public BubbleSort(){
-        s = new SequentialTransition();
-    }
-
-    public boolean isThreadAlive(){
-        if(thread != null){
-            return thread.isAlive();
-        }
-        return false;
+    public BubbleSort(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 
     @Override
@@ -49,46 +46,34 @@ public class BubbleSort implements SortAlgorithm{
         }
     }
 
+    public boolean isThreadAlive() {
+        if (thread != null) {
+            return thread.isAlive();
+        }
+        return false;
+    }
+
     @Override
     public void sort(Tail[] array , GridPane gridPane) {
-
         //We use a new thread to pause/resume its execution whenever we want
+        deleteAllPreviousFiles(userSettings);
+        int width = (int) ( array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
+                array[0].getImage().getWidth() - 1);
+        int height = (int) (  array[0].getImage().getHeight() % 2 == 0 ?  array[0].getImage().getHeight() :
+                array[0].getImage().getHeight() - 1);
+
         thread = new Thread(() -> {
-
             long start = System.nanoTime();
-
-            for (int i = 1, size = array.length; i < size; ++i) {
+            for (int size = array.length, i = 1; i < size; ++i) {
                 boolean swapped = false;
+
+                if ((i % 2) == 0) {
+                    writeImage(userSettings, array , width , height, i);
+                }
+
                 for (int j = 0; j < size - i; ++j) {
                     countComparison++;
-                    if (SortUtils.greater(array[j], array[j + 1])) {
-
-
-
-                        //So that j is effectively final
-                        int finalJ = j;
-
-                        /*
-                        A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable,
-                        a FutureTask can be submitted to an Executor for execution.In addition to serving as a standalone class,
-                         this class provides protected functionality that may be useful when creating customized task classes.
-                         This class implements runnable
-                         */
-                        future = new FutureTask<>(
-                                () -> {
-                                    swapNodes( gridPane, array[finalJ], array[finalJ +1]);
-                                    return null;
-                                }
-                        );
-                        synchronized (lock) {
-                            try {
-                                    //The future task gets run on the Javafx Thread (in order to perform gui action)
-                                    Platform.runLater(future);
-                                    lock.wait();
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                            }
-                        }
+                    if (SortUtils.greater(array[j] , array[j + 1])) {
                         countSwaps++;
                         SortUtils.swap(array , j , j + 1);
                         swapped = true;
@@ -99,68 +84,39 @@ public class BubbleSort implements SortAlgorithm{
                 }
             }
             long end = System.nanoTime();
-            System.out.println(Math.floorDiv(end-start, 1000000));
+            System.out.println(Math.floorDiv(end - start , 1000000));
+            writeImage(userSettings, array , width , height, i);
+            File tmp = new File(userSettings.getOutputDirectory() , "tmp.txt");
+            try {
+                FileWriter fw1 = new FileWriter(tmp);
+                fw1.write("Comparisons : " + countComparison + "\nSwaps : " + countSwaps);
+                fw1.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             System.out.println("Comparison: " + countComparison);
             System.out.println("Swaps: " + countSwaps);
-            writeImage(array);
+            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath() , userSettings.getOutName() ,
+                userSettings.getOutputDirectory(),
+                    3);
+            Platform.runLater(() -> {
+                createMediaView(gridPane);
+            });
         });
-
         thread.start();
-
-
     }
 
-    private void writeImage(Tail[] array, int chunkWidth, int chunkHeight, int cols, int rows){
-        //PixelWriter reader = imageToWrite.getPixelReader();
-        BufferedImage bufferedImage = new BufferedImage(cols*chunkWidth,rows*chunkHeight,BufferedImage.TYPE_INT_ARGB);
-        for (int i = 0; i < array.length; i++) {
-            WritableImage tmp = array[i].getTail();
-            IntBuffer buffer = IntBuffer.allocate(chunkHeight*chunkWidth);
-            tmp.getPixelReader().getPixels(0,0, chunkWidth, chunkHeight, PixelFormat.getIntArgbInstance(), buffer, 0);
-            for (int j = 0; j < buffer.array().length; j++) {
-                int col_to_write = i % 4, row_to_write = i/4;
-                //TODO FIND RIGHT X-Y COORDINATES
-                bufferedImage.setRGB(col_to_write*chunkWidth,row_to_write*chunkHeight, buffer.get(j));
-            }
-        }
-    }
-
-    private void swapNodes(GridPane container, Tail first, Tail sec) {
-        int first_col = GridPane.getColumnIndex(first);
-        int first_row = GridPane.getRowIndex(first);
-        int second_col = GridPane.getColumnIndex(sec);
-        int second_row = GridPane.getRowIndex(sec);
-
-        TranslateTransition tt = new TranslateTransition(Duration.millis(0.1), first);
-        TranslateTransition tt1 = new TranslateTransition(Duration.millis(0.1), sec);
-
-        tt.setToX(sec.getX());
-        tt.setToY(sec.getY());
-
-        tt1.setToX(first.getX());
-        tt1.setToY(first.getY());
-
-        s.getChildren().addAll(tt,tt1);
-
-        s.play();
-
-        s.setOnFinished(event ->{
-
-            s.getChildren().removeAll(s.getChildren());
-            synchronized (lock) {
-                try {
-                    lock.notify();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        container.getChildren().removeAll(first,sec);
-        container.add(sec, first_col, first_row);
-        container.add(first, second_col, second_row);
+    private void createMediaView(GridPane gridPane) {
+        Media media = new Media(new File(userSettings.getOutputDirectory().getAbsolutePath() + '\\' + userSettings.getOutName()).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        MediaView m = new MediaView(mediaPlayer);
+        m.setMediaPlayer(mediaPlayer);
+        m.setFitWidth(1200);
+        BorderPane root = ((BorderPane) gridPane.getParent());
+        root.setCenter(m);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        deleteAllPreviousFiles(userSettings);
     }
 
     @Override

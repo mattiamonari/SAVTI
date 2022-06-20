@@ -1,32 +1,39 @@
 package JavaFXVersion.sorting;
 
+import JavaFXVersion.FFMPEG;
 import JavaFXVersion.Tail;
-import JavaFXVersion.sorting.SortUtils;
+import JavaFXVersion.UserSettings;
 import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Duration;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.FutureTask;
 
+import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.FileUtilities.writeImage;
 import static JavaFXVersion.sorting.SortUtils.*;
 
 public class QuickSort implements SortAlgorithm {
 
-    //Sequential transition which will group both the transitions of the swap
-    SequentialTransition s;
 
+    private final UserSettings userSettings;
     FutureTask<Void> future;
-
     Thread thread;
+    int i = 0;
+    int countSwaps, countComparison;
 
-    //Random object used for lock the threads in this class
-    //TODO Use the Lock class!
-    final Object lock = new String("Ciaoo");
-
-    public QuickSort() {
-        s = new SequentialTransition();
+    public QuickSort(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 
     public boolean isThreadAlive(){
@@ -48,11 +55,17 @@ public class QuickSort implements SortAlgorithm {
 
     @Override
     public void sort(Tail[] array , GridPane gridPane) {
+        deleteAllPreviousFiles(userSettings);
         thread = new Thread(() -> {
             long start = System.nanoTime();
             doSort(array,0,array.length - 1, gridPane);
             long end = System.nanoTime();
             System.out.println(Math.floorDiv(end-start, 1000000));
+            new FFMPEG(userSettings.getFfmpegPath() , userSettings.getOutName() , userSettings.getOutputDirectory(),
+                    30);
+            Platform.runLater(() -> {
+                createMediaView(gridPane);
+            });
         });
         thread.start();
     }
@@ -69,9 +82,16 @@ public class QuickSort implements SortAlgorithm {
 
 
     private <T extends Comparable<T>> void doSort(Tail[] array, int left, int right, GridPane gridPane) {
+        countComparison++;
         if (left < right) {
             int pivot = randomPartition(array, left, right, gridPane);
+            int width = (int) ( array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
+                                array[0].getImage().getWidth() - 1);
+            int height = (int) (  array[0].getImage().getHeight() % 2 == 0 ?  array[0].getImage().getHeight() :
+                    array[0].getImage().getHeight() - 1);
+            writeImage(userSettings, array , width , height, i++);
             doSort(array, left, pivot - 1, gridPane);
+            writeImage(userSettings, array , width , height, i++);
             doSort(array, pivot, right, gridPane);
         }
     }
@@ -86,23 +106,8 @@ public class QuickSort implements SortAlgorithm {
      */
     private <T extends Comparable<T>> int randomPartition(Tail[] array, int left, int right, GridPane gridPane) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
-        future = new FutureTask<>(
-                () -> {
-                    swapNodes( gridPane, array[randomIndex], array[right]);
-                    return null;
-                }
-        );
-        synchronized (lock) {
-            try {
-                //The future task gets run on the Javafx Thread (in order to perform gui action)
-                Platform.runLater(future);
 
-                lock.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
+        countSwaps++;
         swap(array, randomIndex, right);
 
         return partition(array, left, right, gridPane);
@@ -121,34 +126,21 @@ public class QuickSort implements SortAlgorithm {
         Tail pivot = array[mid];
 
         while (left <= right) {
+            countComparison++;
             while (less(array[left], pivot)) {
+                countComparison++;
                 ++left;
             }
             while (less(pivot, array[right])) {
+                countComparison++;
                 --right;
             }
+            countComparison++;
             if (left <= right) {
                 int finalLeft = left;
                 int finalRight = right;
-                future = new FutureTask<>(
-                        () -> {
-                            swapNodes( gridPane, array[finalLeft], array[finalRight]);
-                            return null;
-                        }
-                );
-                synchronized (lock) {
-                    try {
-                        //The future task gets run on the Javafx Thread (in order to perform gui action)
-                        Platform.runLater(future);
 
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        //e.printStackTrace();
-                        //break;
-                        Thread.currentThread().interrupt();
-                    }
-                }
-
+                countSwaps++;
                 swap(array, left, right);
                 ++left;
                 --right;
@@ -157,42 +149,17 @@ public class QuickSort implements SortAlgorithm {
         return left;
     }
 
-    private void swapNodes(GridPane container, Tail first, Tail sec) {
-        int first_col = GridPane.getColumnIndex(first);
-        int first_row = GridPane.getRowIndex(first);
-        int second_col = GridPane.getColumnIndex(sec);
-        int second_row = GridPane.getRowIndex(sec);
-
-        TranslateTransition tt = new TranslateTransition(Duration.millis(0.1), first);
-        TranslateTransition tt1 = new TranslateTransition(Duration.millis(0.1), sec);
-
-        tt.setToX(sec.getX());
-        tt.setToY(sec.getY());
-
-        tt1.setToX(first.getX());
-        tt1.setToY(first.getY());
-
-        s.getChildren().addAll(tt,tt1);
-
-        s.play();
-
-        s.setOnFinished(event ->{
-
-            s.getChildren().removeAll(s.getChildren());
-            synchronized (lock) {
-                try {
-                    lock.notify();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        container.getChildren().removeAll(first,sec);
-        container.add(sec, first_col, first_row);
-        container.add(first, second_col, second_row);
+    private void createMediaView(GridPane gridPane) {
+        Media media = new Media(new File(userSettings.getOutputDirectory().getAbsolutePath() + '\\' + userSettings.getOutName()).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        MediaView m = new MediaView(mediaPlayer);
+        m.setMediaPlayer(mediaPlayer);
+        m.setFitWidth(1000);
+        BorderPane root = ((BorderPane) gridPane.getParent());
+        root.setCenter(m);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        deleteAllPreviousFiles(userSettings);
     }
 
 }
