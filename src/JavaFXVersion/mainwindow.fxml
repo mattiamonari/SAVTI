@@ -6,11 +6,6 @@
 <?import javafx.scene.text.*?>
 
 <fx:root type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <GridPane fx:id="gridPane" BorderPane.alignment="CENTER">
-
-      </GridPane>
-   </center>
    <top>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
@@ -39,16 +34,20 @@
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin></Button>
-            <Button fx:id="stopSorting" disable="true" mnemonicParsing="false" text="Interrompi">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </VBox.margin>
-            </Button>
             <Button fx:id="sortingButton" mnemonicParsing="false" text="Ricomponi l'immgine">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin></Button>
-            <Button fx:id="cleanButton" layoutX="10.0" layoutY="36.0" mnemonicParsing="false" text="Rimuovi l'immagine">
+            <Button fx:id="cleanButton" disable="true" layoutX="10.0" layoutY="36.0" mnemonicParsing="false" text="Rimuovi l'immagine">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin></Button>
+            <Button fx:id="ffmpegButton" mnemonicParsing="false" text="Setta il percorso a FFMPEG!">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="outputButton" layoutX="20.0" layoutY="155.0" mnemonicParsing="false" text="Scegli dove salvare le immagini!">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin></Button>
@@ -59,7 +58,7 @@
             </Label>
             <HBox>
                <children>
-                  <Slider fx:id="precisionSlider" />
+                  <Slider fx:id="precisionSlider" blockIncrement="5.0" majorTickUnit="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
                   <Label fx:id="sliderValue" />
                </children>
                <VBox.margin>
@@ -69,4 +68,9 @@
          </children>
       </VBox>
    </left>
+   <center>
+      <GridPane fx:id="gridPane" BorderPane.alignment="CENTER">
+
+      </GridPane>
+   </center>
 </fx:root>
