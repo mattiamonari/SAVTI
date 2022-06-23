@@ -1,6 +1,7 @@
 package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
+import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import JavaFXVersion.UserSettings;
 import javafx.animation.SequentialTransition;
@@ -63,8 +64,8 @@ public class BubbleSort implements SortAlgorithm {
                 if (running == true) {
                     boolean swapped = false;
 
-                    if ((i % 2) == 0) {
-                        writeImage(userSettings, array, width, height, i);
+                    if ((i % userSettings.getDelay()) == 0) {
+                        writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
                     }
 
                     for (int j = 0; j < size - i; ++j) {
@@ -82,7 +83,7 @@ public class BubbleSort implements SortAlgorithm {
             }
             long end = System.nanoTime();
             System.out.println(Math.floorDiv(end - start, 1000000));
-            writeImage(userSettings, array, width, height, i);
+            writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
             File tmp = new File(userSettings.getOutputDirectory(), "tmp.txt");
             try {
                 FileWriter fw1 = new FileWriter(tmp);
@@ -95,10 +96,11 @@ public class BubbleSort implements SortAlgorithm {
             System.out.println("Swaps: " + countSwaps);
             FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
                     userSettings.getOutputDirectory(),
-                    3);
-            Platform.runLater(() -> {
+                    userSettings.getFrameRate());
+            /*Platform.runLater(() -> {
                 createMediaView(gridPane);
-            });
+            });*/
+            deleteAllPreviousFiles(userSettings);
         });
         thread.start();
     }

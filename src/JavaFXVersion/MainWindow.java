@@ -62,13 +62,21 @@ public class MainWindow extends BorderPane {
     @FXML
     Slider precisionSlider;
     @FXML
-    Label sliderValue;
+    Label precisionValue;
     @FXML
     Button ffmpegButton;
     @FXML
     Button outputButton;
     @FXML
     Button pauseButton;
+    @FXML
+    Slider framerateSlider;
+    @FXML
+    Slider delaySlider;
+    @FXML
+    Label framerateValue;
+    @FXML
+    Label delayValue;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -176,6 +184,7 @@ public class MainWindow extends BorderPane {
             }
         });
 
+
         //settingsItem
         outputButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -204,12 +213,23 @@ public class MainWindow extends BorderPane {
         }));
 
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
-            sliderValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
             main = new Tail[(int) Math.pow(userSettings.getPrecision() , 2)];
             CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
             CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
         });
+
+        framerateSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
+            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
+        });
+
+        delaySlider.valueProperty().addListener((observable , oldValue , newValue) -> {
+            delayValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            userSettings.setDelay((int) Math.floor((Double) newValue) / 2);
+        });
+
     }
 
     private void createRadioButtons() {

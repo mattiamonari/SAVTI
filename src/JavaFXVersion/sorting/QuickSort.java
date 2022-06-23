@@ -56,7 +56,7 @@ public class QuickSort implements SortAlgorithm {
             long end = System.nanoTime();
             System.out.println(Math.floorDiv(end - start, 1000000));
             new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(), userSettings.getOutputDirectory(),
-                    30);
+                    userSettings.getFrameRate());
             Platform.runLater(() -> {
                 createMediaView(gridPane);
             });
@@ -84,9 +84,9 @@ public class QuickSort implements SortAlgorithm {
                         array[0].getImage().getWidth() - 1);
                 int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
                         array[0].getImage().getHeight() - 1);
-                writeImage(userSettings, array, width, height, i++);
+                writeImage(userSettings, array, width, height, i++, countComparison, countSwaps);
                 doSort(array, left, pivot - 1, gridPane);
-                writeImage(userSettings, array, width, height, i++);
+                writeImage(userSettings, array, width, height, i++, countComparison, countSwaps);
                 doSort(array, pivot, right, gridPane);
             }
         }

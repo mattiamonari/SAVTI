@@ -72,11 +72,43 @@
             <HBox>
                <children>
                   <Slider fx:id="precisionSlider" blockIncrement="5.0" majorTickUnit="5.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
-                  <Label fx:id="sliderValue" />
+                  <Label fx:id="precisionValue" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" />
                </VBox.margin>
+            </HBox>
+            <Label text="Scegli il framerate">
+               <VBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <HBox>
+               <children>
+                  <Slider fx:id="framerateSlider" blockIncrement="5.0" majorTickUnit="5.0" max="60.0" minorTickCount="0" showTickLabels="true" showTickMarks="true">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Slider>
+                  <Label fx:id="framerateValue" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" />
+               </VBox.margin>
+            </HBox>
+            <Label text="Scegli il delay">
+               <VBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <HBox>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" />
+               </VBox.margin>
+               <children>
+                  <Slider fx:id="delaySlider" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
+                  <Label fx:id="delayValue" />
+               </children>
             </HBox>
          </children>
       </VBox>

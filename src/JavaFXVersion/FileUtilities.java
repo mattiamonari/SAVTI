@@ -19,7 +19,7 @@ public class FileUtilities {
         }
     }
 
-    public static void writeImage(UserSettings userSettings, Tail[] array , int chunkWidth , int chunkHeight , int index) {
+    public static void writeImage(UserSettings userSettings, Tail[] array , int chunkWidth , int chunkHeight , int index, int comparisons, int swaps) {
         int cols = userSettings.getPrecision();
         int rows = userSettings.getPrecision();
         BufferedImage finalImage = new BufferedImage(chunkWidth * cols , chunkHeight * rows , BufferedImage.TYPE_INT_ARGB);
@@ -32,6 +32,8 @@ public class FileUtilities {
             graphics2D.drawImage(tail , row * chunkWidth , col * chunkHeight , null);
             i++;
         }
+        graphics2D.drawString ("Comparisons =" + comparisons, 20, 20 );
+        graphics2D.drawString("Swaps =" + swaps, 20, 35);
         graphics2D.dispose();
         File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index / 5 + ".png");
         try {
