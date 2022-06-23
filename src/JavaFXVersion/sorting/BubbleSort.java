@@ -31,6 +31,7 @@ public class BubbleSort implements SortAlgorithm {
     FutureTask<Void> future;
     Thread thread;
     int countComparison = 0, countSwaps = 0, i = 1;
+    boolean running = true;
 
     public BubbleSort(UserSettings userSettings) {
         this.userSettings = userSettings;
@@ -38,55 +39,51 @@ public class BubbleSort implements SortAlgorithm {
 
     @Override
     public void killTask() {
-        if (thread != null) {
-            if (thread.isAlive()) {
-                thread.interrupt();
-                future.cancel(false);
-            }
-        }
+        running = false;
     }
 
     public boolean isThreadAlive() {
-        if (thread != null) {
-            return thread.isAlive();
-        }
-        return false;
+        return running;
     }
 
     @Override
-    public void sort(Tail[] array , GridPane gridPane) {
+    public void sort(Tail[] array, GridPane gridPane) {
         //We use a new thread to pause/resume its execution whenever we want
+        running = true;
         deleteAllPreviousFiles(userSettings);
-        int width = (int) ( array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
+        int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
                 array[0].getImage().getWidth() - 1);
-        int height = (int) (  array[0].getImage().getHeight() % 2 == 0 ?  array[0].getImage().getHeight() :
+        int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
                 array[0].getImage().getHeight() - 1);
 
         thread = new Thread(() -> {
             long start = System.nanoTime();
             for (int size = array.length, i = 1; i < size; ++i) {
-                boolean swapped = false;
 
-                if ((i % 2) == 0) {
-                    writeImage(userSettings, array , width , height, i);
-                }
+                if (running == true) {
+                    boolean swapped = false;
 
-                for (int j = 0; j < size - i; ++j) {
-                    countComparison++;
-                    if (SortUtils.greater(array[j] , array[j + 1])) {
-                        countSwaps++;
-                        SortUtils.swap(array , j , j + 1);
-                        swapped = true;
+                    if ((i % 2) == 0) {
+                        writeImage(userSettings, array, width, height, i);
                     }
-                }
-                if (!swapped) {
-                    break;
+
+                    for (int j = 0; j < size - i; ++j) {
+                        countComparison++;
+                        if (SortUtils.greater(array[j], array[j + 1])) {
+                            countSwaps++;
+                            SortUtils.swap(array, j, j + 1);
+                            swapped = true;
+                        }
+                    }
+                    if (!swapped) {
+                        break;
+                    }
                 }
             }
             long end = System.nanoTime();
-            System.out.println(Math.floorDiv(end - start , 1000000));
-            writeImage(userSettings, array , width , height, i);
-            File tmp = new File(userSettings.getOutputDirectory() , "tmp.txt");
+            System.out.println(Math.floorDiv(end - start, 1000000));
+            writeImage(userSettings, array, width, height, i);
+            File tmp = new File(userSettings.getOutputDirectory(), "tmp.txt");
             try {
                 FileWriter fw1 = new FileWriter(tmp);
                 fw1.write("Comparisons : " + countComparison + "\nSwaps : " + countSwaps);
@@ -96,8 +93,8 @@ public class BubbleSort implements SortAlgorithm {
             }
             System.out.println("Comparison: " + countComparison);
             System.out.println("Swaps: " + countSwaps);
-            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath() , userSettings.getOutName() ,
-                userSettings.getOutputDirectory(),
+            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
+                    userSettings.getOutputDirectory(),
                     3);
             Platform.runLater(() -> {
                 createMediaView(gridPane);

@@ -67,6 +67,8 @@ public class MainWindow extends BorderPane {
     Button ffmpegButton;
     @FXML
     Button outputButton;
+    @FXML
+    Button pauseButton;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -138,7 +140,6 @@ public class MainWindow extends BorderPane {
 
         randomizeButton.setOnAction(e -> {
             if (i != null) {
-                algorithm.killTask();
                 splitImage(i , userSettings.getPrecision() , userSettings.getPrecision() , main);
                 removeAllTails();
                 rand(main); //shuffle(writableimages)
@@ -147,7 +148,7 @@ public class MainWindow extends BorderPane {
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            if (!algorithm.isThreadAlive() && !Arrays.stream(main).allMatch(Objects::isNull)) {
+            if (!Arrays.stream(main).allMatch(Objects::isNull)) {
 
                 //Ha senso farlo sempre?
                 if (tg.getSelectedToggle() != null) {
@@ -158,6 +159,7 @@ public class MainWindow extends BorderPane {
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
                 // faccio partire l'ordinamento
+                disableAll();
                 algorithm.sort(main, gridPane);
             }
         }));
@@ -196,6 +198,11 @@ public class MainWindow extends BorderPane {
             }
         });
 
+        pauseButton.setOnAction((e ->{
+            algorithm.killTask();
+            enableAll();
+        }));
+
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
             sliderValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
@@ -228,6 +235,26 @@ public class MainWindow extends BorderPane {
 
     private void removeAllTails() {
         gridPane.getChildren().removeAll(gridPane.getChildren());
+    }
+
+    private void enableAll(){
+        randomizeButton.setDisable(false);
+        sortingButton.setDisable(false);
+        pauseButton.setDisable(true);
+        cleanButton.setDisable(false);
+        ffmpegButton.setDisable(false);
+        outputButton.setDisable(false);
+        precisionSlider.setDisable(false);
+    }
+
+    private void disableAll(){
+        randomizeButton.setDisable(true);
+        sortingButton.setDisable(true);
+        pauseButton.setDisable(false);
+        cleanButton.setDisable(true);
+        ffmpegButton.setDisable(true);
+        outputButton.setDisable(true);
+        precisionSlider.setDisable(true);
     }
 
     //region Utilities methods

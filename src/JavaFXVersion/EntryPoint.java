@@ -26,7 +26,7 @@ public class EntryPoint extends Application {
         MainWindow mw = new MainWindow(stage);
         Scene scene = new Scene(mw, screenSize.getWidth(), screenSize.getHeight());
         stage.setMaximized(true);
-        stage.getIcons().add(new Image("icon.png"));
+        stage.getIcons().add(new Image("C:\\Users\\paolo\\IdeaProjects\\sortingVisualization\\res\\icon.png"));
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
