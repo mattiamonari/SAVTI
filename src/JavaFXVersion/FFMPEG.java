@@ -20,8 +20,6 @@ public class FFMPEG {
                 String.valueOf(framerate),
                 "-y", "-i",
                 "final%d.png","-vcodec","libx264","-acodec", "aac", "-strict", "2", "-preset", "slow",
-                "-vf","\"drawtext=fontfile=C:/Users/mmatt/Desktop/Roboto/Roboto-LightItalic" +
-                ".ttf:text=tmp.txt:fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=w-tw:y=0\"",
                 "-pix_fmt", "yuv420p", outName);
         builder.directory(outputDirectory);
         builder.redirectErrorStream(true);
