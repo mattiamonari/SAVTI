@@ -32,10 +32,11 @@ public class FileUtilities {
             graphics2D.drawImage(tail , row * chunkWidth , col * chunkHeight , null);
             i++;
         }
-        graphics2D.drawString ("Comparisons =" + comparisons, 20, 20 );
-        graphics2D.drawString("Swaps =" + swaps, 20, 35);
+        graphics2D.setFont(new Font("Segoe UI Bold", Font.BOLD, 25));
+        graphics2D.drawString ("Comparisons =" + comparisons, 20, 30 );
+        graphics2D.drawString("Swaps =" + swaps, 20, 60);
         graphics2D.dispose();
-        File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index / 5 + ".png");
+        File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index / userSettings.getDelay() + ".png");
         try {
             ImageIO.write(finalImage , "png" , f);
         } catch (IOException e) {
