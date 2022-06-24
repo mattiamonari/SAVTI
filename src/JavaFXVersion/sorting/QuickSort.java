@@ -27,7 +27,6 @@ public class QuickSort implements SortAlgorithm {
 
 
     private final UserSettings userSettings;
-    FutureTask<Void> future;
     Thread thread;
     int i = 0;
     int countSwaps, countComparison;
@@ -57,9 +56,10 @@ public class QuickSort implements SortAlgorithm {
             System.out.println(Math.floorDiv(end - start, 1000000));
             new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(), userSettings.getOutputDirectory(),
                     userSettings.getFrameRate());
-            Platform.runLater(() -> {
+           /* Platform.runLater(() -> {
                 createMediaView(gridPane);
-            });
+            });*/
+            deleteAllPreviousFiles(userSettings);
         });
         thread.start();
     }
@@ -159,3 +159,4 @@ public class QuickSort implements SortAlgorithm {
     }
 
 }
+

@@ -2,6 +2,7 @@ package JavaFXVersion;
 
 import JavaFXVersion.sorting.BubbleSort;
 import JavaFXVersion.sorting.QuickSort;
+import JavaFXVersion.sorting.SelectionSort;
 import JavaFXVersion.sorting.SortAlgorithm;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -162,6 +163,8 @@ public class MainWindow extends BorderPane {
                 if (tg.getSelectedToggle() != null) {
                     if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
                         algorithm = new QuickSort(userSettings);
+                    else if (((RadioButton) tg.getSelectedToggle()).getText().equals("SelectionSort"))
+                        algorithm = new SelectionSort(userSettings);
                     else
                         algorithm = new BubbleSort(userSettings);
                 }
@@ -239,14 +242,18 @@ public class MainWindow extends BorderPane {
         // create radiobuttons
         RadioButton r1 = new RadioButton("QuickSort");
         RadioButton r2 = new RadioButton("BubbleSort");
+        RadioButton r3 = new RadioButton("SelectionSort");
         VBox.setMargin(r1 , new Insets(10));
         VBox.setMargin(r2 , new Insets(10));
+        VBox.setMargin(r3 , new Insets(10));
 
         // add radiobuttons to toggle group
         r1.setToggleGroup(tg);
         r2.setToggleGroup(tg);
+        r3.setToggleGroup(tg);
         r.getChildren().add(r1);
         r.getChildren().add(r2);
+        r.getChildren().add(r3);
         r2.setSelected(true);
 
         VBox leftVbox = (VBox) (cleanButton.getParent());
