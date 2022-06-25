@@ -62,13 +62,14 @@ public class SelectionSort implements SortAlgorithm {
             for (int step = 0; step < size - 1; step++) {
                 int min_idx = step;
                 for (int k = step + 1; k < size; k++) {
-                    // To sort in descending order, change > to < in this line.
-                    // Select the minimum element in each loop.
-                    ++countComparison;
-                    if (SortUtils.greater(array[min_idx], array[k])) {
-                        //?WHY++countSwaps;
-                        min_idx = k;
-                    }
+                        if(running == false)
+                            break;
+                        // To sort in descending order, change > to < in this line.
+                        // Select the minimum element in each loop.
+                        ++countComparison;
+                        if (SortUtils.greater(array[min_idx], array[k])) {
+                            min_idx = k;
+                        }
                 }
 
                 // put min at the correct position
@@ -77,6 +78,8 @@ public class SelectionSort implements SortAlgorithm {
                 if((countSwaps % delay) == 0){
                     writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
                 }
+                if (running == false)
+                    break;
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
 

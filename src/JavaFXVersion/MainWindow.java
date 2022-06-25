@@ -1,10 +1,8 @@
 package JavaFXVersion;
 
-import JavaFXVersion.sorting.BubbleSort;
-import JavaFXVersion.sorting.QuickSort;
-import JavaFXVersion.sorting.SelectionSort;
-import JavaFXVersion.sorting.SortAlgorithm;
+import JavaFXVersion.sorting.*;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,6 +43,7 @@ public class MainWindow extends BorderPane {
     SortAlgorithm algorithm;
     Image i;
     ToggleGroup tg;
+    ComboBox cb;
     //endregion
     //region FXML variables declaration
     @FXML
@@ -89,7 +88,7 @@ public class MainWindow extends BorderPane {
         //Instantiating and initializing non-JavaFX variables
         initComponents();
         //Load the image in the gridPane splitting it
-        loadAndSplitImage(new File("res/bigimage.jpg") , 1200, 800);
+        loadAndSplitImage(new File("res/bigimage.jpg"), 1200, 800);
         //Add event listeners for the components
         addEventListeners();
     }
@@ -103,13 +102,13 @@ public class MainWindow extends BorderPane {
         //By default, the image is split in 8x8 grid
         main = new Tail[64];
         //?Radio buttons for the algorithm choice, can we use something else like a window?
-        createRadioButtons();
-
+        createComboBox();
+        cb.setValue("BubbleSort");
     }
 
     //? Should we move loadAndSplitImage inside ImageUtilities class?
     //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
-    private void loadAndSplitImage(File file , int width, int height) {
+    private void loadAndSplitImage(File file, int width, int height) {
         BufferedImage capture = null;
         try {
             capture = ImageIO.read(file);
@@ -117,18 +116,18 @@ public class MainWindow extends BorderPane {
             e.printStackTrace();
         }
         assert capture != null;
-        BufferedImage dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_WIDTH , width , height);
+        BufferedImage dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width, height);
         if (dimg.getHeight() > height)
-            dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_HEIGHT , width , height);
-        i = SwingFXUtils.toFXImage(dimg , null);
+            dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, width, height);
+        i = SwingFXUtils.toFXImage(dimg, null);
         CHUNK_WIDTH = dimg.getWidth() / userSettings.getPrecision();
         CHUNK_HEIGHT = dimg.getHeight() / userSettings.getPrecision();
-        gridPane.setPrefSize(i.getWidth() , i.getHeight());
-        gridPane.setMaxSize(i.getWidth() , i.getHeight());
+        gridPane.setPrefSize(i.getWidth(), i.getHeight());
+        gridPane.setMaxSize(i.getWidth(), i.getHeight());
         gridPane.setPadding(Insets.EMPTY);
         removeAllTails();
-        splitImage(i , userSettings.getPrecision() , userSettings.getPrecision() , main);
-        fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , userSettings.getPrecision() , userSettings.getPrecision() , main , gridPane);
+        splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
+        fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
     }
 
     //Aggiunge i listener agli eventi dei nodi/elementi
@@ -136,48 +135,58 @@ public class MainWindow extends BorderPane {
     private void addEventListeners() {
         cleanButton.setOnAction(e -> {
             removeAllTails();
-            Arrays.fill(main , null);
+            Arrays.fill(main, null);
             i = null;
         });
         randomizeButton.setOnAction(e -> {
             if (i != null) {
-                splitImage(i , userSettings.getPrecision() , userSettings.getPrecision() , main);
+                splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
                 removeAllTails();
                 rand(main); //shuffle(writableimages)
-                fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , userSettings.getPrecision() , userSettings.getPrecision() , main , gridPane);
+                fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
             }
         });
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (!Arrays.stream(main).allMatch(Objects::isNull)) {
-                //TODO USE SWITCH CASE!
-                if (tg.getSelectedToggle() != null) {
-                    if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
-                        algorithm = new QuickSort(userSettings);
-                    else if (((RadioButton) tg.getSelectedToggle()).getText().equals("SelectionSort"))
-                        algorithm = new SelectionSort(userSettings);
-                    else
-                        algorithm = new BubbleSort(userSettings);
+                if (cb.getValue() != null) {
+                    String choice = cb.getValue().toString();
+                    switch (choice) {
+
+                        case "QuickSort":
+                            algorithm = new QuickSort(userSettings);
+                            break;
+                        case "SelectionSort":
+                            algorithm = new SelectionSort(userSettings);
+                            break;
+                        case "BubbleSort":
+                            algorithm = new BubbleSort(userSettings);
+                            break;
+                        case "InsertionSort":
+                            algorithm = new InsertionSort(userSettings);
+                            break;
+
+                    }
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
                 // faccio partire l'ordinamento
                 disableAll();
-                algorithm.sort(main , gridPane);
+                algorithm.sort(main, gridPane);
             }
         }));
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG" , "*.jpg") , new FileChooser.ExtensionFilter("PNG" , "*.png"));
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
             fileChooser.setTitle("Open Resource File");
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth());
-                int height = (int) Math.round( ((VBox) cleanButton.getParent()).getHeight() - 20);
-                loadAndSplitImage(chosenFile , width, height);
+                int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 20);
+                loadAndSplitImage(chosenFile, width, height);
             }
         });
         songLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3" , "*.mp3"));
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3", "*.mp3"));
             fileChooser.setTitle("Open Song File");
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             userSettings.setMusic(chosenFile);
@@ -193,7 +202,7 @@ public class MainWindow extends BorderPane {
         });
         ffmpegButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE" , "*.exe"));
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
             fileChooser.setTitle("Path to ffmpeg");
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
@@ -204,37 +213,29 @@ public class MainWindow extends BorderPane {
             algorithm.killTask();
             enableAll();
         }));
-        precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
+        precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
-            main = new Tail[(int) Math.pow(userSettings.getPrecision() , 2)];
+            main = new Tail[(int) Math.pow(userSettings.getPrecision(), 2)];
             CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
             CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
         });
-        framerateSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
+        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
     }
 
-    private void createRadioButtons() {
+    //?Meglio aggiungere la combobox direttamente su scene builder?
+    //TODO: sistemare i margini della combobox
+    private void createComboBox() {
         VBox r = new VBox();
-        tg = new ToggleGroup();
-        // create radiobuttons
-        RadioButton r1 = new RadioButton("QuickSort");
-        RadioButton r2 = new RadioButton("BubbleSort");
-        RadioButton r3 = new RadioButton("SelectionSort");
-        VBox.setMargin(r1 , new Insets(10));
-        VBox.setMargin(r2 , new Insets(10));
-        VBox.setMargin(r3 , new Insets(10));
-        // add radiobuttons to toggle group
-        r1.setToggleGroup(tg);
-        r2.setToggleGroup(tg);
-        r3.setToggleGroup(tg);
-        r.getChildren().add(r1);
-        r.getChildren().add(r2);
-        r.getChildren().add(r3);
-        r2.setSelected(true);
+        // Weekdays
+        String sort[] = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort"};
+
+        // Create a combo box
+        cb = new ComboBox(FXCollections.observableArrayList(sort));
+        r.getChildren().add(cb);
         VBox leftVbox = (VBox) (cleanButton.getParent());
         leftVbox.getChildren().add(r);
     }
