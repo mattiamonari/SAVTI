@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<fx:root type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
@@ -23,6 +15,7 @@
                      <items>
                         <MenuItem fx:id="imageLoaderItem" mnemonicParsing="false" text="Load Image..." />
                         <MenuItem fx:id="settingsItem" mnemonicParsing="false" text="Settings..." />
+                        <MenuItem fx:id="songLoaderItem" mnemonicParsing="false" text="Load a song.." />
                      </items>
                   </Menu>
                </menus>
@@ -85,7 +78,7 @@
             </Label>
             <HBox>
                <children>
-                  <Slider fx:id="framerateSlider" blockIncrement="5.0" majorTickUnit="5.0" max="60.0" minorTickCount="0" showTickLabels="true" showTickMarks="true">
+                  <Slider fx:id="framerateSlider" blockIncrement="5.0" majorTickUnit="5.0" max="60.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="10.0">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -96,19 +89,10 @@
                   <Insets bottom="10.0" left="10.0" />
                </VBox.margin>
             </HBox>
-            <Label text="Scegli il delay">
-               <VBox.margin>
-                  <Insets left="10.0" top="10.0" />
-               </VBox.margin>
-            </Label>
             <HBox>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" />
                </VBox.margin>
-               <children>
-                  <Slider fx:id="delaySlider" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
-                  <Label fx:id="delayValue" />
-               </children>
             </HBox>
          </children>
       </VBox>

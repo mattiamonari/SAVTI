@@ -10,16 +10,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -29,13 +32,11 @@ import java.util.Objects;
 import static JavaFXVersion.ImageUtilities.fillImage;
 import static JavaFXVersion.ImageUtilities.splitImage;
 import static JavaFXVersion.sorting.SortAlgorithm.rand;
-
 //IMPORTANT TODO:
 //TODO : WE DON'T NEED NO MORE TO MAKE THE ANIMATION. SIMPLY 
 
 public class MainWindow extends BorderPane {
-
-    //region Local variables decleration
+    //region Local variables' declaration
     //? Question is, do we really need all these variables?
     int CHUNK_WIDTH;
     int CHUNK_HEIGHT;
@@ -45,15 +46,14 @@ public class MainWindow extends BorderPane {
     Image i;
     ToggleGroup tg;
     //endregion
-
     //region FXML variables declaration
     @FXML
     GridPane gridPane;
     //?? Probably better substitute with buttons
     @FXML
-    MenuItem settingsItem;
-    @FXML
     MenuItem imageLoaderItem;
+    @FXML
+    MenuItem songLoaderItem;
     @FXML
     Button randomizeButton;
     @FXML
@@ -73,15 +73,10 @@ public class MainWindow extends BorderPane {
     @FXML
     Slider framerateSlider;
     @FXML
-    Slider delaySlider;
-    @FXML
     Label framerateValue;
-    @FXML
-    Label delayValue;
     //endregion
 
     public MainWindow(Stage primaryStage) {
-
         //Load FXML for the scene
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mainwindow.fxml"));
         fxmlLoader.setRoot(this);
@@ -91,16 +86,12 @@ public class MainWindow extends BorderPane {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //Istantiating and initializating non-JavaFX variables
+        //Instantiating and initializing non-JavaFX variables
         initComponents();
-
         //Load the image in the gridPane splitting it
-        loadAndSplitImage(new File("res/bigimage.jpg"),1200);
-
+        loadAndSplitImage(new File("res/bigimage.jpg") , 1200, 800);
         //Add event listeners for the components
         addEventListeners();
-
     }
 
     //Creazione dei componenti
@@ -109,15 +100,16 @@ public class MainWindow extends BorderPane {
         userSettings = new UserSettings();
         //We choose bubblesort as default algorithm
         algorithm = new BubbleSort(userSettings);
-        //By default, the image is splitted in 8x8 grid
+        //By default, the image is split in 8x8 grid
         main = new Tail[64];
         //?Radio buttons for the algorithm choice, can we use something else like a window?
         createRadioButtons();
+
     }
 
     //? Should we move loadAndSplitImage inside ImageUtilities class?
     //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
-    private void loadAndSplitImage(File file, int width) {
+    private void loadAndSplitImage(File file , int width, int height) {
         BufferedImage capture = null;
         try {
             capture = ImageIO.read(file);
@@ -125,7 +117,9 @@ public class MainWindow extends BorderPane {
             e.printStackTrace();
         }
         assert capture != null;
-        BufferedImage dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_WIDTH , width,700);
+        BufferedImage dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_WIDTH , width , height);
+        if (dimg.getHeight() > height)
+            dimg = Scalr.resize(capture , Scalr.Method.ULTRA_QUALITY , Scalr.Mode.FIT_TO_HEIGHT , width , height);
         i = SwingFXUtils.toFXImage(dimg , null);
         CHUNK_WIDTH = dimg.getWidth() / userSettings.getPrecision();
         CHUNK_HEIGHT = dimg.getHeight() / userSettings.getPrecision();
@@ -140,13 +134,11 @@ public class MainWindow extends BorderPane {
     //Aggiunge i listener agli eventi dei nodi/elementi
     //TODO Risolvere vari bug relativi a combinazione di tasti e variazioni di paramteri (slider) durante l'esecuzione degli algoritmi
     private void addEventListeners() {
-
         cleanButton.setOnAction(e -> {
             removeAllTails();
             Arrays.fill(main , null);
             i = null;
         });
-
         randomizeButton.setOnAction(e -> {
             if (i != null) {
                 splitImage(i , userSettings.getPrecision() , userSettings.getPrecision() , main);
@@ -155,11 +147,9 @@ public class MainWindow extends BorderPane {
                 fillImage(CHUNK_WIDTH , CHUNK_HEIGHT , userSettings.getPrecision() , userSettings.getPrecision() , main , gridPane);
             }
         });
-
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (!Arrays.stream(main).allMatch(Objects::isNull)) {
-
-                //Ha senso farlo sempre?
+                //TODO USE SWITCH CASE!
                 if (tg.getSelectedToggle() != null) {
                     if (((RadioButton) tg.getSelectedToggle()).getText().equals("QuickSort"))
                         algorithm = new QuickSort(userSettings);
@@ -171,50 +161,49 @@ public class MainWindow extends BorderPane {
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
                 // faccio partire l'ordinamento
                 disableAll();
-                algorithm.sort(main, gridPane);
+                algorithm.sort(main , gridPane);
             }
         }));
-
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG" , "*.jpg") , new FileChooser.ExtensionFilter("PNG" , "*.png"));
             fileChooser.setTitle("Open Resource File");
-
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
-                int width = (int) Math.round(this.getScene().getWidth() - ((VBox)cleanButton.getParent()).getWidth());
-                loadAndSplitImage(chosenFile, width);
+                int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth());
+                int height = (int) Math.round( ((VBox) cleanButton.getParent()).getHeight() - 20);
+                loadAndSplitImage(chosenFile , width, height);
             }
         });
-
-
+        songLoaderItem.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3" , "*.mp3"));
+            fileChooser.setTitle("Open Song File");
+            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
+            userSettings.setMusic(chosenFile);
+        });
         //settingsItem
         outputButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Choose where to save your images!");
-
             File chosenDirectory = directoryChooser.showDialog(getScene().getWindow());
             if (chosenDirectory != null) {
                 userSettings.setOutputDirectory(chosenDirectory);
             }
         });
-
         ffmpegButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE" , "*.exe"));
             fileChooser.setTitle("Path to ffmpeg");
-
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfmpegPath(chosenFile);
             }
         });
-
-        pauseButton.setOnAction((e ->{
+        pauseButton.setOnAction((e -> {
             algorithm.killTask();
             enableAll();
         }));
-
         precisionSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
             precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
@@ -222,23 +211,15 @@ public class MainWindow extends BorderPane {
             CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
             CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
         });
-
         framerateSlider.valueProperty().addListener((observable , oldValue , newValue) -> {
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
+            userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
-
-        delaySlider.valueProperty().addListener((observable , oldValue , newValue) -> {
-            delayValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setDelay((int) Math.floor((Double) newValue) / 2);
-        });
-
     }
 
     private void createRadioButtons() {
         VBox r = new VBox();
         tg = new ToggleGroup();
-
         // create radiobuttons
         RadioButton r1 = new RadioButton("QuickSort");
         RadioButton r2 = new RadioButton("BubbleSort");
@@ -246,7 +227,6 @@ public class MainWindow extends BorderPane {
         VBox.setMargin(r1 , new Insets(10));
         VBox.setMargin(r2 , new Insets(10));
         VBox.setMargin(r3 , new Insets(10));
-
         // add radiobuttons to toggle group
         r1.setToggleGroup(tg);
         r2.setToggleGroup(tg);
@@ -255,7 +235,6 @@ public class MainWindow extends BorderPane {
         r.getChildren().add(r2);
         r.getChildren().add(r3);
         r2.setSelected(true);
-
         VBox leftVbox = (VBox) (cleanButton.getParent());
         leftVbox.getChildren().add(r);
     }
@@ -264,17 +243,7 @@ public class MainWindow extends BorderPane {
         gridPane.getChildren().removeAll(gridPane.getChildren());
     }
 
-    private void enableAll(){
-        randomizeButton.setDisable(false);
-        sortingButton.setDisable(false);
-        pauseButton.setDisable(true);
-        cleanButton.setDisable(false);
-        ffmpegButton.setDisable(false);
-        outputButton.setDisable(false);
-        precisionSlider.setDisable(false);
-    }
-
-    private void disableAll(){
+    private void disableAll() {
         randomizeButton.setDisable(true);
         sortingButton.setDisable(true);
         pauseButton.setDisable(false);
@@ -284,6 +253,15 @@ public class MainWindow extends BorderPane {
         precisionSlider.setDisable(true);
     }
 
+    private void enableAll() {
+        randomizeButton.setDisable(false);
+        sortingButton.setDisable(false);
+        pauseButton.setDisable(true);
+        cleanButton.setDisable(false);
+        ffmpegButton.setDisable(false);
+        outputButton.setDisable(false);
+        precisionSlider.setDisable(false);
+    }
     //region Utilities methods
     //endregion
 }
