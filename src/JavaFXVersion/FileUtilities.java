@@ -1,6 +1,10 @@
 package JavaFXVersion;
 
 import javafx.embed.swing.SwingFXUtils;
+import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.ImageFormats;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -36,10 +40,10 @@ public class FileUtilities {
         graphics2D.drawString ("Comparisons =" + comparisons, 20, 30 );
         graphics2D.drawString("Swaps =" + swaps, 20, 60);
         graphics2D.dispose();
-        File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index / userSettings.getDelay() + ".png");
+        File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index+ ".png");
         try {
-            ImageIO.write(finalImage , "png" , f);
-        } catch (IOException e) {
+            Imaging.writeImage(finalImage, f, ImageFormats.PNG);
+        } catch (ImageWriteException | IOException e) {
             e.printStackTrace();
         }
     }
