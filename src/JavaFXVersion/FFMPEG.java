@@ -14,13 +14,26 @@ public class FFMPEG {
 
     private Process process = null;
 
-    public FFMPEG(File pathToFFMPEG, String outName, File outputDirectory, int framerate) {
+    public FFMPEG(File pathToFFMPEG, String outName, File outputDirectory, int framerate, File music) {
         File pathToExecutable = pathToFFMPEG;
-        ProcessBuilder builder = new ProcessBuilder( pathToExecutable.getAbsolutePath(), "-framerate",
-                String.valueOf(framerate),
-                "-y", "-i",
-                "final%d.png","-vcodec","libx264","-acodec", "aac", "-strict", "2", "-preset", "slow",
-                "-pix_fmt", "yuv420p", outName);
+        ProcessBuilder builder;
+        if(music == null)
+        {
+            builder = new ProcessBuilder( pathToExecutable.getAbsolutePath(), "-framerate",
+                    String.valueOf(framerate),
+                    "-y", "-i",
+                    "final%d.png","-vcodec","libx264","-acodec", "aac", "-strict", "2", "-preset", "slow",
+                    "-pix_fmt", "yuv420p", outName);
+        }
+        else
+        {
+            builder = new ProcessBuilder( pathToExecutable.getAbsolutePath(), "-framerate",
+                    String.valueOf(framerate),
+                    "-y", "-i","final%d.png", "-i", music.getAbsolutePath(), "-c", "copy", "-map", "0:v:0", "-map",
+                    "1:a:0","-shortest", "-vcodec" ,"libx264", "-acodec", "aac", "-strict", "2", "-preset", "slow",
+                    "-pix_fmt",
+                    "yuv420p", outName);
+        }
         builder.directory(outputDirectory);
         builder.redirectErrorStream(true);
         try {
