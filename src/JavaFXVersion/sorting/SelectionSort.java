@@ -29,7 +29,7 @@ public class SelectionSort implements SortAlgorithm {
 
     private final UserSettings userSettings;
     Thread thread;
-    int countComparison = 0, countSwaps = 0, i = 1;
+    int countComparison = 0, countSwaps = 0, imageIndex = 0;
     boolean running = true;
 
     public SelectionSort(UserSettings userSettings) {
@@ -50,6 +50,9 @@ public class SelectionSort implements SortAlgorithm {
     public void sort(Tail[] array, GridPane gridPane) {
         running = true;
         deleteAllPreviousFiles(userSettings);
+        calculateNumberOfSwaps(array);
+        int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        countSwaps = 0;
         int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
                 array[0].getImage().getWidth() - 1);
         int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
@@ -63,7 +66,7 @@ public class SelectionSort implements SortAlgorithm {
                     // Select the minimum element in each loop.
                     ++countComparison;
                     if (SortUtils.greater(array[min_idx], array[k])) {
-                        ++countSwaps;
+                        //?WHY++countSwaps;
                         min_idx = k;
                     }
                 }
@@ -71,28 +74,37 @@ public class SelectionSort implements SortAlgorithm {
                 // put min at the correct position
                 SortUtils.swap(array, step, min_idx);
                 ++countSwaps;
-                ++i;
-                if((i % userSettings.getDelay()) == 0){
-                    writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
+                if((countSwaps % delay) == 0){
+                    writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
                 }
             }
-            writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
-            File tmp = new File(userSettings.getOutputDirectory(), "tmp.txt");
-            try {
-                FileWriter fw1 = new FileWriter(tmp);
-                fw1.write("Comparisons : " + countComparison + "\nSwaps : " + countSwaps);
-                fw1.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Comparison: " + countComparison);
-            System.out.println("Swaps: " + countSwaps);
+            writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
+
             FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
                     userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate());
+                    userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
         });
         thread.start();
+    }
+
+    private void calculateNumberOfSwaps(Tail[] array) {
+        Tail[] tmp = new Tail[array.length];
+        System.arraycopy(array,0,tmp, 0, array.length);
+
+        int size = tmp.length;
+        for (int step = 0; step < size - 1; step++) {
+            int min_idx = step;
+            for (int k = step + 1; k < size; k++) {
+                if (SortUtils.greater(tmp[min_idx], tmp[k])) {
+                    min_idx = k;
+                }
+            }
+
+            // put min at the correct position
+            SortUtils.swap(tmp, step, min_idx);
+            ++countSwaps;
+        }
     }
 
     @Override

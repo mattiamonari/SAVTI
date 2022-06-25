@@ -17,6 +17,7 @@ public interface SortAlgorithm {
     /*********
      Methood that i added. Improve them!
      **********/
+
     void killTask();
     boolean isThreadAlive();
     void sort(Tail[] array , GridPane gridPane);

@@ -30,7 +30,7 @@ public class BubbleSort implements SortAlgorithm {
     //TODO Use the Lock class!
     private final UserSettings userSettings;
     Thread thread;
-    int countComparison = 0, countSwaps = 0, i = 1;
+    int countComparison = 0, countSwaps = 0, imageIndex = 1;
     boolean running = true;
 
     public BubbleSort(UserSettings userSettings) {
@@ -51,21 +51,20 @@ public class BubbleSort implements SortAlgorithm {
         //We use a new thread to pause/resume its execution whenever we want
         running = true;
         deleteAllPreviousFiles(userSettings);
+        calculateNumberOfSwaps(array);
+
+        int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        countSwaps = 0;
         int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
                 array[0].getImage().getWidth() - 1);
         int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
                 array[0].getImage().getHeight() - 1);
 
         thread = new Thread(() -> {
-            long start = System.nanoTime();
             for (int size = array.length, i = 1; i < size; ++i) {
 
-                if (running == true) {
+                if (running) {
                     boolean swapped = false;
-
-                    if ((i % userSettings.getDelay()) == 0) {
-                        writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
-                    }
 
                     for (int j = 0; j < size - i; ++j) {
                         countComparison++;
@@ -73,6 +72,8 @@ public class BubbleSort implements SortAlgorithm {
                             countSwaps++;
                             SortUtils.swap(array, j, j + 1);
                             swapped = true;
+                            if((countSwaps % delay) == 0)
+                                writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
                         }
                     }
                     if (!swapped) {
@@ -80,28 +81,34 @@ public class BubbleSort implements SortAlgorithm {
                     }
                 }
             }
-            long end = System.nanoTime();
-            System.out.println(Math.floorDiv(end - start, 1000000));
-            writeImage(userSettings, array, width, height, i, countComparison, countSwaps);
-            File tmp = new File(userSettings.getOutputDirectory(), "tmp.txt");
-            try {
-                FileWriter fw1 = new FileWriter(tmp);
-                fw1.write("Comparisons : " + countComparison + "\nSwaps : " + countSwaps);
-                fw1.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Comparison: " + countComparison);
-            System.out.println("Swaps: " + countSwaps);
+            writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
+            //?MAYBE JUST PASS userSettings?
             FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
                     userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate());
-            /*Platform.runLater(() -> {
-                createMediaView(gridPane);
-            });*/
+                    userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
         });
         thread.start();
+    }
+
+    private void calculateNumberOfSwaps(Tail[] array) {
+        Tail[] tmp = new Tail[array.length];
+        System.arraycopy(array,0,tmp, 0, array.length);
+
+        for (int size = tmp.length, i = 1; i < size; ++i) {
+            boolean swapped = false;
+
+            for (int j = 0; j < size - i; ++j) {
+                if (SortUtils.greater(tmp[j], tmp[j + 1])) {
+                    countSwaps++;
+                    SortUtils.swap(tmp, j, j + 1);
+                    swapped = true;
+                }
+            }
+            if (!swapped) {
+                break;
+            }
+        }
     }
 
     private void createMediaView(GridPane gridPane) {

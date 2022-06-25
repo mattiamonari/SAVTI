@@ -28,7 +28,7 @@ public class QuickSort implements SortAlgorithm {
 
     private final UserSettings userSettings;
     Thread thread;
-    int i = 0;
+    int imageIndex = 0, width = 0, height = 0, delay = 1;
     int countSwaps, countComparison;
     boolean running = true;
 
@@ -49,19 +49,28 @@ public class QuickSort implements SortAlgorithm {
     public void sort(Tail[] array, GridPane gridPane) {
         running = true;
         deleteAllPreviousFiles(userSettings);
+        calculateNumberOfSwaps(array, gridPane);
+        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        countSwaps = 0;
+        countComparison = 0;
+        width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
+                array[0].getImage().getWidth() - 1);
+        height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
+                array[0].getImage().getHeight() - 1);
         thread = new Thread(() -> {
-            long start = System.nanoTime();
-            doSort(array, 0, array.length - 1, gridPane);
-            long end = System.nanoTime();
-            System.out.println(Math.floorDiv(end - start, 1000000));
+            doSort(array, 0, array.length - 1, gridPane,true);
             new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(), userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate());
-           /* Platform.runLater(() -> {
-                createMediaView(gridPane);
-            });*/
+                    userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
+            System.out.println(imageIndex);
         });
         thread.start();
+    }
+
+    private void calculateNumberOfSwaps(Tail[] array, GridPane gridPane) {
+        Tail[] tmp = new Tail[array.length];
+        System.arraycopy(array, 0, tmp, 0, array.length);
+        doSort(tmp, 0, tmp.length - 1, gridPane,false);
     }
 
     /**
@@ -75,19 +84,13 @@ public class QuickSort implements SortAlgorithm {
     }
 
 
-    private <T extends Comparable<T>> void doSort(Tail[] array, int left, int right, GridPane gridPane) {
-        if (running == true) {
+    private <T extends Comparable<T>> void doSort(Tail[] array, int left, int right, GridPane gridPane, boolean write) {
+        if (running) {
             countComparison++;
             if (left < right) {
-                int pivot = randomPartition(array, left, right, gridPane);
-                int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
-                        array[0].getImage().getWidth() - 1);
-                int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
-                        array[0].getImage().getHeight() - 1);
-                writeImage(userSettings, array, width, height, i++, countComparison, countSwaps);
-                doSort(array, left, pivot - 1, gridPane);
-                writeImage(userSettings, array, width, height, i++, countComparison, countSwaps);
-                doSort(array, pivot, right, gridPane);
+                int pivot = randomPartition(array, left, right, gridPane, write);
+                doSort(array, left, pivot - 1, gridPane, write);
+                doSort(array, pivot, right, gridPane, write);
             }
         }
     }
@@ -100,10 +103,13 @@ public class QuickSort implements SortAlgorithm {
      * @param right The last index of an array
      * @return the partition index of the array
      */
-    private <T extends Comparable<T>> int randomPartition(Tail[] array, int left, int right, GridPane gridPane) {
+    private <T extends Comparable<T>> int randomPartition(Tail[] array, int left, int right, GridPane gridPane,
+                                                          boolean write) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
 
         countSwaps++;
+        if((countSwaps % delay) == 0 && write)
+            writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, gridPane);
@@ -145,18 +151,6 @@ public class QuickSort implements SortAlgorithm {
         return left;
     }
 
-    private void createMediaView(GridPane gridPane) {
-        Media media = new Media(new File(userSettings.getOutputDirectory().getAbsolutePath() + '\\' + userSettings.getOutName()).toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        MediaView m = new MediaView(mediaPlayer);
-        m.setMediaPlayer(mediaPlayer);
-        m.setFitWidth(1000);
-        BorderPane root = ((BorderPane) gridPane.getParent());
-        root.setCenter(m);
-        mediaPlayer.setAutoPlay(true);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        deleteAllPreviousFiles(userSettings);
-    }
 
 }
 
