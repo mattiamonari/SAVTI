@@ -11,24 +11,22 @@ public class UserSettings {
     private int precision;
     private File outputDirectory;
     private File ffmpegPath;
-    private MediaView m;
     private String outName;
     private static String currDirectory;
     private int frameRate;
-    private int delay;
-
+    private File music;
 
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
+    //?Maybe add a time of the video feature?
     public UserSettings() {
         precision = 8;
         currDirectory = Paths.get("").toAbsolutePath().toString();
-        System.out.println();
         outputDirectory = new File( currDirectory + "\\out\\");
         ffmpegPath = new File(currDirectory + "\\ext\\ffmpeg.exe");
         outName = "sorted.mp4";
         frameRate = 3;
-        delay = 2;
+        music = null;
     }
 
     public int getPrecision() {
@@ -63,15 +61,16 @@ public class UserSettings {
         return frameRate;
     }
 
-    public int getDelay() {
-        return delay;
-    }
-
     public void setFrameRate(int frameRate) {
         this.frameRate = frameRate;
     }
 
-    public void setDelay(int delay) {
-        this.delay = delay;
+    public File getMusic() {
+        return music;
     }
+
+    public void setMusic(File music) {
+        this.music = music;
+    }
+
 }
