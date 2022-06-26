@@ -30,7 +30,7 @@ import java.util.Objects;
 import static JavaFXVersion.ImageUtilities.fillImage;
 import static JavaFXVersion.ImageUtilities.splitImage;
 import static JavaFXVersion.sorting.SortAlgorithm.rand;
-//IMPORTANT TODO:
+
 //TODO : WE DON'T NEED NO MORE TO MAKE THE ANIMATION. SIMPLY 
 
 public class MainWindow extends BorderPane {
@@ -42,7 +42,6 @@ public class MainWindow extends BorderPane {
     Tail[] main;
     SortAlgorithm algorithm;
     Image i;
-    ToggleGroup tg;
     ComboBox cb;
     //endregion
     //region FXML variables declaration
@@ -73,6 +72,8 @@ public class MainWindow extends BorderPane {
     Slider framerateSlider;
     @FXML
     Label framerateValue;
+    @FXML
+    CheckBox openVideo;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -103,7 +104,6 @@ public class MainWindow extends BorderPane {
         main = new Tail[64];
         //?Radio buttons for the algorithm choice, can we use something else like a window?
         createComboBox();
-        cb.setValue("BubbleSort");
     }
 
     //? Should we move loadAndSplitImage inside ImageUtilities class?
@@ -138,33 +138,25 @@ public class MainWindow extends BorderPane {
             Arrays.fill(main, null);
             i = null;
         });
+
         randomizeButton.setOnAction(e -> {
             if (i != null) {
                 splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
                 removeAllTails();
-                rand(main); //shuffle(writableimages)
+                rand(main);
                 fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
             }
         });
+
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (!Arrays.stream(main).allMatch(Objects::isNull)) {
                 if (cb.getValue() != null) {
                     String choice = cb.getValue().toString();
                     switch (choice) {
-
-                        case "QuickSort":
-                            algorithm = new QuickSort(userSettings);
-                            break;
-                        case "SelectionSort":
-                            algorithm = new SelectionSort(userSettings);
-                            break;
-                        case "BubbleSort":
-                            algorithm = new BubbleSort(userSettings);
-                            break;
-                        case "InsertionSort":
-                            algorithm = new InsertionSort(userSettings);
-                            break;
-
+                        case "QuickSort" -> algorithm = new QuickSort(userSettings);
+                        case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
+                        case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
+                        case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
                     }
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
@@ -173,6 +165,7 @@ public class MainWindow extends BorderPane {
                 algorithm.sort(main, gridPane);
             }
         }));
+
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
@@ -184,6 +177,7 @@ public class MainWindow extends BorderPane {
                 loadAndSplitImage(chosenFile, width, height);
             }
         });
+
         songLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3", "*.mp3"));
@@ -191,7 +185,8 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             userSettings.setMusic(chosenFile);
         });
-        //settingsItem
+
+
         outputButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Choose where to save your images!");
@@ -200,6 +195,7 @@ public class MainWindow extends BorderPane {
                 userSettings.setOutputDirectory(chosenDirectory);
             }
         });
+
         ffmpegButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
@@ -209,10 +205,12 @@ public class MainWindow extends BorderPane {
                 userSettings.setFfmpegPath(chosenFile);
             }
         });
+
         pauseButton.setOnAction((e -> {
             algorithm.killTask();
             enableAll();
         }));
+
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
@@ -220,24 +218,34 @@ public class MainWindow extends BorderPane {
             CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
             CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
         });
+
         framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
+
+        openVideo.setOnAction((event -> {
+            userSettings.setOpenFile(openVideo.isSelected());
+        }));
     }
 
     //?Meglio aggiungere la combobox direttamente su scene builder?
-    //TODO: sistemare i margini della combobox
+    //!SI
     private void createComboBox() {
-        VBox r = new VBox();
+        //!NON SERVE CREARE UN'ALTRA VBOX ABBIAMO GIA' QUELLA DEI BOTTONI
+        //!VBox v = new VBox();
         // Weekdays
-        String sort[] = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort"};
-
+        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort"};
         // Create a combo box
         cb = new ComboBox(FXCollections.observableArrayList(sort));
-        r.getChildren().add(cb);
+
         VBox leftVbox = (VBox) (cleanButton.getParent());
-        leftVbox.getChildren().add(r);
+        leftVbox.getChildren().add(cb);
+        //In generale, per settare i margini di un elemento (il quale sarà necessariamente in un container)
+        //basta fare classeContainer.setMargin( elemento, new Insets( margine destro, margine sopra ..))
+        VBox.setMargin(cb, new Insets(10));
+        cb.setValue("BubbleSort");
+
     }
 
     private void removeAllTails() {
