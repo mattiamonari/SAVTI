@@ -14,7 +14,6 @@
                   <Menu mnemonicParsing="false" text="App">
                      <items>
                         <MenuItem fx:id="imageLoaderItem" mnemonicParsing="false" text="Load Image..." />
-                        <MenuItem fx:id="settingsItem" mnemonicParsing="false" text="Settings..." />
                         <MenuItem fx:id="songLoaderItem" mnemonicParsing="false" text="Load a song.." />
                      </items>
                   </Menu>
@@ -89,6 +88,11 @@
                   <Insets bottom="10.0" left="10.0" />
                </VBox.margin>
             </HBox>
+            <CheckBox fx:id="openVideo" mnemonicParsing="false" text="Open video when created">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </CheckBox>
             <HBox>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" />
