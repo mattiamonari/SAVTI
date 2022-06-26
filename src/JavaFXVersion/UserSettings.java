@@ -15,6 +15,7 @@ public class UserSettings {
     private static String currDirectory;
     private int frameRate;
     private File music;
+    private boolean openFile;
 
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
@@ -27,6 +28,7 @@ public class UserSettings {
         outName = "sorted.mp4";
         frameRate = 3;
         music = null;
+        openFile = false;
     }
 
     public int getPrecision() {
@@ -73,4 +75,11 @@ public class UserSettings {
         this.music = music;
     }
 
+    public boolean isOpenFile() {
+        return openFile;
+    }
+
+    public void setOpenFile(boolean openFile) {
+        this.openFile = openFile;
+    }
 }
