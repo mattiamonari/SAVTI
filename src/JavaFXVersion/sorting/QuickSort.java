@@ -6,6 +6,9 @@ import JavaFXVersion.UserSettings;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
@@ -31,7 +34,9 @@ public class QuickSort implements SortAlgorithm {
     int imageIndex = 0, width = 0, height = 0, delay = 1;
     int countSwaps, countComparison;
     boolean running = true;
-
+    private ProgressBar progressBar;
+    private double progress = 0;
+    private double increment;
     public QuickSort(UserSettings userSettings) {
         this.userSettings = userSettings;
     }
@@ -50,6 +55,17 @@ public class QuickSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array, gridPane);
+
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
         delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
         countSwaps = 0;
         countComparison = 0;
@@ -62,7 +78,19 @@ public class QuickSort implements SortAlgorithm {
             new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(), userSettings.getOutputDirectory(),
                     userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
-            System.out.println(imageIndex);
+
+            if(userSettings.isOpenFile()) {
+                File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
+                try {
+                    Desktop.getDesktop().open(out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Platform.runLater(() -> {
+                gridPane.setVisible(true);
+                ((BorderPane)gridPane.getParent()).getChildren().remove(progressBar);
+            });
         });
         thread.start();
     }
@@ -110,6 +138,7 @@ public class QuickSort implements SortAlgorithm {
         countSwaps++;
         if((countSwaps % delay) == 0 && write)
             writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
+        progressBar.setProgress(progress += increment);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, gridPane);

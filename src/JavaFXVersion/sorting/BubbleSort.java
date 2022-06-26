@@ -7,6 +7,9 @@ import JavaFXVersion.UserSettings;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
@@ -25,13 +28,17 @@ import java.util.concurrent.FutureTask;
 import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.FileUtilities.writeImage;
 
+
+
 public class BubbleSort implements SortAlgorithm {
     //Random object used for lock the threads in this class
-    //TODO Use the Lock class!
     private final UserSettings userSettings;
     Thread thread;
     int countComparison = 0, countSwaps = 0, imageIndex = 1;
     boolean running = true;
+    private ProgressBar progressBar;
+    private double progress = 0;
+    private double increment;
 
     public BubbleSort(UserSettings userSettings) {
         this.userSettings = userSettings;
@@ -52,6 +59,17 @@ public class BubbleSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
+
+        progressBar = new ProgressBar(0);
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
 
         int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
         countSwaps = 0;
@@ -74,6 +92,8 @@ public class BubbleSort implements SortAlgorithm {
                             swapped = true;
                             if((countSwaps % delay) == 0)
                                 writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
+
+                            progressBar.setProgress(progress+=increment);
                         }
                     }
                     if (!swapped) {
@@ -87,6 +107,20 @@ public class BubbleSort implements SortAlgorithm {
                     userSettings.getOutputDirectory(),
                     userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
+
+            if(userSettings.isOpenFile()) {
+                File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
+                try {
+                    Desktop.getDesktop().open(out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Platform.runLater(() -> {
+                gridPane.setVisible(true);
+                ((BorderPane)gridPane.getParent()).getChildren().remove(progressBar);
+            });
+
         });
         thread.start();
     }
@@ -111,18 +145,7 @@ public class BubbleSort implements SortAlgorithm {
         }
     }
 
-    private void createMediaView(GridPane gridPane) {
-        Media media = new Media(new File(userSettings.getOutputDirectory().getAbsolutePath() + '\\' + userSettings.getOutName()).toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        MediaView m = new MediaView(mediaPlayer);
-        m.setMediaPlayer(mediaPlayer);
-        m.setFitWidth(1200);
-        BorderPane root = ((BorderPane) gridPane.getParent());
-        root.setCenter(m);
-        mediaPlayer.setAutoPlay(true);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        deleteAllPreviousFiles(userSettings);
-    }
+
 
     @Override
     public <T extends Comparable<T>> T[] sort(T[] unsorted) {

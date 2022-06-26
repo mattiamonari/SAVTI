@@ -7,6 +7,9 @@ import JavaFXVersion.UserSettings;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
@@ -31,6 +34,9 @@ public class SelectionSort implements SortAlgorithm {
     Thread thread;
     int countComparison = 0, countSwaps = 0, imageIndex = 0;
     boolean running = true;
+    private ProgressBar progressBar;
+    private double progress = 0;
+    private double increment;
 
     public SelectionSort(UserSettings userSettings) {
         this.userSettings = userSettings;
@@ -51,6 +57,18 @@ public class SelectionSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
+        progressBar = new ProgressBar(0);
+
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+
         int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
         countSwaps = 0;
         int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
@@ -62,7 +80,7 @@ public class SelectionSort implements SortAlgorithm {
             for (int step = 0; step < size - 1; step++) {
                 int min_idx = step;
                 for (int k = step + 1; k < size; k++) {
-                        if(running == false)
+                        if(!running)
                             break;
                         // To sort in descending order, change > to < in this line.
                         // Select the minimum element in each loop.
@@ -75,6 +93,7 @@ public class SelectionSort implements SortAlgorithm {
                 // put min at the correct position
                 SortUtils.swap(array, step, min_idx);
                 ++countSwaps;
+                progressBar.setProgress(progress += increment);
                 if((countSwaps % delay) == 0){
                     writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
                 }
@@ -87,6 +106,20 @@ public class SelectionSort implements SortAlgorithm {
                     userSettings.getOutputDirectory(),
                     userSettings.getFrameRate(), userSettings.getMusic());
             deleteAllPreviousFiles(userSettings);
+
+            if(userSettings.isOpenFile()) {
+                File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
+                try {
+                    Desktop.getDesktop().open(out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Platform.runLater(() -> {
+                gridPane.setVisible(true);
+                ((BorderPane)gridPane.getParent()).getChildren().remove(progressBar);
+            });
+
         });
         thread.start();
     }
