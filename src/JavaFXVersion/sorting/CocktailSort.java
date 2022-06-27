@@ -21,7 +21,7 @@ public class CocktailSort implements SortAlgorithm {
 
     private final UserSettings userSettings;
     Thread thread;
-    int countComparison = 0, countSwaps = 0, imageIndex = 0;
+    int countComparison = 0, countSwaps = 0, imageIndex = 0, delay = 1;
     boolean running = true;
     private ProgressBar progressBar;
     private double progress = 0;
@@ -46,19 +46,7 @@ public class CocktailSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
-
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
-
-        int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        setupEnv(gridPane);
         countSwaps = 0;
         int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
                 array[0].getImage().getWidth() - 1);
@@ -72,11 +60,7 @@ public class CocktailSort implements SortAlgorithm {
             int end = n - 1;
             int i;
             while (swap == 1) {
-                swap = 0;  
-  
-/* Loop similar to bubble sort to compare and swap array elements starting   
-  
-from left to right */
+                swap = 0;
                 for (i = beg; i < end; ++i) {
                     if(running == false)
                         break;
@@ -94,17 +78,9 @@ from left to right */
                 if (swap == 0)
                     break;
 
-                swap = 0;  
-          
-        /* decrease the 'end' point by one position.   
-        It is because the item at the last position is at its   
-  
-correct position */
+                swap = 0;
                 --end;  
-           
-        /* This loop starts from right to left to perform the   
-  
-same comparison as in the previous loop */
+
                 for (i = end - 1; i >= beg; --i) {
                     if(running == false)
                         break;
@@ -117,18 +93,11 @@ same comparison as in the previous loop */
                         progressBar.setProgress(progress += increment);
                         swap = 1;
                     }
-                }  
-  
-        /* increase the beg point by one position.   
-        It is because the item at the first position is at its   
-correct position */
+                }
                 ++beg;
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-            //?MAYBE JUST PASS userSettings?
-            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
-                    userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate(), userSettings.getMusic());
+            FFMPEG prc = new FFMPEG(userSettings, progressBar);
             deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
@@ -159,10 +128,6 @@ correct position */
         int i;
         while (swap == 1) {
             swap = 0;
-
-/* Loop similar to bubble sort to compare and swap array elements starting
-
-from left to right */
             for (i = beg; i < end; ++i) {
                 if (SortUtils.greater(tmp[i], tmp[i + 1])) {
                     ++countSwaps;
@@ -175,16 +140,7 @@ from left to right */
                 break;
 
             swap = 0;
-
-        /* decrease the 'end' point by one position.
-        It is because the item at the last position is at its
-
-correct position */
             --end;
-
-        /* This loop starts from right to left to perform the
-
-same comparison as in the previous loop */
             for (i = end - 1; i >= beg; --i) {
                 if (SortUtils.greater(tmp[i], tmp[i + 1])) {
                     ++countSwaps;
@@ -192,12 +148,23 @@ same comparison as in the previous loop */
                     swap = 1;
                 }
             }
-
-        /* increase the beg point by one position.
-        It is because the item at the first position is at its
-correct position */
             ++beg;
         }
+    }
+
+    private void setupEnv(GridPane gridPane) {
+        progressBar = new ProgressBar(0);
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+
+        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
     }
 
     @Override

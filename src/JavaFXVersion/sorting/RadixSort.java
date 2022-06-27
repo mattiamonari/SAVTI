@@ -21,7 +21,7 @@ public class RadixSort implements SortAlgorithm {
 
     private final UserSettings userSettings;
     Thread thread;
-    int countComparison = 0, countSwaps = 0, imageIndex = 1;
+    int countComparison = 0, countSwaps = 0, imageIndex = 1, delay = 1;
     boolean running = true;
     private ProgressBar progressBar;
     private double progress = 0;
@@ -48,19 +48,7 @@ public class RadixSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
-
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
-
-        int delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        setupEnv(gridPane);
         countSwaps = 0;
         countComparison = 0;
         write = true;
@@ -81,13 +69,10 @@ public class RadixSort implements SortAlgorithm {
             countingSort(array, size, place, delay, width, height, write);
         }
         writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-        //?MAYBE JUST PASS userSettings?
-        FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
-                userSettings.getOutputDirectory(),
-                userSettings.getFrameRate(), userSettings.getMusic());
-        deleteAllPreviousFiles(userSettings);
+        FFMPEG prc = new FFMPEG(userSettings, progressBar);
 
-        if(userSettings.isOpenFile()) {
+
+            if(userSettings.isOpenFile()) {
             File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
             try {
                 Desktop.getDesktop().open(out);
@@ -152,6 +137,21 @@ public class RadixSort implements SortAlgorithm {
             //progressBar.setProgress(progress+=increment);
 
         }
+    }
+
+    private void setupEnv(GridPane gridPane) {
+        progressBar = new ProgressBar(0);
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+
+        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
     }
 
 

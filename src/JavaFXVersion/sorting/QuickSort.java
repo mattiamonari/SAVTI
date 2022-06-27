@@ -55,18 +55,7 @@ public class QuickSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array, gridPane);
-
-        increment = 1d / countSwaps;
-        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
-        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        setupEnv(gridPane);
         countSwaps = 0;
         countComparison = 0;
         width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
@@ -75,8 +64,7 @@ public class QuickSort implements SortAlgorithm {
                 array[0].getImage().getHeight() - 1);
         thread = new Thread(() -> {
             doSort(array, 0, array.length - 1, gridPane,true);
-            new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(), userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate(), userSettings.getMusic());
+            FFMPEG prc = new FFMPEG(userSettings, progressBar);
             deleteAllPreviousFiles(userSettings);
 
             if(userSettings.isOpenFile()) {
@@ -94,6 +82,22 @@ public class QuickSort implements SortAlgorithm {
         });
         thread.start();
     }
+
+    private void setupEnv(GridPane gridPane) {
+        progressBar = new ProgressBar(0);
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+
+        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+    }
+
 
     private void calculateNumberOfSwaps(Tail[] array, GridPane gridPane) {
         Tail[] tmp = new Tail[array.length];
@@ -138,7 +142,8 @@ public class QuickSort implements SortAlgorithm {
         countSwaps++;
         if((countSwaps % delay) == 0 && write)
             writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
-        progressBar.setProgress(progress += increment);
+        if(write)
+            progressBar.setProgress(progress += increment);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, gridPane);

@@ -50,19 +50,7 @@ public class MergeSort implements SortAlgorithm {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
-
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
-
-        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        setupEnv(gridPane);
         countSwaps = 0;
         countComparison = 0;
         width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
@@ -74,10 +62,7 @@ public class MergeSort implements SortAlgorithm {
 
             mergeSort(array, 0, array.length - 1, true);
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-            //?MAYBE JUST PASS userSettings?
-            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
-                    userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate(), userSettings.getMusic());
+            FFMPEG prc = new FFMPEG(userSettings, progressBar);
             deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
@@ -98,6 +83,21 @@ public class MergeSort implements SortAlgorithm {
         thread.start();
 
 
+    }
+
+    private void setupEnv(GridPane gridPane) {
+        progressBar = new ProgressBar(0);
+        increment = 1d / countSwaps;
+        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        gridPane.setVisible(false);
+        progressBar.setPrefWidth(gridPane.getWidth());
+        progressBar.setMinWidth(gridPane.getWidth());
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        BorderPane.setAlignment(progressBar, Pos.CENTER);
+        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+
+        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
     }
 
     private void calculateNumberOfSwaps(Tail[] array) {

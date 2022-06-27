@@ -85,11 +85,7 @@ public class InsertionSort implements SortAlgorithm {
                     break;
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-
-            FFMPEG prc = new FFMPEG(userSettings.getFfmpegPath(), userSettings.getOutName(),
-                    userSettings.getOutputDirectory(),
-                    userSettings.getFrameRate(), userSettings.getMusic());
-            deleteAllPreviousFiles(userSettings);
+            FFMPEG prc = new FFMPEG(userSettings, progressBar);
 
             if(userSettings.isOpenFile()) {
                 File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
