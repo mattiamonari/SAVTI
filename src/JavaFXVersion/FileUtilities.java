@@ -16,9 +16,11 @@ public class FileUtilities {
 
     public static void deleteAllPreviousFiles(UserSettings userSettings)   {
         File directory = userSettings.getOutputDirectory();
-        for (File f : directory.listFiles()) {
-            if (f.getName().startsWith("final")) {
-                f.delete();
+        if(directory.listFiles() != null) {
+            for (File f : directory.listFiles()) {
+                if (f.getName().startsWith("final")) {
+                    f.delete();
+                }
             }
         }
     }
