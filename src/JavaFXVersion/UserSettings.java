@@ -11,6 +11,7 @@ public class UserSettings {
     private int precision;
     private File outputDirectory;
     private File ffmpegPath;
+    private File ffprobePath;
     private String outName;
     private static String currDirectory;
     private int frameRate;
@@ -25,6 +26,7 @@ public class UserSettings {
         currDirectory = Paths.get("").toAbsolutePath().toString();
         outputDirectory = new File( currDirectory + "\\out\\");
         ffmpegPath = new File(currDirectory + "\\ext\\ffmpeg.exe");
+        ffprobePath = new File(currDirectory + "\\ext\\ffprobe.exe");
         outName = "sorted.mp4";
         frameRate = 3;
         music = null;
@@ -81,5 +83,13 @@ public class UserSettings {
 
     public void setOpenFile(boolean openFile) {
         this.openFile = openFile;
+    }
+
+    public File getFfprobePath() {
+        return ffprobePath;
+    }
+
+    public void setFfprobePath(File ffprobePath) {
+        this.ffprobePath = ffprobePath;
     }
 }
