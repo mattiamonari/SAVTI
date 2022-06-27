@@ -13,14 +13,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -157,6 +155,7 @@ public class MainWindow extends BorderPane {
                         case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
                         case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
                         case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
+                        case "RadixSort" -> algorithm = new RadixSort(userSettings);
                     }
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
@@ -224,9 +223,7 @@ public class MainWindow extends BorderPane {
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
 
-        openVideo.setOnAction((event -> {
-            userSettings.setOpenFile(openVideo.isSelected());
-        }));
+        openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
     }
 
     //?Meglio aggiungere la combobox direttamente su scene builder?
@@ -235,7 +232,7 @@ public class MainWindow extends BorderPane {
         //!NON SERVE CREARE UN'ALTRA VBOX ABBIAMO GIA' QUELLA DEI BOTTONI
         //!VBox v = new VBox();
         // Weekdays
-        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort"};
+        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort"};
         // Create a combo box
         cb = new ComboBox(FXCollections.observableArrayList(sort));
 
