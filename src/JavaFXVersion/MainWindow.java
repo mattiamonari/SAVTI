@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static JavaFXVersion.ImageUtilities.fillImage;
@@ -40,7 +41,6 @@ public class MainWindow extends BorderPane {
     Tail[] main;
     SortAlgorithm algorithm;
     Image i;
-    ComboBox cb;
     //endregion
     //region FXML variables declaration
     @FXML
@@ -72,6 +72,8 @@ public class MainWindow extends BorderPane {
     Label framerateValue;
     @FXML
     CheckBox openVideo;
+    @FXML
+    ComboBox<String> chooseAlgo;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -100,7 +102,7 @@ public class MainWindow extends BorderPane {
         algorithm = new BubbleSort(userSettings);
         //By default, the image is split in 8x8 grid
         main = new Tail[64];
-        //?Radio buttons for the algorithm choice, can we use something else like a window?
+
         createComboBox();
     }
 
@@ -129,7 +131,6 @@ public class MainWindow extends BorderPane {
     }
 
     //Aggiunge i listener agli eventi dei nodi/elementi
-    //TODO Risolvere vari bug relativi a combinazione di tasti e variazioni di paramteri (slider) durante l'esecuzione degli algoritmi
     private void addEventListeners() {
         cleanButton.setOnAction(e -> {
             removeAllTails();
@@ -148,8 +149,8 @@ public class MainWindow extends BorderPane {
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (!Arrays.stream(main).allMatch(Objects::isNull)) {
-                if (cb.getValue() != null) {
-                    String choice = cb.getValue().toString();
+                if (chooseAlgo.getValue() != null) {
+                    String choice = chooseAlgo.getValue().toString();
                     switch (choice) {
                         case "QuickSort" -> algorithm = new QuickSort(userSettings);
                         case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
@@ -158,7 +159,7 @@ public class MainWindow extends BorderPane {
                         case "RadixSort" -> algorithm = new RadixSort(userSettings);
                         case "MergeSort" -> algorithm = new MergeSort(userSettings);
                         case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
-                        case "Gnomesort" -> algorithm = new GnomeSort(userSettings);
+                        case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
                     }
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
@@ -229,22 +230,13 @@ public class MainWindow extends BorderPane {
         openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
     }
 
-    //?Meglio aggiungere la combobox direttamente su scene builder?
-    //!SI
     private void createComboBox() {
-        //!NON SERVE CREARE UN'ALTRA VBOX ABBIAMO GIA' QUELLA DEI BOTTONI
-        //!VBox v = new VBox();
-        // Weekdays
-        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort"};
-        // Create a combo box
-        cb = new ComboBox(FXCollections.observableArrayList(sort));
 
-        VBox leftVbox = (VBox) (cleanButton.getParent());
-        leftVbox.getChildren().add(cb);
-        //In generale, per settare i margini di un elemento (il quale sarà necessariamente in un container)
-        //basta fare classeContainer.setMargin( elemento, new Insets( margine destro, margine sopra ..))
-        VBox.setMargin(cb, new Insets(10));
-        cb.setValue("BubbleSort");
+        List<String> algos = Arrays.asList("BubbleSort" , "QuickSort" , "SelectionSort" , "InsertionSort" , "RadixSort" , "MergeSort" , "CocktailSort" , "GnomeSort");
+
+        chooseAlgo.setItems(FXCollections.observableList(algos));
+
+        chooseAlgo.setValue("BubbleSort");
 
     }
 
