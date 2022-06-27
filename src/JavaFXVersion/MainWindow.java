@@ -156,6 +156,7 @@ public class MainWindow extends BorderPane {
                         case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
                         case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
                         case "RadixSort" -> algorithm = new RadixSort(userSettings);
+                        case "MergeSort" -> algorithm = new MergeSort(userSettings);
                     }
                 }
                 //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
@@ -232,7 +233,7 @@ public class MainWindow extends BorderPane {
         //!NON SERVE CREARE UN'ALTRA VBOX ABBIAMO GIA' QUELLA DEI BOTTONI
         //!VBox v = new VBox();
         // Weekdays
-        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort"};
+        String[] sort = {"BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort"};
         // Create a combo box
         cb = new ComboBox(FXCollections.observableArrayList(sort));
 
