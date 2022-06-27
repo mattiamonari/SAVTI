@@ -15,10 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-//./ffmpeg -framerate 1 -i final%d.png -vf -vcodec libx264 -acodec aac -strict -2 -preset slow -pix_fmt yuv420p -r 30
-// prova1.mp4
-//-vf -vf "drawtext=fontfile=/path/to/font.ttf:text='Stack Overflow':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(w-text_w)/2:y=(h-text_h)/2"
-
 
 public class FFMPEG {
 
@@ -29,11 +25,7 @@ public class FFMPEG {
     FFmpegBuilder builder;
     FFmpegJob job;
     double percentage;
-/*
- "-i", music.getAbsolutePath(), "-c", "copy", "-map", "0:v:0", "-map",
-                    "1:a:0","-shortest"
 
- */
     public FFMPEG(UserSettings userSettings, ProgressBar progressBar) {
         try {
             ffprobe = new FFprobe(userSettings.getFfprobePath().getAbsolutePath());
