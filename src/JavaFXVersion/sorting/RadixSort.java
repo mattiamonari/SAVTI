@@ -164,7 +164,7 @@ public class RadixSort implements SortAlgorithm {
 
         // Apply counting sort to sort elements based on place value.
         for (int place = 1; max.position / place > 0; place *= 10)
-            countingSort(array, size, place, 1,0,0, write);
+            countingSort(tmp, size, place, 1,0,0, write);
     }
 
     @Override
