@@ -144,6 +144,7 @@ public class MergeSort implements SortAlgorithm {
             // Until we reach either end of either L or M, pick larger among
             // elements L and M and place them in the correct position at A[p..r]
             while (i < n1 && j < n2) {
+                ++countComparison;
                 if (SortUtils.greater(M[j], L[i])) {
                     ++countSwaps;
                     arr[k] = L[i];
