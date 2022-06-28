@@ -63,7 +63,8 @@ public class MergeSort implements SortAlgorithm {
             mergeSort(array, 0, array.length - 1, true);
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            deleteAllPreviousFiles(userSettings);
+            if (userSettings.saveImage == false)
+                deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
                 File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
@@ -88,16 +89,16 @@ public class MergeSort implements SortAlgorithm {
     private void setupEnv(GridPane gridPane) {
         progressBar = new ProgressBar(0);
         increment = 1d / countSwaps;
-        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
         gridPane.setVisible(false);
         progressBar.setPrefWidth(gridPane.getWidth());
         progressBar.setMinWidth(gridPane.getWidth());
         progressBar.setPrefHeight(50);
         progressBar.setMinHeight(50);
         BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
 
-        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
     }
 
     private void calculateNumberOfSwaps(Tail[] array) {
@@ -152,8 +153,8 @@ public class MergeSort implements SortAlgorithm {
                     if ((countSwaps % delay) == 0 && write) {
                         writeImage(userSettings, arr, width, height, imageIndex++, countComparison, countSwaps);
                     }
-                    if(write)
-                        progressBar.setProgress(progress+=increment);
+                    if (write)
+                        progressBar.setProgress(progress += increment);
 
                 } else {
                     ++countSwaps;

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static JavaFXVersion.ImageUtilities.fillImage;
 import static JavaFXVersion.ImageUtilities.splitImage;
@@ -71,9 +72,17 @@ public class MainWindow extends BorderPane {
     @FXML
     Label framerateValue;
     @FXML
+    Slider videodurationSlider;
+    @FXML
+    Label videodurationValue;
+    @FXML
     CheckBox openVideo;
     @FXML
     ComboBox<String> chooseAlgo;
+    @FXML
+    CheckMenuItem saveimageItem;
+    @FXML
+    MenuItem changeoutputItem;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -181,6 +190,17 @@ public class MainWindow extends BorderPane {
             }
         });
 
+        changeoutputItem.setOnAction(e -> {
+            TextInputDialog output = new TextInputDialog();
+            output.setTitle("Nome file video");
+            output.setHeaderText("ATTENZIONE:\nUsare l'estensione .mp4");
+            output.setContentText("Nome file:");
+            Optional<String> out = output.showAndWait();
+            if (out.isPresent())
+                userSettings.setOutName(out.get());
+
+        });
+
         songLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3", "*.mp3"));
@@ -188,6 +208,8 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             userSettings.setMusic(chosenFile);
         });
+
+        saveimageItem.setOnAction((event -> userSettings.setSaveImage(saveimageItem.isSelected())));
 
 
         outputButton.setOnAction(e -> {
@@ -227,12 +249,18 @@ public class MainWindow extends BorderPane {
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
 
+        videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            userSettings.setVideoDuration((int) Math.floor((Double) newValue));
+        });
+
         openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
+
     }
 
     private void createComboBox() {
 
-        List<String> algos = Arrays.asList("BubbleSort" , "QuickSort" , "SelectionSort" , "InsertionSort" , "RadixSort" , "MergeSort" , "CocktailSort" , "GnomeSort");
+        List<String> algos = Arrays.asList("BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort");
 
         chooseAlgo.setItems(FXCollections.observableList(algos));
 
@@ -252,6 +280,7 @@ public class MainWindow extends BorderPane {
         ffmpegButton.setDisable(true);
         outputButton.setDisable(true);
         precisionSlider.setDisable(true);
+        videodurationSlider.setDisable(true);
     }
 
     private void enableAll() {
@@ -262,6 +291,7 @@ public class MainWindow extends BorderPane {
         ffmpegButton.setDisable(false);
         outputButton.setDisable(false);
         precisionSlider.setDisable(false);
+        videodurationSlider.setDisable(false);
     }
     //region Utilities methods
     //endregion

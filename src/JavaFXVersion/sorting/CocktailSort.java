@@ -62,7 +62,7 @@ public class CocktailSort implements SortAlgorithm {
             while (swap == 1) {
                 swap = 0;
                 for (i = beg; i < end; ++i) {
-                    if(running == false)
+                    if (running == false)
                         break;
                     ++countComparison;
                     if (SortUtils.greater(array[i], array[i + 1])) {
@@ -79,10 +79,10 @@ public class CocktailSort implements SortAlgorithm {
                     break;
 
                 swap = 0;
-                --end;  
+                --end;
 
                 for (i = end - 1; i >= beg; --i) {
-                    if(running == false)
+                    if (running == false)
                         break;
                     ++countComparison;
                     if (SortUtils.greater(array[i], array[i + 1])) {
@@ -98,7 +98,8 @@ public class CocktailSort implements SortAlgorithm {
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            deleteAllPreviousFiles(userSettings);
+            if (userSettings.saveImage == false)
+                deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
                 File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
@@ -155,17 +156,18 @@ public class CocktailSort implements SortAlgorithm {
     private void setupEnv(GridPane gridPane) {
         progressBar = new ProgressBar(0);
         increment = 1d / countSwaps;
-        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
         gridPane.setVisible(false);
         progressBar.setPrefWidth(gridPane.getWidth());
         progressBar.setMinWidth(gridPane.getWidth());
         progressBar.setPrefHeight(50);
         progressBar.setMinHeight(50);
         BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
 
-        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
     }
+
 
     @Override
     public <T extends Comparable<T>> T[] sort(T[] unsorted) {

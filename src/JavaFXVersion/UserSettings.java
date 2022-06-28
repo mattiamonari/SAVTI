@@ -17,6 +17,8 @@ public class UserSettings {
     private int frameRate;
     private File music;
     private boolean openFile;
+    private int videoDuration;
+    public boolean saveImage = false;
 
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
@@ -31,6 +33,7 @@ public class UserSettings {
         frameRate = 3;
         music = null;
         openFile = false;
+        videoDuration = 15;
     }
 
     public int getPrecision() {
@@ -85,6 +88,8 @@ public class UserSettings {
         this.openFile = openFile;
     }
 
+    public void setSaveImage(boolean saveImage) { this.saveImage = saveImage;}
+
     public File getFfprobePath() {
         return ffprobePath;
     }
@@ -92,4 +97,10 @@ public class UserSettings {
     public void setFfprobePath(File ffprobePath) {
         this.ffprobePath = ffprobePath;
     }
+
+    public int getVideoDuration() { return videoDuration;}
+
+    public void setVideoDuration(int videoDuration) { this.videoDuration = videoDuration;}
+
+    public void setOutName(String outName) { this.outName = outName;}
 }

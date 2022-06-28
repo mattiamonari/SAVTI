@@ -32,7 +32,7 @@ public class SelectionSort implements SortAlgorithm {
 
     private final UserSettings userSettings;
     Thread thread;
-    int countComparison = 0, countSwaps = 0, imageIndex = 0,delay = 1;
+    int countComparison = 0, countSwaps = 0, imageIndex = 0, delay = 1;
     boolean running = true;
     private ProgressBar progressBar;
     private double progress = 0;
@@ -68,21 +68,21 @@ public class SelectionSort implements SortAlgorithm {
             for (int step = 0; step < size - 1; step++) {
                 int min_idx = step;
                 for (int k = step + 1; k < size; k++) {
-                        if(!running)
-                            break;
-                        // To sort in descending order, change > to < in this line.
-                        // Select the minimum element in each loop.
-                        ++countComparison;
-                        if (SortUtils.greater(array[min_idx], array[k])) {
-                            min_idx = k;
-                        }
+                    if (!running)
+                        break;
+                    // To sort in descending order, change > to < in this line.
+                    // Select the minimum element in each loop.
+                    ++countComparison;
+                    if (SortUtils.greater(array[min_idx], array[k])) {
+                        min_idx = k;
+                    }
                 }
 
                 // put min at the correct position
                 SortUtils.swap(array, step, min_idx);
                 ++countSwaps;
                 progressBar.setProgress(progress += increment);
-                if((countSwaps % delay) == 0){
+                if ((countSwaps % delay) == 0) {
                     writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
                 }
                 if (running == false)
@@ -90,9 +90,10 @@ public class SelectionSort implements SortAlgorithm {
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            deleteAllPreviousFiles(userSettings);
+            if (userSettings.saveImage == false)
+                deleteAllPreviousFiles(userSettings);
 
-            if(userSettings.isOpenFile()) {
+            if (userSettings.isOpenFile()) {
                 File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
                 try {
                     Desktop.getDesktop().open(out);
@@ -102,7 +103,7 @@ public class SelectionSort implements SortAlgorithm {
             }
             Platform.runLater(() -> {
                 gridPane.setVisible(true);
-                ((BorderPane)gridPane.getParent()).getChildren().remove(progressBar);
+                ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
             });
 
         });
@@ -112,21 +113,21 @@ public class SelectionSort implements SortAlgorithm {
     private void setupEnv(GridPane gridPane) {
         progressBar = new ProgressBar(0);
         increment = 1d / countSwaps;
-        ((BorderPane)gridPane.getParent()).setBottom(progressBar);
+        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
         gridPane.setVisible(false);
         progressBar.setPrefWidth(gridPane.getWidth());
         progressBar.setMinWidth(gridPane.getWidth());
         progressBar.setPrefHeight(50);
         progressBar.setMinHeight(50);
         BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0,0,10,0));
+        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
 
-        delay = countSwaps / (userSettings.getFrameRate() * 15) + 1;
+        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
     }
 
     private void calculateNumberOfSwaps(Tail[] array) {
         Tail[] tmp = new Tail[array.length];
-        System.arraycopy(array,0,tmp, 0, array.length);
+        System.arraycopy(array, 0, tmp, 0, array.length);
 
         int size = tmp.length;
         for (int step = 0; step < size - 1; step++) {
