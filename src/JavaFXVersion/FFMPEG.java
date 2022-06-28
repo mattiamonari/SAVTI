@@ -32,20 +32,20 @@ public class FFMPEG {
             FFmpegProbeResult in = ffprobe.probe(userSettings.getOutputDirectory().getAbsolutePath() + "\\final%d.png");
             ffmpeg = new FFmpeg(userSettings.getFfmpegPath().getAbsolutePath());
             builder = new FFmpegBuilder()
+                    .addExtraArgs("-framerate", String.valueOf(userSettings.getFrameRate()))
                     .setInput(in)
                     .overrideOutputFiles(true)
                     .addOutput(userSettings.getOutputDirectory().getAbsolutePath() + "\\" + userSettings.getOutName())
-                    .addExtraArgs("-shortest")
+                    .setVideoFrameRate(userSettings.getFrameRate())
                     .setAudioCodec("aac")
                     .setVideoCodec("libx264")
-                    .setVideoFrameRate(userSettings.getFrameRate())
                     .setPreset("slow")
                     .setVideoPixelFormat("yuv420p")
                     .done();
 
             if(userSettings.getMusic() != null)
             {
-                builder = builder.addInput(userSettings.getMusic().getAbsolutePath());
+                builder = builder.addInput(userSettings.getMusic().getAbsolutePath()).addExtraArgs("-shortest");
 
             }
 
