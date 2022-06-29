@@ -83,6 +83,8 @@ public class MainWindow extends BorderPane {
     CheckMenuItem saveimageItem;
     @FXML
     MenuItem changeoutputItem;
+    @FXML
+    Button ffprobeButton;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -98,7 +100,7 @@ public class MainWindow extends BorderPane {
         //Instantiating and initializing non-JavaFX variables
         initComponents();
         //Load the image in the gridPane splitting it
-        loadAndSplitImage(new File("res/bigimage.jpg"), 1200, 800);
+        //loadAndSplitImage(new File("bigimage.jpg"), 1200, 800);
         //Add event listeners for the components
         addEventListeners();
     }
@@ -192,12 +194,16 @@ public class MainWindow extends BorderPane {
 
         changeoutputItem.setOnAction(e -> {
             TextInputDialog output = new TextInputDialog();
-            output.setTitle("Nome file video");
-            output.setHeaderText("ATTENZIONE:\nUsare l'estensione .mp4");
+            output.setTitle("Scegli il nome del file video!");
             output.setContentText("Nome file:");
             Optional<String> out = output.showAndWait();
             if (out.isPresent())
-                userSettings.setOutName(out.get());
+            {
+                if(out.get().endsWith(".mp4"))
+                    userSettings.setOutName(out.get());
+                else
+                    userSettings.setOutName(out.get() + ".mp4");
+            }
 
         });
 
@@ -228,6 +234,16 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfmpegPath(chosenFile);
+            }
+        });
+
+        ffprobeButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
+            fileChooser.setTitle("Path to ffprobe");
+            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
+            if (chosenFile != null) {
+                userSettings.setFfprobePath(chosenFile);
             }
         });
 
