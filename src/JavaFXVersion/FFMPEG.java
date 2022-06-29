@@ -27,14 +27,6 @@ public class FFMPEG {
     double percentage;
 
     public FFMPEG(UserSettings userSettings, ProgressBar progressBar) {
-        File directory = userSettings.getOutputDirectory();
-        if (directory.listFiles() != null) {
-            for (File f : directory.listFiles()) {
-                if (f.getName().endsWith(".mp4")) {
-                    f.delete();
-                }
-            }
-        }
         try {
             ffprobe = new FFprobe(userSettings.getFfprobePath().getAbsolutePath());
             FFmpegProbeResult in = ffprobe.probe(userSettings.getOutputDirectory().getAbsolutePath() + "\\final%d.png");
@@ -49,10 +41,11 @@ public class FFMPEG {
                     .setVideoCodec("libx264")
                     .setPreset("slow")
                     .setVideoPixelFormat("yuv420p")
+                    .addExtraArgs("-shortest")
                     .done();
 
             if (userSettings.getMusic() != null) {
-                builder = builder.addInput(userSettings.getMusic().getAbsolutePath()).addExtraArgs("-shortest");
+                builder = builder.addInput(userSettings.getMusic().getAbsolutePath());
 
             }
 
