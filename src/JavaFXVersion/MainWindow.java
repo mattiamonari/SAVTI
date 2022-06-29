@@ -163,7 +163,7 @@ public class MainWindow extends BorderPane {
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            if(verifyFfmpegPath() && verifyOutputPath() && verifyFfprobePath()) {
+            if (verifyFfmpegPath() && verifyOutputPath() && verifyFfprobePath()) {
                 if (!Arrays.stream(main).allMatch(Objects::isNull)) {
                     if (chooseAlgo.getValue() != null) {
                         String choice = chooseAlgo.getValue();
@@ -182,23 +182,25 @@ public class MainWindow extends BorderPane {
                     // faccio partire l'ordinamento
                     disableAll();
                     algorithm.sort(main, gridPane);
+                } else {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setHeaderText("Immagine non valida");
+                    errorAlert.setContentText("Selezionare un'immagine da ordinare");
+                    errorAlert.showAndWait();
                 }
-            }
-            else{
+            } else {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                if(!verifyFfmpegPath()) {
+                if (!verifyFfmpegPath()) {
                     ffmpegButton.setUnderline(true);
                     errorAlert.setHeaderText("Ffmpeg path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
                     errorAlert.showAndWait();
-                }
-                else if(!verifyFfprobePath()) {
+                } else if (!verifyFfprobePath()) {
                     ffprobeButton.setUnderline(true);
                     errorAlert.setHeaderText("Ffprobe path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
                     errorAlert.showAndWait();
-                }
-                else if(!verifyOutputPath()){
+                } else if (!verifyOutputPath()) {
                     outputButton.setUnderline(true);
                     errorAlert.setHeaderText("Output path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per l'output");
@@ -224,9 +226,8 @@ public class MainWindow extends BorderPane {
             output.setTitle("Scegli il nome del file video!");
             output.setContentText("Nome file:");
             Optional<String> out = output.showAndWait();
-            if (out.isPresent())
-            {
-                if(out.get().endsWith(".mp4"))
+            if (out.isPresent()) {
+                if (out.get().endsWith(".mp4"))
                     userSettings.setOutName(out.get());
                 else
                     userSettings.setOutName(out.get() + ".mp4");
@@ -251,7 +252,7 @@ public class MainWindow extends BorderPane {
             File chosenDirectory = directoryChooser.showDialog(getScene().getWindow());
             if (chosenDirectory != null) {
                 userSettings.setOutputDirectory(chosenDirectory);
-                headerText.setText( "Video path: " + userSettings.getOutputDirectory().toString());
+                headerText.setText("Video path: " + userSettings.getOutputDirectory().toString());
                 outputButton.setUnderline(false);
             }
         });
@@ -343,23 +344,23 @@ public class MainWindow extends BorderPane {
         ffprobeButton.setDisable(false);
     }
 
-    private boolean verifyFfmpegPath(){
-        if(userSettings.getFfmpegPath() == null || !userSettings.getFfmpegPath().toString().endsWith("ffmpeg.exe"))
+    private boolean verifyFfmpegPath() {
+        if (userSettings.getFfmpegPath() == null || !userSettings.getFfmpegPath().toString().endsWith("ffmpeg.exe"))
             return false;
 
         else
             return true;
     }
 
-    private boolean verifyFfprobePath(){
-        if(userSettings.getFfprobePath() == null || !userSettings.getFfprobePath().toString().endsWith("ffprobe.exe"))
+    private boolean verifyFfprobePath() {
+        if (userSettings.getFfprobePath() == null || !userSettings.getFfprobePath().toString().endsWith("ffprobe.exe"))
             return false;
         else
             return true;
     }
 
-    private boolean verifyOutputPath(){
-        if(userSettings.getOutputDirectory() == null)
+    private boolean verifyOutputPath() {
+        if (userSettings.getOutputDirectory() == null)
             return false;
         else
             return true;
