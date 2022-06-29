@@ -26,9 +26,9 @@ public class UserSettings {
     public UserSettings() {
         precision = 8;
         currDirectory = Paths.get("").toAbsolutePath().toString();
-        outputDirectory = new File( currDirectory + "\\out\\");
-        ffmpegPath = new File(currDirectory + "\\ext\\ffmpeg.exe");
-        ffprobePath = new File(currDirectory + "\\ext\\ffprobe.exe");
+        outputDirectory = null;
+        ffmpegPath = null;
+        ffprobePath = null;
         outName = "sorted.mp4";
         frameRate = 3;
         music = null;

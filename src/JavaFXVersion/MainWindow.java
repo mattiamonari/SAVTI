@@ -116,7 +116,7 @@ public class MainWindow extends BorderPane {
         //By default, the image is split in 8x8 grid
         main = new Tail[64];
         //display output path
-        headerText.setText("Video path: " + userSettings.getOutputDirectory().toString());
+        headerText.setText("Video path: ");
 
         createComboBox();
     }
@@ -163,24 +163,47 @@ public class MainWindow extends BorderPane {
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            if (!Arrays.stream(main).allMatch(Objects::isNull)) {
-                if (chooseAlgo.getValue() != null) {
-                    String choice = chooseAlgo.getValue().toString();
-                    switch (choice) {
-                        case "QuickSort" -> algorithm = new QuickSort(userSettings);
-                        case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
-                        case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
-                        case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
-                        case "RadixSort" -> algorithm = new RadixSort(userSettings);
-                        case "MergeSort" -> algorithm = new MergeSort(userSettings);
-                        case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
-                        case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
+            if(verifyFfmpegPath() && verifyOutputPath() && verifyFfprobePath()) {
+                if (!Arrays.stream(main).allMatch(Objects::isNull)) {
+                    if (chooseAlgo.getValue() != null) {
+                        String choice = chooseAlgo.getValue();
+                        switch (choice) {
+                            case "QuickSort" -> algorithm = new QuickSort(userSettings);
+                            case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
+                            case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
+                            case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
+                            case "RadixSort" -> algorithm = new RadixSort(userSettings);
+                            case "MergeSort" -> algorithm = new MergeSort(userSettings);
+                            case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
+                            case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
+                        }
                     }
+                    //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
+                    // faccio partire l'ordinamento
+                    disableAll();
+                    algorithm.sort(main, gridPane);
                 }
-                //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
-                // faccio partire l'ordinamento
-                disableAll();
-                algorithm.sort(main, gridPane);
+            }
+            else{
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                if(!verifyFfmpegPath()) {
+                    ffmpegButton.setUnderline(true);
+                    errorAlert.setHeaderText("Ffmpeg path non valido");
+                    errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
+                    errorAlert.showAndWait();
+                }
+                else if(!verifyFfprobePath()) {
+                    ffprobeButton.setUnderline(true);
+                    errorAlert.setHeaderText("Ffprobe path non valido");
+                    errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
+                    errorAlert.showAndWait();
+                }
+                else if(!verifyOutputPath()){
+                    outputButton.setUnderline(true);
+                    errorAlert.setHeaderText("Output path non valido");
+                    errorAlert.setContentText("Selezionare un percorso valido per l'output");
+                    errorAlert.showAndWait();
+                }
             }
         }));
 
@@ -229,6 +252,7 @@ public class MainWindow extends BorderPane {
             if (chosenDirectory != null) {
                 userSettings.setOutputDirectory(chosenDirectory);
                 headerText.setText( "Video path: " + userSettings.getOutputDirectory().toString());
+                outputButton.setUnderline(false);
             }
         });
 
@@ -239,6 +263,7 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfmpegPath(chosenFile);
+                ffmpegButton.setUnderline(false);
             }
         });
 
@@ -249,6 +274,7 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfprobePath(chosenFile);
+                ffprobeButton.setUnderline(false);
             }
         });
 
@@ -315,6 +341,28 @@ public class MainWindow extends BorderPane {
         precisionSlider.setDisable(false);
         videodurationSlider.setDisable(false);
         ffprobeButton.setDisable(false);
+    }
+
+    private boolean verifyFfmpegPath(){
+        if(userSettings.getFfmpegPath() == null || !userSettings.getFfmpegPath().toString().endsWith("ffmpeg.exe"))
+            return false;
+
+        else
+            return true;
+    }
+
+    private boolean verifyFfprobePath(){
+        if(userSettings.getFfprobePath() == null || !userSettings.getFfprobePath().toString().endsWith("ffprobe.exe"))
+            return false;
+        else
+            return true;
+    }
+
+    private boolean verifyOutputPath(){
+        if(userSettings.getOutputDirectory() == null)
+            return false;
+        else
+            return true;
     }
     //region Utilities methods
     //endregion
