@@ -42,6 +42,8 @@ public class FileUtilities {
         graphics2D.drawString ("Comparisons =" + comparisons, 20, 30 );
         graphics2D.drawString("Swaps =" + swaps, 20, 60);
         graphics2D.dispose();
+        if(!userSettings.getOutputDirectory().isDirectory())
+            userSettings.getOutputDirectory().mkdir();
         File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index+ ".png");
         try {
             Imaging.writeImage(finalImage, f, ImageFormats.PNG);
