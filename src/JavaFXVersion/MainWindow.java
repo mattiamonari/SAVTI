@@ -76,7 +76,7 @@ public class MainWindow extends BorderPane {
     @FXML
     Label videodurationValue;
     @FXML
-    CheckBox openVideo;
+    CheckMenuItem openVideo;
     @FXML
     ComboBox<String> chooseAlgo;
     @FXML
@@ -85,6 +85,8 @@ public class MainWindow extends BorderPane {
     MenuItem changeoutputItem;
     @FXML
     Button ffprobeButton;
+    @FXML
+    Label headerText;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -113,6 +115,8 @@ public class MainWindow extends BorderPane {
         algorithm = new BubbleSort(userSettings);
         //By default, the image is split in 8x8 grid
         main = new Tail[64];
+        //display output path
+        headerText.setText("Video path: " + userSettings.getOutputDirectory().toString());
 
         createComboBox();
     }
@@ -224,6 +228,7 @@ public class MainWindow extends BorderPane {
             File chosenDirectory = directoryChooser.showDialog(getScene().getWindow());
             if (chosenDirectory != null) {
                 userSettings.setOutputDirectory(chosenDirectory);
+                headerText.setText( "Video path: " + userSettings.getOutputDirectory().toString());
             }
         });
 
@@ -297,6 +302,7 @@ public class MainWindow extends BorderPane {
         outputButton.setDisable(true);
         precisionSlider.setDisable(true);
         videodurationSlider.setDisable(true);
+        ffprobeButton.setDisable(true);
     }
 
     private void enableAll() {
@@ -308,6 +314,7 @@ public class MainWindow extends BorderPane {
         outputButton.setDisable(false);
         precisionSlider.setDisable(false);
         videodurationSlider.setDisable(false);
+        ffprobeButton.setDisable(false);
     }
     //region Utilities methods
     //endregion
