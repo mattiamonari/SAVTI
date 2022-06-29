@@ -62,7 +62,7 @@ public class CocktailSort implements SortAlgorithm {
             while (swap == 1) {
                 swap = 0;
                 for (i = beg; i < end; ++i) {
-                    if (running == false)
+                    if (!running)
                         break;
                     ++countComparison;
                     if (SortUtils.greater(array[i], array[i + 1])) {
@@ -82,7 +82,7 @@ public class CocktailSort implements SortAlgorithm {
                 --end;
 
                 for (i = end - 1; i >= beg; --i) {
-                    if (running == false)
+                    if (!running)
                         break;
                     ++countComparison;
                     if (SortUtils.greater(array[i], array[i + 1])) {
@@ -98,7 +98,7 @@ public class CocktailSort implements SortAlgorithm {
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            if (userSettings.saveImage == false)
+            if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
