@@ -136,6 +136,8 @@ public class RadixSort implements SortAlgorithm {
             array[i] = output[i];
             if ((countSwaps % delay) == 0 && (write == true))
                 writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
+            if(write)
+                progressBar.setProgress(progress += increment);
             //progressBar.setProgress(progress+=increment);
 
         }
