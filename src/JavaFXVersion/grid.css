@@ -1,0 +1,24 @@
+.dark-blue:hover {
+    -fx-background-color: #999999;
+    -fx-background-radius: 5,4,3,5;
+    -fx-background-insets: 0,1,2,0;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-font-size: 12.5px;
+}
+
+.menu-item:focused {
+     -fx-background-color: darkgray;
+}
+
+
+.slider .track{
+     -fx-background-color: darkgray;
+}
+
+.context-menu {
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+/*    -fx-padding: 0.666667em 0.083333em 0.666667em 0.083333em;  8 1 8 1 */
+    -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+}
+
