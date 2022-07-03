@@ -1,12 +1,18 @@
 package JavaFXVersion;
 
 import JavaFXVersion.sorting.*;
+import com.pixelduke.control.skin.FXButtonSkin;
+import com.pixelduke.control.skin.FXSkins;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,6 +22,7 @@ import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.controlsfx.control.ToggleSwitch;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
@@ -87,6 +94,8 @@ public class MainWindow extends BorderPane {
     Button ffprobeButton;
     @FXML
     Label headerText;
+    @FXML
+    ToggleSwitch darkMode;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -118,7 +127,36 @@ public class MainWindow extends BorderPane {
         //display output path
         headerText.setText("Video path: ");
 
+        HBox.setHgrow(headerText, Priority.ALWAYS);
+
+        BorderPane.setAlignment((HBox)headerText.getParent(), Pos.CENTER);
+
+        addCssFiles();
+
         createComboBox();
+    }
+
+    private void addCssFiles() {
+
+        randomizeButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        sortingButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        cleanButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        ffmpegButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        outputButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        pauseButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        ffprobeButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        precisionSlider.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        framerateSlider.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+        randomizeButton.getStyleClass().add("dark-blue");
+        sortingButton.getStyleClass().add("dark-blue");
+        cleanButton.getStyleClass().add("dark-blue");
+        ffmpegButton.getStyleClass().add("dark-blue");
+        outputButton.getStyleClass().add("dark-blue");
+        pauseButton.getStyleClass().add("dark-blue");
+        ffprobeButton.getStyleClass().add("dark-blue");
+        framerateSlider.getStyleClass().add("redThumb");
+        precisionSlider.getStyleClass().add("redThumb");
+        this.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
     }
 
     //? Should we move loadAndSplitImage inside ImageUtilities class?
@@ -191,17 +229,26 @@ public class MainWindow extends BorderPane {
             } else {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 if (!verifyFfmpegPath()) {
-                    ffmpegButton.setUnderline(true);
+                    ffmpegButton.setStyle("""
+                            -fx-background-color: #cd5c5c;
+                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+                            """);
                     errorAlert.setHeaderText("Ffmpeg path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
                     errorAlert.showAndWait();
                 } else if (!verifyFfprobePath()) {
-                    ffprobeButton.setUnderline(true);
+                    ffprobeButton.setStyle("""
+                            -fx-background-color: #cd5c5c;
+                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+                            """);
                     errorAlert.setHeaderText("Ffprobe path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
                     errorAlert.showAndWait();
                 } else if (!verifyOutputPath()) {
-                    outputButton.setUnderline(true);
+                    outputButton.setStyle("""
+                            -fx-background-color: #cd5c5c;
+                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+                            """);
                     errorAlert.setHeaderText("Output path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per l'output");
                     errorAlert.showAndWait();
@@ -223,6 +270,7 @@ public class MainWindow extends BorderPane {
 
         changeoutputItem.setOnAction(e -> {
             TextInputDialog output = new TextInputDialog();
+            output.getDialogPane().getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
             output.setTitle("Scegli il nome del file video!");
             output.setContentText("Nome file:");
             Optional<String> out = output.showAndWait();
@@ -253,7 +301,7 @@ public class MainWindow extends BorderPane {
             if (chosenDirectory != null) {
                 userSettings.setOutputDirectory(chosenDirectory);
                 headerText.setText("Video path: " + userSettings.getOutputDirectory().toString());
-                outputButton.setUnderline(false);
+                outputButton.setStyle("");
             }
         });
 
@@ -264,7 +312,7 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfmpegPath(chosenFile);
-                ffmpegButton.setUnderline(false);
+                ffmpegButton.setStyle("");
             }
         });
 
@@ -275,7 +323,7 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 userSettings.setFfprobePath(chosenFile);
-                ffprobeButton.setUnderline(false);
+                ffprobeButton.setStyle("");
             }
         });
 
@@ -285,24 +333,50 @@ public class MainWindow extends BorderPane {
         }));
 
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Node thumb = precisionSlider.lookup(".thumb");
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/100f) + ";");
             precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/100f) +
+                    ";");
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
-            main = new Tail[(int) Math.pow(userSettings.getPrecision(), 2)];
-            CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
-            CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
+            if(i != null)
+            {
+                main = new Tail[(int) Math.pow(userSettings.getPrecision() , 2)];
+                CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
+                CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
+            }
         });
 
         framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Node thumb = framerateSlider.lookup(".thumb");
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/60f) +
+                    ";");
+            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
+            framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/60f) + ";");
+            userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
 
         videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Node thumb = videodurationSlider.lookup(".thumb");
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/30f) + ";");
+            videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/30f) + ";");
             videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setVideoDuration((int) Math.floor((Double) newValue));
         });
 
         openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
+
+        darkMode.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable , Boolean oldValue , Boolean newValue) {
+                if(newValue)
+                    setStyle("-fx-base: black");
+                else
+                    setStyle("-fx-base: white");
+            }
+        });
 
     }
 
