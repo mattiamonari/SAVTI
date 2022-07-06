@@ -52,7 +52,7 @@ public class BubbleSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane) {
+    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
         //We use a new thread to pause/resume its execution whenever we want
         running = true;
         deleteAllPreviousFiles(userSettings);
@@ -103,6 +103,7 @@ public class BubbleSort implements SortAlgorithm {
             Platform.runLater(() -> {
                 gridPane.setVisible(true);
                 ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
+                mainWindow.enableAll();
             });
 
         });

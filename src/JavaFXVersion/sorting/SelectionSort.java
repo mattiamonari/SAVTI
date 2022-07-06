@@ -53,7 +53,7 @@ public class SelectionSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane) {
+    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
@@ -104,6 +104,7 @@ public class SelectionSort implements SortAlgorithm {
             Platform.runLater(() -> {
                 gridPane.setVisible(true);
                 ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
+                mainWindow.enableAll();
             });
 
         });

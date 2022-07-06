@@ -1,5 +1,6 @@
 package JavaFXVersion.sorting;
 
+import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import javafx.scene.layout.GridPane;
 
@@ -28,7 +29,7 @@ public interface SortAlgorithm {
 
     void killTask();
     boolean isThreadAlive();
-    void sort(Tail[] array , GridPane gridPane);
+    void sort(Tail[] array , GridPane gridPane, MainWindow mainWindow);
 
 
     /**

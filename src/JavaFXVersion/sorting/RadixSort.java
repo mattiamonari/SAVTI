@@ -1,6 +1,7 @@
 package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
+import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
@@ -43,7 +44,7 @@ public class RadixSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane) {
+    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
 
         running = true;
         deleteAllPreviousFiles(userSettings);
@@ -85,6 +86,7 @@ public class RadixSort implements SortAlgorithm {
             Platform.runLater(() -> {
                 gridPane.setVisible(true);
                 ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
+                mainWindow.enableAll();
             });
 
         });
