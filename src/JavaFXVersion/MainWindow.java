@@ -43,6 +43,7 @@ import static JavaFXVersion.sorting.SortAlgorithm.rand;
 public class MainWindow extends BorderPane {
     //region Local variables' declaration
     //? Question is, do we really need all these variables?
+    String hoverButton = "-fx-background-color: #cd5c5c; \n-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);";
     int CHUNK_WIDTH;
     int CHUNK_HEIGHT;
     UserSettings userSettings;
@@ -50,6 +51,7 @@ public class MainWindow extends BorderPane {
     SortAlgorithm algorithm;
     Image i;
     //endregion
+
     //region FXML variables declaration
     @FXML
     GridPane gridPane;
@@ -111,7 +113,7 @@ public class MainWindow extends BorderPane {
         //Instantiating and initializing non-JavaFX variables
         initComponents();
         //Load the image in the gridPane splitting it
-        //loadAndSplitImage(new File("bigimage.jpg"), 1200, 800);
+        loadAndSplitImage(new File("res/bigimage.jpg"), 1200, 800);
         //Add event listeners for the components
         addEventListeners();
     }
@@ -138,40 +140,25 @@ public class MainWindow extends BorderPane {
 
     private void addCssFiles() {
 
-        randomizeButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        sortingButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        cleanButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        ffmpegButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        outputButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        pauseButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        ffprobeButton.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        precisionSlider.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        framerateSlider.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-        randomizeButton.getStyleClass().add("dark-blue");
-        sortingButton.getStyleClass().add("dark-blue");
-        cleanButton.getStyleClass().add("dark-blue");
-        ffmpegButton.getStyleClass().add("dark-blue");
-        outputButton.getStyleClass().add("dark-blue");
-        pauseButton.getStyleClass().add("dark-blue");
-        ffprobeButton.getStyleClass().add("dark-blue");
-        framerateSlider.getStyleClass().add("redThumb");
-        precisionSlider.getStyleClass().add("redThumb");
+        randomizeButton.getParent().getStylesheets().add("grid.css");
         this.getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
+
     }
 
     //? Should we move loadAndSplitImage inside ImageUtilities class?
     //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
     private void loadAndSplitImage(File file, int width, int height) {
         BufferedImage capture = null;
+        BufferedImage dimg = null;
         try {
             capture = ImageIO.read(file);
+             dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width, height);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assert capture != null;
-        BufferedImage dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width, height);
         if (dimg.getHeight() > height)
-            dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, width, height);
+            dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, width, height-50);
         i = SwingFXUtils.toFXImage(dimg, null);
         CHUNK_WIDTH = dimg.getWidth() / userSettings.getPrecision();
         CHUNK_HEIGHT = dimg.getHeight() / userSettings.getPrecision();
@@ -185,6 +172,7 @@ public class MainWindow extends BorderPane {
 
     //Aggiunge i listener agli eventi dei nodi/elementi
     private void addEventListeners() {
+
         cleanButton.setOnAction(e -> {
             removeAllTails();
             Arrays.fill(main, null);
@@ -219,7 +207,7 @@ public class MainWindow extends BorderPane {
                     //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
                     // faccio partire l'ordinamento
                     disableAll();
-                    algorithm.sort(main, gridPane);
+                    algorithm.sort(main, gridPane, this);
                 } else {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setHeaderText("Immagine non valida");
@@ -229,26 +217,17 @@ public class MainWindow extends BorderPane {
             } else {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 if (!verifyFfmpegPath()) {
-                    ffmpegButton.setStyle("""
-                            -fx-background-color: #cd5c5c;
-                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
-                            """);
+                    ffmpegButton.setStyle(hoverButton);
                     errorAlert.setHeaderText("Ffmpeg path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
                     errorAlert.showAndWait();
                 } else if (!verifyFfprobePath()) {
-                    ffprobeButton.setStyle("""
-                            -fx-background-color: #cd5c5c;
-                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
-                            """);
+                    ffprobeButton.setStyle(hoverButton);
                     errorAlert.setHeaderText("Ffprobe path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
                     errorAlert.showAndWait();
                 } else if (!verifyOutputPath()) {
-                    outputButton.setStyle("""
-                            -fx-background-color: #cd5c5c;
-                            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
-                            """);
+                    outputButton.setStyle(hoverButton);
                     errorAlert.setHeaderText("Output path non valido");
                     errorAlert.setContentText("Selezionare un percorso valido per l'output");
                     errorAlert.showAndWait();
@@ -339,9 +318,9 @@ public class MainWindow extends BorderPane {
             precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/100f) +
                     ";");
             userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
+            main = new Tail[(int) Math.pow(userSettings.getPrecision() , 2)];
             if(i != null)
             {
-                main = new Tail[(int) Math.pow(userSettings.getPrecision() , 2)];
                 CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
                 CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
             }
@@ -353,7 +332,7 @@ public class MainWindow extends BorderPane {
                     ";");
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/60f) + ";");
-            userSettings.setPrecision((int) Math.floor((Double) newValue) / 2);
+            userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
         });
@@ -368,26 +347,25 @@ public class MainWindow extends BorderPane {
 
         openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
 
-        darkMode.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable , Boolean oldValue , Boolean newValue) {
-                if(newValue)
-                    setStyle("-fx-base: black");
-                else
-                    setStyle("-fx-base: white");
+        darkMode.selectedProperty().addListener((observable , oldValue , newValue) -> {
+            if(newValue)
+            {
+                setStyle("-fx-base: black");
+                headerText.setStyle("-fx-text-fill: white");
+            }
+            else
+            {
+                setStyle("-fx-base: white");
+                headerText.setStyle("-fx-text-fill: black");
             }
         });
 
     }
 
     private void createComboBox() {
-
         List<String> algos = Arrays.asList("BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort");
-
         chooseAlgo.setItems(FXCollections.observableList(algos));
-
         chooseAlgo.setValue("BubbleSort");
-
     }
 
     private void removeAllTails() {
@@ -406,7 +384,7 @@ public class MainWindow extends BorderPane {
         ffprobeButton.setDisable(true);
     }
 
-    private void enableAll() {
+    public void enableAll() {
         randomizeButton.setDisable(false);
         sortingButton.setDisable(false);
         pauseButton.setDisable(true);
@@ -439,6 +417,7 @@ public class MainWindow extends BorderPane {
         else
             return true;
     }
+
     //region Utilities methods
     //endregion
 }
