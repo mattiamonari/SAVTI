@@ -5,9 +5,6 @@ import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -18,28 +15,10 @@ import java.io.IOException;
 import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.FileUtilities.writeImage;
 
-public class CocktailSort implements SortAlgorithm {
-
-    private final UserSettings userSettings;
-    Thread thread;
-    int countComparison = 0, countSwaps = 0, imageIndex = 0, delay = 1;
-    boolean running = true;
-    private ProgressBar progressBar;
-    private double progress = 0;
-    private double increment;
+public class CocktailSort extends AbstractSort implements SortAlgorithm {
 
     public CocktailSort(UserSettings userSettings) {
-        this.userSettings = userSettings;
-    }
-
-    @Override
-    public void killTask() {
-        running = false;
-    }
-
-    @Override
-    public boolean isThreadAlive() {
-        return running;
+        super(userSettings);
     }
 
     @Override
@@ -153,26 +132,5 @@ public class CocktailSort implements SortAlgorithm {
             }
             ++beg;
         }
-    }
-
-    private void setupEnv(GridPane gridPane) {
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
-
-        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
-    }
-
-
-    @Override
-    public <T extends Comparable<T>> T[] sort(T[] unsorted) {
-        return null;
     }
 }
