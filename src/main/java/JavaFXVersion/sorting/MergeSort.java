@@ -50,9 +50,7 @@ public class MergeSort extends AbstractSort implements SortAlgorithm {
                     e.printStackTrace();
                 }
             }
-            Platform.runLater(() -> {
-                resumeProgram(gridPane, mainWindow, array);
-            });
+            Platform.runLater(() -> resumeProgram(gridPane, mainWindow, array));
 
         });
 

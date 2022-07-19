@@ -1,0 +1,14 @@
+.dark-blue:hover {
+        -fx-background-color: #999999;
+    -fx-background-radius: 5,4,3,5;
+    -fx-background-insets: 0,1,2,0;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-font-size: 13px;
+}
+
+
+.slider .track{
+     -fx-background-color: darkgray;
+}
+
+

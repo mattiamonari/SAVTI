@@ -62,9 +62,7 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
                     e.printStackTrace();
                 }
             }
-            Platform.runLater(() -> {
-                resumeProgram(gridPane, mainWindow, array);
-            });
+            Platform.runLater(() -> resumeProgram(gridPane, mainWindow, array));
 
         });
         thread.start();
