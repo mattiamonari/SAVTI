@@ -2,18 +2,17 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
-import JavaFXVersion.Tail;
+import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
-import static JavaFXVersion.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
 public class InsertionSort extends AbstractSort implements SortAlgorithm {
 
@@ -22,7 +21,7 @@ public class InsertionSort extends AbstractSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
+    public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array);
@@ -66,9 +65,7 @@ public class InsertionSort extends AbstractSort implements SortAlgorithm {
                 }
             }
             Platform.runLater(() -> {
-                gridPane.setVisible(true);
-                ((BorderPane)gridPane.getParent()).getChildren().remove(progressBar);
-                mainWindow.enableAll();
+                resumeProgram(gridPane, mainWindow, array);
             });
 
         });
@@ -76,8 +73,8 @@ public class InsertionSort extends AbstractSort implements SortAlgorithm {
     }
 
 
-    private void calculateNumberOfSwaps(Tail[] array) {
-        Tail[] tmp = new Tail[array.length];
+    private void calculateNumberOfSwaps(Tile[] array) {
+        Tile[] tmp = new Tile[array.length];
         System.arraycopy(array, 0, tmp, 0, array.length);
 
         for (int i = 0; i < tmp.length; ++i) {

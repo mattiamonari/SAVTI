@@ -2,18 +2,17 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
-import JavaFXVersion.Tail;
+import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
-import static JavaFXVersion.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
 public class GnomeSort extends AbstractSort implements SortAlgorithm {
 
@@ -24,7 +23,7 @@ public class GnomeSort extends AbstractSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
+    public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
 
         running = true;
         deleteAllPreviousFiles(userSettings);
@@ -47,7 +46,7 @@ public class GnomeSort extends AbstractSort implements SortAlgorithm {
                     i++;
                 } else {
                     ++countSwaps;
-                    Tail tmp = array[i];
+                    Tile tmp = array[i];
                     array[i] = array[i - 1];
                     array[--i] = tmp;
                     if ((countSwaps % delay) == 0)
@@ -69,16 +68,14 @@ public class GnomeSort extends AbstractSort implements SortAlgorithm {
                 }
             }
             Platform.runLater(() -> {
-                gridPane.setVisible(true);
-                ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
-                mainWindow.enableAll();
+                resumeProgram(gridPane, mainWindow, array);
             });
         });
         thread.start();
     }
-    private void calculateNumberOfSwaps(Tail[] array) {
+    private void calculateNumberOfSwaps(Tile[] array) {
 
-        Tail[] tmp = new Tail[array.length];
+        Tile[] tmp = new Tile[array.length];
         System.arraycopy(array, 0, tmp, 0, array.length);
         int i = 1;
         int n = tmp.length;
@@ -87,7 +84,7 @@ public class GnomeSort extends AbstractSort implements SortAlgorithm {
                 i++;
             } else {
                 ++countSwaps;
-                Tail temp = tmp[i];
+                Tile temp = tmp[i];
                 tmp[i] = tmp[i - 1];
                 tmp[--i] = temp;
             }

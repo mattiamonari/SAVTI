@@ -2,18 +2,17 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
-import JavaFXVersion.Tail;
+import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
-import static JavaFXVersion.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
 public class RadixSort extends AbstractSort implements SortAlgorithm {
 
@@ -24,7 +23,7 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
+    public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
 
         running = true;
         deleteAllPreviousFiles(userSettings);
@@ -41,7 +40,7 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
         thread = new Thread(() -> {
             // Get maximum element
             int size = array.length;
-            Tail max = getMax(array, size);
+            Tile max = getMax(array, size);
 
             // Apply counting sort to sort elements based on place value.
             for (int place = 1; max.position / place > 0; place *= 10) {
@@ -64,9 +63,7 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
                 }
             }
             Platform.runLater(() -> {
-                gridPane.setVisible(true);
-                ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
-                mainWindow.enableAll();
+                resumeProgram(gridPane, mainWindow, array);
             });
 
         });
@@ -74,8 +71,8 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
 
     }
 
-    Tail getMax(Tail[] array, int n) {
-        Tail max = array[0];
+    Tile getMax(Tile[] array, int n) {
+        Tile max = array[0];
         for (int i = 1; i < n; i++) {
             ++countComparison;
             if (SortUtils.greater(array[i], max))
@@ -84,9 +81,9 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
         return max;
     }
 
-    void countingSort(Tail[] array, int size, int place, int delay, int width, int height, boolean write) {
-        Tail[] output = new Tail[size + 1];
-        Tail max = array[0];
+    void countingSort(Tile[] array, int size, int place, int delay, int width, int height, boolean write) {
+        Tile[] output = new Tile[size + 1];
+        Tile max = array[0];
         if (!running)
             return;
         for (int i = 1; i < size; i++) {
@@ -126,11 +123,11 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
     }
 
 
-    private void calculateNumberOfSwaps(Tail[] array) {
+    private void calculateNumberOfSwaps(Tile[] array) {
         write = false;
         int size = array.length;
-        Tail max = getMax(array, size);
-        Tail[] tmp = new Tail[size];
+        Tile max = getMax(array, size);
+        Tile[] tmp = new Tile[size];
         System.arraycopy(array, 0, tmp, 0, size);
 
         // Apply counting sort to sort elements based on place value.

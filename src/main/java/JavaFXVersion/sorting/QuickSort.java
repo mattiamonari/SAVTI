@@ -2,20 +2,19 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
-import JavaFXVersion.Tail;
+import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
-import static JavaFXVersion.FileUtilities.writeImage;
 import static JavaFXVersion.sorting.SortUtils.less;
 import static JavaFXVersion.sorting.SortUtils.swap;
+import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
+import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
 public class QuickSort extends AbstractSort implements SortAlgorithm {
 
@@ -24,7 +23,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
     }
 
     @Override
-    public void sort(Tail[] array, GridPane gridPane, MainWindow mainWindow) {
+    public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
         running = true;
         deleteAllPreviousFiles(userSettings);
         calculateNumberOfSwaps(array, gridPane);
@@ -50,33 +49,20 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
                 }
             }
             Platform.runLater(() -> {
-                gridPane.setVisible(true);
-                ((BorderPane) gridPane.getParent()).getChildren().remove(progressBar);
-                mainWindow.enableAll();
+                resumeProgram(gridPane, mainWindow, array);
             });
         });
         thread.start();
     }
 
 
-    private void calculateNumberOfSwaps(Tail[] array, GridPane gridPane) {
-        Tail[] tmp = new Tail[array.length];
+    private void calculateNumberOfSwaps(Tile[] array, GridPane gridPane) {
+        Tile[] tmp = new Tile[array.length];
         System.arraycopy(array, 0, tmp, 0, array.length);
         doSort(tmp, 0, tmp.length - 1, gridPane, false);
     }
 
-    /**
-     * This method implements the Generic Quick Sort
-     *
-     * @param array The array to be sorted Sorts the array in increasing order
-     */
-    @Override
-    public <T extends Comparable<T>> T[] sort(T[] array) {
-        return array;
-    }
-
-
-    private <T extends Comparable<T>> void doSort(Tail[] array, int left, int right, GridPane gridPane, boolean write) {
+    private <T extends Comparable<T>> void doSort(Tile[] array, int left, int right, GridPane gridPane, boolean write) {
         if (running) {
             countComparison++;
             if (left < right) {
@@ -95,7 +81,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
      * @param right The last index of an array
      * @return the partition index of the array
      */
-    private <T extends Comparable<T>> int randomPartition(Tail[] array, int left, int right, GridPane gridPane,
+    private <T extends Comparable<T>> int randomPartition(Tile[] array, int left, int right, GridPane gridPane,
                                                           boolean write) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
 
@@ -117,9 +103,9 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
      * @param right The last index of an array Finds the partition index of an
      *              array
      */
-    private <T extends Comparable<T>> int partition(Tail[] array, int left, int right, GridPane gridPane) {
+    private <T extends Comparable<T>> int partition(Tile[] array, int left, int right, GridPane gridPane) {
         int mid = (left + right) >>> 1;
-        Tail pivot = array[mid];
+        Tile pivot = array[mid];
 
         while (left <= right) {
             countComparison++;
