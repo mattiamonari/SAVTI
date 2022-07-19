@@ -4,52 +4,23 @@ import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import JavaFXVersion.UserSettings;
-import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.FutureTask;
 
 import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.FileUtilities.writeImage;
-import static JavaFXVersion.sorting.SortUtils.*;
+import static JavaFXVersion.sorting.SortUtils.less;
+import static JavaFXVersion.sorting.SortUtils.swap;
 
-public class QuickSort implements SortAlgorithm {
-
-
-    private final UserSettings userSettings;
-    Thread thread;
-    int imageIndex = 0, width = 0, height = 0, delay = 1;
-    int countSwaps, countComparison;
-    boolean running = true;
-    private ProgressBar progressBar;
-    private double progress = 0;
-    private double increment;
+public class QuickSort extends AbstractSort implements SortAlgorithm {
 
     public QuickSort(UserSettings userSettings) {
-        this.userSettings = userSettings;
-    }
-
-    public boolean isThreadAlive() {
-        return running;
-    }
-
-    @Override
-    public void killTask() {
-        running = false;
+        super(userSettings);
     }
 
     @Override
@@ -67,7 +38,7 @@ public class QuickSort implements SortAlgorithm {
         thread = new Thread(() -> {
             doSort(array, 0, array.length - 1, gridPane, true);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            if (userSettings.saveImage == false)
+            if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 
             if (userSettings.isOpenFile()) {
@@ -85,21 +56,6 @@ public class QuickSort implements SortAlgorithm {
             });
         });
         thread.start();
-    }
-
-    private void setupEnv(GridPane gridPane) {
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
-
-        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
     }
 
 

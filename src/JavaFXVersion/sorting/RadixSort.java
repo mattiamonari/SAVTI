@@ -5,9 +5,6 @@ import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tail;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -18,29 +15,12 @@ import java.io.IOException;
 import static JavaFXVersion.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.FileUtilities.writeImage;
 
-public class RadixSort implements SortAlgorithm {
+public class RadixSort extends AbstractSort implements SortAlgorithm {
 
-    private final UserSettings userSettings;
-    Thread thread;
-    int countComparison = 0, countSwaps = 0, imageIndex = 1, delay = 1;
-    boolean running = true;
-    private ProgressBar progressBar;
-    private double progress = 0;
-    private double increment;
     boolean write;
 
     public RadixSort(UserSettings userSettings) {
-        this.userSettings = userSettings;
-    }
-
-    @Override
-    public void killTask() {
-        running = false;
-    }
-
-    @Override
-    public boolean isThreadAlive() {
-        return running;
+        super(userSettings);
     }
 
     @Override
@@ -65,13 +45,13 @@ public class RadixSort implements SortAlgorithm {
 
             // Apply counting sort to sort elements based on place value.
             for (int place = 1; max.position / place > 0; place *= 10) {
-                if (running == false)
+                if (!running)
                     break;
                 countingSort(array, size, place, delay, width, height, write);
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
             FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            if (userSettings.saveImage == false)
+            if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 
 
@@ -94,7 +74,7 @@ public class RadixSort implements SortAlgorithm {
 
     }
 
-    Tail getMax(Tail array[], int n) {
+    Tail getMax(Tail[] array, int n) {
         Tail max = array[0];
         for (int i = 1; i < n; i++) {
             ++countComparison;
@@ -104,10 +84,10 @@ public class RadixSort implements SortAlgorithm {
         return max;
     }
 
-    void countingSort(Tail array[], int size, int place, int delay, int width, int height, boolean write) {
+    void countingSort(Tail[] array, int size, int place, int delay, int width, int height, boolean write) {
         Tail[] output = new Tail[size + 1];
         Tail max = array[0];
-        if (running == false)
+        if (!running)
             return;
         for (int i = 1; i < size; i++) {
             ++countComparison;
@@ -136,28 +116,13 @@ public class RadixSort implements SortAlgorithm {
         for (int i = 0; i < size; i++) {
             ++countSwaps;
             array[i] = output[i];
-            if ((countSwaps % delay) == 0 && (write == true))
+            if ((countSwaps % delay) == 0 && (write))
                 writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
             if(write)
                 progressBar.setProgress(progress += increment);
             //progressBar.setProgress(progress+=increment);
 
         }
-    }
-
-    private void setupEnv(GridPane gridPane) {
-        progressBar = new ProgressBar(0);
-        increment = 1d / countSwaps;
-        ((BorderPane) gridPane.getParent()).setBottom(progressBar);
-        gridPane.setVisible(false);
-        progressBar.setPrefWidth(gridPane.getWidth());
-        progressBar.setMinWidth(gridPane.getWidth());
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        BorderPane.setAlignment(progressBar, Pos.CENTER);
-        BorderPane.setMargin(progressBar, new Insets(0, 0, 10, 0));
-
-        delay = countSwaps / (userSettings.getFrameRate() * userSettings.getVideoDuration()) + 1;
     }
 
 
@@ -171,10 +136,5 @@ public class RadixSort implements SortAlgorithm {
         // Apply counting sort to sort elements based on place value.
         for (int place = 1; max.position / place > 0; place *= 10)
             countingSort(tmp, size, place, 1, 0, 0, write);
-    }
-
-    @Override
-    public <T extends Comparable<T>> T[] sort(T[] unsorted) {
-        return null;
     }
 }
