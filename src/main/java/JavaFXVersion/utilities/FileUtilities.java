@@ -47,7 +47,7 @@ public class FileUtilities {
         try {
             Imaging.writeImage(finalImage , f , ImageFormats.PNG);
         } catch (ImageWriteException | IOException e) {
-            e.printStackTrace();
+            ErrorUtilities.writeError();
         }
     }
 
@@ -70,7 +70,8 @@ public class FileUtilities {
         try {
             Imaging.writeImage(finalImage , f , ImageFormats.PNG);
         } catch (ImageWriteException | IOException e) {
-            e.printStackTrace();
+            ErrorUtilities.writeError();
         }
     }
+
 }

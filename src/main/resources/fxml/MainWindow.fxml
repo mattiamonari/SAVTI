@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -13,9 +14,9 @@
                <Menu mnemonicParsing="false" text="App">
                    <MenuItem fx:id="imageLoaderItem" mnemonicParsing="false" text="Load Image..." />
                    <Menu mnemonicParsing="false" text="Settings...">
-                       <CheckMenuItem fx:id="openVideo" mnemonicParsing="false" text="Riproduci video alla fine" />
-                       <CheckMenuItem fx:id="saveimageItem" mnemonicParsing="false" text="Salva frame video" />
-                       <MenuItem fx:id="changeoutputItem" mnemonicParsing="false" text="Cambia nome del file video" />
+                       <CheckMenuItem fx:id="openVideo" mnemonicParsing="false" text="Play video after creation" />
+                       <CheckMenuItem fx:id="saveimageItem" mnemonicParsing="false" text="Keep video frame in out directory" />
+                       <MenuItem fx:id="changeoutputItem" mnemonicParsing="false" text="Change output file name" />
                    </Menu>
                    <MenuItem fx:id="songLoaderItem" mnemonicParsing="false" text="Load a song.." />
                </Menu>
@@ -29,7 +30,7 @@
                       <Font name="System Bold" size="25.0" />
                   </font>
                </Label>
-            <ToggleSwitch fx:id="darkMode" text="Dark Mode">
+            <ToggleSwitch fx:id="darkMode" selected="true" text="Dark Mode">
                <HBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </HBox.margin>
@@ -39,42 +40,42 @@
     </top>
     <left>
         <VBox BorderPane.alignment="CENTER">
-            <Button fx:id="randomizeButton" mnemonicParsing="false" styleClass="dark-blue" text="Randomizza l'immagine">
+            <Button fx:id="randomizeButton" mnemonicParsing="false" styleClass="dark-blue" text="Shuffle the image">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="sortingButton" mnemonicParsing="false" styleClass="dark-blue" text="Ricomponi l'immgine">
+            <Button fx:id="sortingButton" mnemonicParsing="false" styleClass="dark-blue" text="Start sorting!">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="pauseButton" disable="true" mnemonicParsing="false" styleClass="dark-blue" text="Pausa">
+            <Button fx:id="pauseButton" disable="true" mnemonicParsing="false" styleClass="dark-blue" text="Pause">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="cleanButton" layoutX="10.0" layoutY="36.0" mnemonicParsing="false" styleClass="dark-blue" text="Rimuovi l'immagine">
+            <Button fx:id="cleanButton" layoutX="10.0" layoutY="36.0" mnemonicParsing="false" styleClass="dark-blue" text="Remove the image">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="ffmpegButton" mnemonicParsing="false" styleClass="dark-blue" text="Setta il percorso a FFMPEG!">
+            <Button fx:id="ffmpegButton" mnemonicParsing="false" styleClass="dark-blue" text="Set FFMPEG path">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="ffprobeButton" mnemonicParsing="false" styleClass="dark-blue" text="Setta il percorso a FFProbe!">
+            <Button fx:id="ffprobeButton" mnemonicParsing="false" styleClass="dark-blue" text="Set FFPROBE path">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Button fx:id="outputButton" layoutX="20.0" layoutY="155.0" mnemonicParsing="false" styleClass="dark-blue" text="Scegli dove salvare il video!">
+            <Button fx:id="outputButton" layoutX="20.0" layoutY="155.0" mnemonicParsing="false" styleClass="dark-blue" text="Set output directory">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Button>
-            <Label text="Scegli il taglio dell'immagine">
+            <Label text="Choose precision">
                 <VBox.margin>
                     <Insets left="10.0" top="10.0" />
                 </VBox.margin>
@@ -86,7 +87,7 @@
                 <Slider fx:id="precisionSlider" blockIncrement="1.0" majorTickUnit="5.0" max="50.0" minorTickCount="1" prefHeight="38.0" prefWidth="175.0" showTickLabels="true" showTickMarks="true" value="8.0" />
                 <Label fx:id="precisionValue" prefWidth="30.0" />
             </HBox>
-            <Label text="Scegli il framerate">
+            <Label text="Choose the framerate">
                 <VBox.margin>
                     <Insets left="10.0" top="10.0" />
                 </VBox.margin>
@@ -102,7 +103,7 @@
                 </Slider>
                 <Label fx:id="framerateValue" prefWidth="30.0" />
             </HBox>
-            <Label text="Durata video (secondi)">
+            <Label text="Video duration (seconds)">
                 <VBox.margin>
                     <Insets left="10.0" top="10.0" />
                 </VBox.margin>
@@ -121,14 +122,6 @@
             </ComboBox>
         </VBox>
     </left>
-    <center>
-        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-            <GridPane fx:id="gridPane">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></GridPane>
-        </VBox>
-    </center>
    <bottom>
          <Hyperlink fx:id="pathLabel" alignment="CENTER" contentDisplay="CENTER" text="Path to output: " wrapText="true" BorderPane.alignment="CENTER">
              <font>
@@ -136,4 +129,24 @@
              </font>
          </Hyperlink>
    </bottom>
+   <right>
+      <StackPane fx:id="container">
+         <children>
+            <Group fx:id="group">
+               <children>
+                    <VBox prefHeight="200.0" prefWidth="100.0">
+                        <GridPane fx:id="gridPane">
+                        <VBox.margin>
+                           <Insets />
+                        </VBox.margin>
+                     </GridPane>
+                    </VBox>
+               </children>
+            </Group>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="20.0" right="20.0" top="20.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </right>
 </fx:root>

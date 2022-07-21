@@ -76,7 +76,6 @@ public class CocktailSort extends AbstractSort implements SortAlgorithm {
                 ++beg;
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-            FFMPEG prc = new FFMPEG(userSettings, progressBar);
             if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 

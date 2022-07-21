@@ -30,6 +30,7 @@ abstract public class AbstractSort implements SortAlgorithm{
         running = false;
     }
 
+    @Override
     public boolean isThreadAlive() {
         return running;
     }

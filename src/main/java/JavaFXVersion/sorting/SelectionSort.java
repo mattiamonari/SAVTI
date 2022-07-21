@@ -1,6 +1,5 @@
 package JavaFXVersion.sorting;
 
-import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
@@ -53,7 +52,6 @@ public class SelectionSort extends AbstractSort implements SortAlgorithm {
                     break;
             }
             writeImage(userSettings , array , width , height , imageIndex , countComparison , countSwaps);
-            FFMPEG prc = new FFMPEG(userSettings , progressBar);
             if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
             if (userSettings.isOpenFile()) {

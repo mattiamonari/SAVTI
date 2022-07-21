@@ -1,6 +1,7 @@
 package JavaFXVersion.utilities;
 
 import JavaFXVersion.Tile;
+import javafx.geometry.VPos;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;

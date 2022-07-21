@@ -8,8 +8,10 @@ import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -27,16 +29,17 @@ import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
 import static JavaFXVersion.sorting.SortAlgorithm.rand;
 import static JavaFXVersion.utilities.ImageUtilities.fillImage;
 import static JavaFXVersion.utilities.ImageUtilities.splitImage;
-//TODO : WE DON'T NEED NO MORE TO MAKE THE ANIMATION. SIMPLY
 
 public class MainWindow extends BorderPane {
     //region Local variables' declaration
@@ -54,7 +57,10 @@ public class MainWindow extends BorderPane {
     //region FXML variables declaration
     @FXML
     GridPane gridPane;
-    //?? Probably better substitute with buttons
+    @FXML
+    StackPane container;
+    @FXML
+    Group group;
     @FXML
     MenuItem imageLoaderItem;
     @FXML
@@ -109,7 +115,7 @@ public class MainWindow extends BorderPane {
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorUtilities.FXMLLoadError();
         }
         //Instantiating and initializing non-JavaFX variables
         initComponents();
@@ -137,27 +143,32 @@ public class MainWindow extends BorderPane {
 
         createComboBox();
 
-        theme = new JMetro(this, Style.LIGHT);
+        updateLabels();
+
+        theme = new JMetro(this, Style.DARK);
     }
 
     private void addCssFiles() {
-
+        setStyle("-fx-base: black");
         randomizeButton.getParent().getStylesheets().add("/css/main.css");
         this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
-
     }
 
-    //? Should we move loadAndSplitImage inside ImageUtilities class?
     //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
     private void loadAndSplitImage(File file, int width, int height) {
         BufferedImage capture = null;
         BufferedImage dimg = null;
         try {
             capture = ImageIO.read(file);
-             dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width-20, height);
-
+            if(capture != null)
+                dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width-20, height);
+            else {
+                ErrorUtilities.loadImageError();
+                return;
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorUtilities.loadImageError();
+            return;
         }
         if (dimg.getHeight() > height)
             dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, width, height-30);
@@ -166,12 +177,14 @@ public class MainWindow extends BorderPane {
         CHUNK_HEIGHT = dimg.getHeight() / userSettings.getPrecision();
         userSettings.setChunkWidth(CHUNK_WIDTH);
         userSettings.setChunkHeight(CHUNK_HEIGHT);
-        gridPane.setPrefSize(i.getWidth(), i.getHeight());
-        gridPane.setMaxSize(i.getWidth(), i.getHeight());
-        gridPane.setPadding(Insets.EMPTY);
         removeAllTiles();
         splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
         fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
+
+        container.setPrefSize(width, height);
+        container.setMaxSize(width, height);
+        container.setPadding(Insets.EMPTY);
+        StackPane.setAlignment(group, Pos.CENTER);
     }
 
     //Aggiunge i listener agli eventi dei nodi/elementi
@@ -193,7 +206,7 @@ public class MainWindow extends BorderPane {
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            //TODO create a function
+            //TODO create a function!!!!!!
             if (verifyFfmpegPath() && verifyOutputPath() && verifyFfprobePath()) {
                 if (!Arrays.stream(main).allMatch(Objects::isNull)) {
                     if (chooseAlgo.getValue() != null) {
@@ -207,17 +220,17 @@ public class MainWindow extends BorderPane {
                             case "MergeSort" -> algorithm = new MergeSort(userSettings);
                             case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
                             case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
+                            case "BitonicSort" -> algorithm = new BitonicSort(userSettings);
                         }
                     }
-                    //Se tutti gli oggetti del vettore main sono diversi da NULL, e non c'è già un SortingThread attivo
-                    // faccio partire l'ordinamento
-                    disableAll();
                     List<Tile> sorted = new ArrayList<Tile>(List.of(main));
                     Collections.sort(sorted);
                     if(sorted.equals(List.of(main)))
                         ErrorUtilities.alreadyOrderedImage();
-                    else
+                    else {
+                        disableAll();
                         algorithm.sort(main, gridPane, this);
+                    }
                 } else {
                     ErrorUtilities.noImageError();
                 }
@@ -248,8 +261,8 @@ public class MainWindow extends BorderPane {
             fileChooser.setTitle("Open Resource File");
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
-                int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth());
-                int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 20);
+                int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20);
+                int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50);
                 loadAndSplitImage(chosenFile, width, height);
             }
         });
@@ -277,7 +290,7 @@ public class MainWindow extends BorderPane {
             userSettings.setMusic(chosenFile);
         });
 
-        saveimageItem.setOnAction((event -> userSettings.setSaveImage(saveimageItem.isSelected())));
+        saveimageItem.setOnAction(event -> userSettings.setSaveImage(saveimageItem.isSelected()));
 
 
         outputButton.setOnAction(e -> {
@@ -313,10 +326,10 @@ public class MainWindow extends BorderPane {
             }
         });
 
-        pauseButton.setOnAction((e -> {
+        pauseButton.setOnAction(e -> {
             algorithm.killTask();
             enableAll();
-        }));
+        });
 
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Node thumb = precisionSlider.lookup(".thumb");
@@ -354,7 +367,7 @@ public class MainWindow extends BorderPane {
             userSettings.setVideoDuration((int) Math.floor((Double) newValue));
         });
 
-        openVideo.setOnAction((event -> userSettings.setOpenFile(openVideo.isSelected())));
+        openVideo.setOnAction(event -> userSettings.setOpenFile(openVideo.isSelected()));
 
         darkMode.selectedProperty().addListener((observable , oldValue , newValue) -> {
             if(newValue)
@@ -370,20 +383,21 @@ public class MainWindow extends BorderPane {
         });
 
         pathLabel.setOnAction(event -> {
-            if(userSettings.getOutputDirectory().isDirectory())
-            {
-                try {
-                    Desktop.getDesktop().open(userSettings.getOutputDirectory());
-                } catch (IOException e) {
-                    ErrorUtilities.SWW();
+            if(userSettings.getOutputDirectory() != null)
+                if(userSettings.getOutputDirectory().isDirectory())
+                {
+                    try {
+                        Desktop.getDesktop().open(userSettings.getOutputDirectory());
+                    } catch (IOException e) {
+                        ErrorUtilities.SWW();
+                    }
                 }
-            }
         });
 
     }
 
     private void createComboBox() {
-        List<String> algos = Arrays.asList("BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort");
+        List<String> algos = Arrays.asList("BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort", "BitonicSort");
         chooseAlgo.setItems(FXCollections.observableList(algos));
         chooseAlgo.setValue("BubbleSort");
     }
@@ -402,6 +416,8 @@ public class MainWindow extends BorderPane {
         videodurationSlider.setDisable(true);
         ffprobeButton.setDisable(true);
         framerateSlider.setDisable(true);
+        imageLoaderItem.setDisable(true);
+        songLoaderItem.setDisable(true);
 
         pauseButton.setDisable(false);
     }
@@ -416,6 +432,8 @@ public class MainWindow extends BorderPane {
         videodurationSlider.setDisable(false);
         ffprobeButton.setDisable(false);
         framerateSlider.setDisable(false);
+        imageLoaderItem.setDisable(false);
+        songLoaderItem.setDisable(false);
 
         pauseButton.setDisable(true);
     }
@@ -432,6 +450,24 @@ public class MainWindow extends BorderPane {
         return userSettings.getOutputDirectory() != null;
     }
 
+    private void updateLabels(){
+
+        //FRAMERATE SLIDER
+        double newValue = framerateSlider.getValue();
+        framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
+        framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/60f)) + ";");
+        framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
+
+        //PRECISION SLIDER
+        newValue = precisionSlider.getValue();
+        precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
+        precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/50f)) + ";");
+
+        //DURATION SLIDER
+        newValue = videodurationSlider.getValue();
+        videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/30f)) + ";");
+        videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
+    }
     //region Utilities methods
     //endregion
 }

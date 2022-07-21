@@ -1,5 +1,6 @@
 package JavaFXVersion;
 
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import net.bramp.ffmpeg.FFmpeg;
@@ -20,18 +21,15 @@ public class FFMPEG {
     FFmpegBuilder builder;
     FFmpegJob job;
     double percentage;
-    private final Process process = null;
 
     public FFMPEG(UserSettings userSettings , ProgressBar progressBar) {
         try {
             ffprobe = new FFprobe(userSettings.getFfprobePath().getAbsolutePath());
             if (ffprobe.version() == null) {
-                System.out.println("PORCODDIO");
                 Platform.exit();
             }
             ffmpeg = new FFmpeg(userSettings.getFfmpegPath().getAbsolutePath());
             if (ffmpeg.version() == null) {
-                System.out.println("Porcdio");
                 Platform.exit();
             }
             FFmpegProbeResult in = ffprobe.probe(userSettings.getOutputDirectory().getAbsolutePath() + "\\final%d" + ".png");
@@ -52,7 +50,9 @@ public class FFMPEG {
             });
             job.run();
         } catch (IOException e) {
-            e.printStackTrace();
+            Platform.runLater(()->{
+                ErrorUtilities.FFError();
+            });
         }
     }
 }

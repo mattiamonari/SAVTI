@@ -26,6 +26,7 @@ public class BubbleSort extends AbstractSort implements SortAlgorithm {
         running = false;
     }
 
+    @Override
     public boolean isThreadAlive() {
         return running;
     }

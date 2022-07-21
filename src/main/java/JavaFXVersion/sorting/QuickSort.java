@@ -1,6 +1,5 @@
 package JavaFXVersion.sorting;
 
-import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
@@ -26,7 +25,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
     public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
         running = true;
         deleteAllPreviousFiles(userSettings);
-        calculateNumberOfSwaps(array, gridPane);
+        calculateNumberOfSwaps(array);
         setupEnv(gridPane);
         countSwaps = 0;
         countComparison = 0;
@@ -35,8 +34,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
         height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
                 array[0].getImage().getHeight() - 1);
         thread = new Thread(() -> {
-            doSort(array, 0, array.length - 1, gridPane, true);
-            FFMPEG prc = new FFMPEG(userSettings, progressBar);
+            doSort(array, 0, array.length - 1, true);
             if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 
@@ -54,19 +52,19 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
     }
 
 
-    private void calculateNumberOfSwaps(Tile[] array, GridPane gridPane) {
+    private void calculateNumberOfSwaps(Tile[] array) {
         Tile[] tmp = new Tile[array.length];
         System.arraycopy(array, 0, tmp, 0, array.length);
-        doSort(tmp, 0, tmp.length - 1, gridPane, false);
+        doSort(tmp, 0, tmp.length - 1, false);
     }
 
-    private <T extends Comparable<T>> void doSort(Tile[] array, int left, int right, GridPane gridPane, boolean write) {
+    private void doSort(Tile[] array, int left, int right, boolean write) {
         if (running) {
             countComparison++;
             if (left < right) {
-                int pivot = randomPartition(array, left, right, gridPane, write);
-                doSort(array, left, pivot - 1, gridPane, write);
-                doSort(array, pivot, right, gridPane, write);
+                int pivot = randomPartition(array, left, right, write);
+                doSort(array, left, pivot - 1, write);
+                doSort(array, pivot, right, write);
             }
         }
     }
@@ -79,8 +77,8 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
      * @param right The last index of an array
      * @return the partition index of the array
      */
-    private <T extends Comparable<T>> int randomPartition(Tile[] array, int left, int right, GridPane gridPane,
-                                                          boolean write) {
+    private int randomPartition(Tile[] array, int left, int right,
+                                boolean write) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
 
         countSwaps++;
@@ -90,7 +88,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
             progressBar.setProgress(progress += increment);
         swap(array, randomIndex, right);
 
-        return partition(array, left, right, gridPane);
+        return partition(array, left, right);
     }
 
     /**
@@ -101,7 +99,7 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
      * @param right The last index of an array Finds the partition index of an
      *              array
      */
-    private <T extends Comparable<T>> int partition(Tile[] array, int left, int right, GridPane gridPane) {
+    private int partition(Tile[] array, int left, int right) {
         int mid = (left + right) >>> 1;
         Tile pivot = array[mid];
 
@@ -117,9 +115,6 @@ public class QuickSort extends AbstractSort implements SortAlgorithm {
             }
             countComparison++;
             if (left <= right) {
-                int finalLeft = left;
-                int finalRight = right;
-
                 countSwaps++;
                 swap(array, left, right);
                 ++left;

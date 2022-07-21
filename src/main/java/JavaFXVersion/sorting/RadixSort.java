@@ -49,7 +49,6 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
                 countingSort(array, size, place, delay, width, height, write);
             }
             writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-            FFMPEG prc = new FFMPEG(userSettings, progressBar);
             if (!userSettings.saveImage)
                 deleteAllPreviousFiles(userSettings);
 
@@ -111,7 +110,7 @@ public class RadixSort extends AbstractSort implements SortAlgorithm {
         for (int i = 0; i < size; i++) {
             ++countSwaps;
             array[i] = output[i];
-            if ((countSwaps % delay) == 0 && (write))
+            if ((countSwaps % delay) == 0 && write)
                 writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps);
             if(write)
                 progressBar.setProgress(progress += increment);
