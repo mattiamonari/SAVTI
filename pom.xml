@@ -128,13 +128,6 @@
             <artifactId>imgscalr-lib</artifactId>
             <version>4.2</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.github.palexdev/materialfx -->
-        <dependency>
-            <groupId>io.github.palexdev</groupId>
-            <artifactId>materialfx</artifactId>
-            <version>11.13.5</version>
-        </dependency>
-
     </dependencies>
 
     <properties>

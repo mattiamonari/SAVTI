@@ -13,7 +13,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class SelectionSort extends AbstractSort implements SortAlgorithm {
+public class SelectionSort extends AbstractSort {
     public SelectionSort(UserSettings userSettings) {
         super(userSettings);
     }

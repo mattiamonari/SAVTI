@@ -15,7 +15,7 @@ import static JavaFXVersion.sorting.SortUtils.swap;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class QuickSort extends AbstractSort implements SortAlgorithm {
+public class QuickSort extends AbstractSort {
 
     public QuickSort(UserSettings userSettings) {
         super(userSettings);

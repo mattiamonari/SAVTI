@@ -220,7 +220,7 @@ public class MainWindow extends BorderPane {
                             case "MergeSort" -> algorithm = new MergeSort(userSettings);
                             case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
                             case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
-                            case "BitonicSort" -> algorithm = new BitonicSort(userSettings);
+                            case "CycleSort" -> algorithm = new CycleSort(userSettings);
                         }
                     }
                     List<Tile> sorted = new ArrayList<Tile>(List.of(main));
@@ -269,9 +269,8 @@ public class MainWindow extends BorderPane {
 
         changeoutputItem.setOnAction(e -> {
             TextInputDialog output = new TextInputDialog();
-            output.getDialogPane().getStylesheets().add(getClass().getResource("grid.css").toExternalForm());
-            output.setTitle("Scegli il nome del file video!");
-            output.setContentText("Nome file:");
+            output.setTitle("Choose the name of the output file.");
+            output.setContentText("Filename: ");
             Optional<String> out = output.showAndWait();
             if (out.isPresent()) {
                 if (out.get().endsWith(".mp4"))
@@ -397,7 +396,7 @@ public class MainWindow extends BorderPane {
     }
 
     private void createComboBox() {
-        List<String> algos = Arrays.asList("BubbleSort", "QuickSort", "SelectionSort", "InsertionSort", "RadixSort", "MergeSort", "CocktailSort", "GnomeSort", "BitonicSort");
+        List<String> algos = Arrays.asList("BubbleSort", "CocktailSort", "CycleSort", "GnomeSort", "InsertionSort", "MergeSort", "QuickSort", "RadixSort", "SelectionSort");
         chooseAlgo.setItems(FXCollections.observableList(algos));
         chooseAlgo.setValue("BubbleSort");
     }

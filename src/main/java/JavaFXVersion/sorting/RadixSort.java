@@ -14,7 +14,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class RadixSort extends AbstractSort implements SortAlgorithm {
+public class RadixSort extends AbstractSort {
 
     boolean write;
 

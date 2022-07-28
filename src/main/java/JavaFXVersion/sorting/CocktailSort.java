@@ -14,7 +14,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class CocktailSort extends AbstractSort implements SortAlgorithm {
+public class CocktailSort extends AbstractSort {
 
     public CocktailSort(UserSettings userSettings) {
         super(userSettings);

@@ -14,7 +14,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class GnomeSort extends AbstractSort implements SortAlgorithm {
+public class GnomeSort extends AbstractSort {
 
 
 

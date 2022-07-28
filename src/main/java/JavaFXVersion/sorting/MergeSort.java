@@ -14,7 +14,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class MergeSort extends AbstractSort implements SortAlgorithm {
+public class MergeSort extends AbstractSort {
 
     public MergeSort(UserSettings userSettings) {
         super(userSettings);

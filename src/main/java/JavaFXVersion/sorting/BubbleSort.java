@@ -14,7 +14,7 @@ import java.io.IOException;
 import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
 
-public class BubbleSort extends AbstractSort implements SortAlgorithm {
+public class BubbleSort extends AbstractSort{
     //Random object used for lock the threads in this class
 
     public BubbleSort(UserSettings userSettings) {
