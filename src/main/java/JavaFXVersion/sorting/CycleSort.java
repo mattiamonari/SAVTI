@@ -1,19 +1,14 @@
 package JavaFXVersion.sorting;
 
-import JavaFXVersion.FFMPEG;
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.GridPane;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import javafx.scene.image.ImageView;
 
 import static JavaFXVersion.sorting.SortUtils.less;
-import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class CycleSort extends AbstractSort {
 
@@ -39,17 +34,9 @@ public class CycleSort extends AbstractSort {
     }
 
     @Override
-    public void sort(Tile[] array, GridPane gridPane, MainWindow mainWindow) {
-        running = true;
-        deleteAllPreviousFiles(userSettings);
-        calculateNumberOfSwaps(array);
-        setupEnv(gridPane);
-        countSwaps = 0;
-        countComparison = 0;
-        int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() :
-                array[0].getImage().getWidth() - 1);
-        int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() :
-                array[0].getImage().getHeight() - 1);
+    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+
+        setupEnv(imageView, array);
 
         thread = new Thread(() -> {
 
@@ -83,8 +70,8 @@ public class CycleSort extends AbstractSort {
                 if (pos != j) {
                     countSwaps++;
                     progressBar.setProgress(progress += increment);
-                    if(countSwaps % delay == 0)
-                        writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps);
+                    if (countSwaps % delay == 0)
+                        writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps, imageView.getFitWidth() / 150f);
                     item = replace(array, pos, item);
                 }
 
@@ -110,31 +97,19 @@ public class CycleSort extends AbstractSort {
                         countSwaps++;
                         item = replace(array, pos, item);
                         if(countSwaps % delay == 0)
-                            writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps);                      progressBar.setProgress(progress += increment);
+                            writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps, imageView.getFitWidth() / 150f);                      progressBar.setProgress(progress += increment);
                     }
                 }
             }
 
-            writeImage(userSettings, array, width, height, imageIndex, countComparison, countSwaps);
-            FFMPEG prc = new FFMPEG(userSettings, progressBar);
-            if (!userSettings.saveImage)
-                deleteAllPreviousFiles(userSettings);
-
-            if (userSettings.isOpenFile()) {
-                File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
-                try {
-                    Desktop.getDesktop().open(out);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            Platform.runLater(() -> resumeProgram(gridPane, mainWindow, array));
-
+            runFFMPEG(array, imageView);
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
         });
         thread.start();
     }
 
-    private void calculateNumberOfSwaps(Tile[] a) {
+    @Override
+    protected void calculateNumberOfSwaps(Tile[] a) {
         Tile[] array = new Tile[a.length];
         System.arraycopy(a,0, array,0, a.length);
         int n = a.length;
@@ -192,7 +167,7 @@ public class CycleSort extends AbstractSort {
                 }
             }
         }
-
+        resetCoordinates(userSettings, array);
     }
 }
 

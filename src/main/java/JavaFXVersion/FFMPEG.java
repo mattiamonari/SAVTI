@@ -25,15 +25,15 @@ public class FFMPEG {
     public FFMPEG(UserSettings userSettings , ProgressBar progressBar) {
         try {
             ffprobe = new FFprobe(userSettings.getFfprobePath().getAbsolutePath());
-            if (ffprobe.version() == null) {
+            if (!ffprobe.isFFprobe() ) {
                 Platform.exit();
             }
             ffmpeg = new FFmpeg(userSettings.getFfmpegPath().getAbsolutePath());
-            if (ffmpeg.version() == null) {
+            if (!ffmpeg.isFFmpeg()) {
                 Platform.exit();
             }
-            FFmpegProbeResult in = ffprobe.probe(userSettings.getOutputDirectory().getAbsolutePath() + "\\final%d" + ".png");
-            builder = new FFmpegBuilder().addExtraArgs("-framerate" , String.valueOf(userSettings.getFrameRate())).setInput(in).overrideOutputFiles(true).addOutput(userSettings.getOutputDirectory().getAbsolutePath() + "\\" + userSettings.getOutName()).setVideoFrameRate(userSettings.getFrameRate()).setAudioCodec("aac").setVideoCodec("libx264").setPreset("slow").setVideoPixelFormat("yuv420p").addExtraArgs("-shortest" , "-crf" , "18").done();
+            FFmpegProbeResult in = ffprobe.probe(userSettings.getOutputDirectory().getAbsolutePath() + "\\final%d" + ".jpg");
+            builder = new FFmpegBuilder().addExtraArgs("-framerate" , String.valueOf(userSettings.getFrameRate())).setInput(in).overrideOutputFiles(true).addOutput(userSettings.getOutputDirectory().getAbsolutePath() + "\\" + userSettings.getOutName()).setVideoFrameRate(userSettings.getFrameRate()).setAudioCodec("aac").setVideoCodec("libx264").setPreset("slow").setVideoPixelFormat("yuv420p").addExtraArgs("-shortest" , "-crf" , "18",  "-vf", "\"crop=trunc(iw/2)*2:trunc(ih/2)*2,loop=" + userSettings.getFrameRate() * 2 + ":1:" + userSettings.getStartingImageIndex() + ",setpts=N/FRAME_RATE/TB\"").done();
             if (userSettings.getMusic() != null) {
                 builder = builder.addInput(userSettings.getMusic().getAbsolutePath());
             }
@@ -50,9 +50,7 @@ public class FFMPEG {
             });
             job.run();
         } catch (IOException e) {
-            Platform.runLater(()->{
-                ErrorUtilities.FFError();
-            });
+            Platform.runLater(ErrorUtilities::FFError);
         }
     }
 }

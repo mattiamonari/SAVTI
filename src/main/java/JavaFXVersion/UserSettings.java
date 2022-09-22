@@ -4,7 +4,7 @@ import java.io.File;
 
 public class UserSettings {
     public boolean saveImage = false;
-    private int precision;
+    private int rowsNumber, colsNumber;
     private File outputDirectory;
     private File ffmpegPath;
     private File ffprobePath;
@@ -16,30 +16,22 @@ public class UserSettings {
     private int chunkWidth;
     private int chunkHeight;
 
+    private int startingImageIndex;
+
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
     //?Maybe add a time of the video feature?
     public UserSettings() {
-        precision = 8;
-        outputDirectory = null;
-        ffmpegPath = null;
-        ffprobePath = null;
+        colsNumber = rowsNumber = 1;
+        outputDirectory = new File("D:\\IdeaProjects\\sortingVisualization\\ext");
+        ffmpegPath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
+        ffprobePath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
         outName = "sorted.mp4";
-        frameRate = 3;
+        frameRate = 30;
         music = null;
         openFile = false;
         videoDuration = 15;
-    }
-
-    public int getPrecision() {
-        return precision;
-    }
-
-    public void setPrecision(int precision) {
-        if (precision == 0)
-            this.precision = 1;
-        else
-            this.precision = precision;
+        startingImageIndex = 0;
     }
 
     public File getOutputDirectory() {
@@ -130,5 +122,48 @@ public class UserSettings {
 
     public int getChunkHeight() {
         return chunkHeight;
+    }
+
+    public int getRowsNumber() {
+        return rowsNumber;
+    }
+
+    public void setRowsNumber(int rowsNumber) {
+        if (rowsNumber == 0)
+            this.rowsNumber = 1;
+        else
+            this.rowsNumber = rowsNumber;
+    }
+
+    public int getColsNumber() {
+        return colsNumber;
+    }
+
+    public void setColsNumber(int colsNumber) {
+        if (colsNumber == 0)
+            this.colsNumber = 1;
+        else
+            this.colsNumber = colsNumber;
+    }
+
+    //TODO FIND A SMART WAY!!!
+    public boolean verifyFfmpegPath() {
+        return ffmpegPath != null && ffmpegPath.toString().endsWith("ffmpeg.exe");
+    }
+
+    public boolean verifyFfprobePath() {
+        return ffprobePath != null && ffprobePath.toString().endsWith("ffprobe.exe");
+    }
+
+    public boolean verifyOutputPath() {
+        return getOutputDirectory() != null;
+    }
+
+    public int getStartingImageIndex() {
+        return startingImageIndex;
+    }
+
+    public void setStartingImageIndex(int startingImageIndex) {
+        this.startingImageIndex = startingImageIndex;
     }
 }

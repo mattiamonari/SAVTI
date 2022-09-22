@@ -1,6 +1,8 @@
 package JavaFXVersion.sorting;
 
-final class SortUtils {
+import JavaFXVersion.Tile;
+
+public final class SortUtils {
     /**
      * Helper method for swapping places in array
      *
@@ -8,10 +10,26 @@ final class SortUtils {
      * @param idx index of the first element
      * @param idy index of the second element
      */
-    static <T> void swap(T[] array , int idx , int idy) {
-        T swap = array[idx];
+    static void swap(Tile[] array , int idx , int idy) {
+        Tile swap = array[idx];
         array[idx] = array[idy];
         array[idy] = swap;
+        swapCoordinates(array[idx], array[idy]);
+    }
+
+    static void replace(Tile[] array, int idx, Tile newTile)
+    {
+        array[idx] = newTile;
+        swapCoordinates(array[idx], newTile);
+    }
+
+    public static void swapCoordinates(Tile t1, Tile t2){
+        int x1 = t1.getX();
+        int y1 = t1.getY();
+        t1.setX(t2.getX());
+        t1.setY(t2.getY());
+        t2.setX(x1);
+        t2.setY(y1);
     }
 
     /**
@@ -36,5 +54,14 @@ final class SortUtils {
      */
     static <T extends Comparable<T>> boolean greater(T v , T w) {
         return v.compareTo(w) > 0;
+    }
+    public static <T extends Comparable<T>> void reverse(T[] array)
+    {
+        for(int i = 0; i < array.length / 2; i++)
+        {
+            T temp = array[i];
+            array[i] = array[array.length - i - 1];
+            array[array.length - i - 1] = temp;
+        }
     }
 }
