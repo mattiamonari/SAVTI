@@ -8,63 +8,58 @@ import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
-import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static JavaFXVersion.sorting.SortAlgorithm.rand;
-import static JavaFXVersion.utilities.ImageUtilities.fillImage;
-import static JavaFXVersion.utilities.ImageUtilities.splitImage;
+import static JavaFXVersion.utilities.GUIUtilities.ableNodes;
+import static JavaFXVersion.utilities.ImageUtilities.*;
 
 public class MainWindow extends BorderPane {
+
     //region Local variables' declaration
-    //? Question is, do we really need all these variables?
     final String hoverButton = "-fx-background-color: #cd5c5c; \n-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);";
-    int CHUNK_WIDTH;
-    int CHUNK_HEIGHT;
     UserSettings userSettings;
     Tile[] main;
     SortAlgorithm algorithm;
-    Image i;
+    WritableImage i;
     JMetro theme;
     //endregion
 
     //region FXML variables declaration
     @FXML
-    GridPane gridPane;
-    @FXML
-    StackPane container;
-    @FXML
-    Group group;
+    ImageView imageView;
     @FXML
     MenuItem imageLoaderItem;
     @FXML
     MenuItem songLoaderItem;
+    @FXML
+    MenuItem advSett;
     @FXML
     Button randomizeButton;
     @FXML
@@ -90,13 +85,7 @@ public class MainWindow extends BorderPane {
     @FXML
     Label videodurationValue;
     @FXML
-    CheckMenuItem openVideo;
-    @FXML
     ComboBox<String> chooseAlgo;
-    @FXML
-    CheckMenuItem saveimageItem;
-    @FXML
-    MenuItem changeoutputItem;
     @FXML
     Button ffprobeButton;
     @FXML
@@ -119,8 +108,6 @@ public class MainWindow extends BorderPane {
         }
         //Instantiating and initializing non-JavaFX variables
         initComponents();
-        //Load the image in the gridPane splitting it
-        //loadAndSplitImage(new File("bigimage.jpg"), 1200, 800);
         //Add event listeners for the components
         addEventListeners();
     }
@@ -154,116 +141,79 @@ public class MainWindow extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
     }
 
-    //carico l'immagine overloaddato per usare il File restituito dalla finestra di dialogo
-    private void loadAndSplitImage(File file, int width, int height) {
-        BufferedImage capture = null;
-        BufferedImage dimg = null;
-        try {
-            capture = ImageIO.read(file);
-            if(capture != null)
-                dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, width-20, height);
-            else {
-                ErrorUtilities.loadImageError();
-                return;
-            }
-        } catch (IOException e) {
-            ErrorUtilities.loadImageError();
-            return;
-        }
-        if (dimg.getHeight() > height)
-            dimg = Scalr.resize(capture, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, width, height-30);
-        i = SwingFXUtils.toFXImage(dimg, null);
-        CHUNK_WIDTH = dimg.getWidth() / userSettings.getPrecision();
-        CHUNK_HEIGHT = dimg.getHeight() / userSettings.getPrecision();
-        userSettings.setChunkWidth(CHUNK_WIDTH);
-        userSettings.setChunkHeight(CHUNK_HEIGHT);
-        removeAllTiles();
-        splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
-        fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
-
-        container.setPrefSize(width, height);
-        container.setMaxSize(width, height);
-        container.setPadding(Insets.EMPTY);
-        StackPane.setAlignment(group, Pos.CENTER);
-    }
-
     //Aggiunge i listener agli eventi dei nodi/elementi
     private void addEventListeners() {
 
         cleanButton.setOnAction(e -> {
-            removeAllTiles();
             Arrays.fill(main, null);
             i = null;
         });
 
         randomizeButton.setOnAction(e -> {
             if (i != null) {
-                splitImage(i, userSettings.getPrecision(), userSettings.getPrecision(), main);
-                removeAllTiles();
-                rand(main);
-                fillImage(CHUNK_WIDTH, CHUNK_HEIGHT, userSettings.getPrecision(), userSettings.getPrecision(), main, gridPane);
+                splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), main);
+                Thread t = new Thread(() -> {
+                    ableNodes(List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of(pauseButton));
+                    rand(main, userSettings);
+                    ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+                    int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20);
+                    int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50);
+                    fillImage(userSettings, main, imageView, width, height);
+                });
+                t.setPriority(Thread.MAX_PRIORITY);
+                t.start();
             }
         });
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
-            //TODO create a function!!!!!!
-            if (verifyFfmpegPath() && verifyOutputPath() && verifyFfprobePath()) {
-                if (!Arrays.stream(main).allMatch(Objects::isNull)) {
-                    if (chooseAlgo.getValue() != null) {
-                        String choice = chooseAlgo.getValue();
-                        switch (choice) {
-                            case "QuickSort" -> algorithm = new QuickSort(userSettings);
-                            case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
-                            case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
-                            case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
-                            case "RadixSort" -> algorithm = new RadixSort(userSettings);
-                            case "MergeSort" -> algorithm = new MergeSort(userSettings);
-                            case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
-                            case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
-                            case "CycleSort" -> algorithm = new CycleSort(userSettings);
-                        }
-                    }
-                    List<Tile> sorted = new ArrayList<Tile>(List.of(main));
-                    Collections.sort(sorted);
-                    if(sorted.equals(List.of(main)))
-                        ErrorUtilities.alreadyOrderedImage();
-                    else {
-                        disableAll();
-                        algorithm.sort(main, gridPane, this);
-                    }
-                } else {
-                    ErrorUtilities.noImageError();
+            if (checkSortingConditions()) {
+                String choice = chooseAlgo.getValue();
+                switch (choice) {
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings);
+                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
+                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings);
+                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings);
+                    default -> ErrorUtilities.SWW();
                 }
-            } else {
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                if (!verifyFfmpegPath()) {
-                    ffmpegButton.setStyle(hoverButton);
-                    errorAlert.setHeaderText("Ffmpeg path non valido");
-                    errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
-                    errorAlert.showAndWait();
-                } else if (!verifyFfprobePath()) {
-                    ffprobeButton.setStyle(hoverButton);
-                    errorAlert.setHeaderText("Ffprobe path non valido");
-                    errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
-                    errorAlert.showAndWait();
-                } else if (!verifyOutputPath()) {
-                    outputButton.setStyle(hoverButton);
-                    errorAlert.setHeaderText("Output path non valido");
-                    errorAlert.setContentText("Selezionare un percorso valido per l'output");
-                    errorAlert.showAndWait();
-                }
+                ableNodes(List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of(pauseButton));
+                algorithm.sort(imageView, main, this);
             }
         }));
 
+        advSett.setOnAction(e -> {
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initOwner(this.getScene().getWindow());
+            Scene scene = new Scene(new AdvancedSettings(stage, userSettings, theme), 600, 400);
+            stage.setTitle("Advanced Settings");
+            stage.setScene(scene);
+            stage.showAndWait();
+        });
+
         imageLoaderItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png"));
             fileChooser.setTitle("Open Resource File");
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             if (chosenFile != null) {
                 int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20);
                 int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50);
-                loadAndSplitImage(chosenFile, width, height);
+                try {
+                    i = SwingFXUtils.toFXImage(ImageIO.read(chosenFile), null);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                userSettings.setRowsNumber((int) Math.round(i.getWidth() * (precisionSlider.valueProperty().floatValue() / 200f)));
+                userSettings.setColsNumber((int) Math.round(i.getHeight() * (precisionSlider.valueProperty().floatValue() / 200f)));
+                userSettings.setChunkHeight((int) i.getHeight() / userSettings.getRowsNumber());
+                userSettings.setChunkWidth((int) i.getWidth() / userSettings.getColsNumber());
+                main = new Tile[userSettings.getColsNumber() * userSettings.getRowsNumber()];
+                fillImage(i, imageView, width, height);
             }
         });
 
@@ -278,7 +228,6 @@ public class MainWindow extends BorderPane {
                 else
                     userSettings.setOutName(out.get() + ".mp4");
             }
-
         });
 
         songLoaderItem.setOnAction(e -> {
@@ -290,7 +239,6 @@ public class MainWindow extends BorderPane {
         });
 
         saveimageItem.setOnAction(event -> userSettings.setSaveImage(saveimageItem.isSelected()));
-
 
         outputButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -325,34 +273,32 @@ public class MainWindow extends BorderPane {
             }
         });
 
+        //TODO
         pauseButton.setOnAction(e -> {
             algorithm.killTask();
-            enableAll();
+            ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
         });
 
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Node thumb = precisionSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/50f) + ";");
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
             precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/50f) +
-                    ";");
-            userSettings.setPrecision((int) Math.floor((Double) newValue));
-            main = new Tile[(int) Math.pow(userSettings.getPrecision() , 2)];
-            if(i != null)
-            {
-                CHUNK_WIDTH = (int) (i.getWidth() / userSettings.getPrecision());
-                CHUNK_HEIGHT = (int) (i.getHeight() / userSettings.getPrecision());
-                userSettings.setChunkWidth(CHUNK_WIDTH);
-                userSettings.setChunkHeight(CHUNK_HEIGHT);
+            precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
+            if (i != null) {
+                userSettings.setRowsNumber((int) Math.round(i.getWidth() * (precisionSlider.valueProperty().floatValue() / 200f)));
+                userSettings.setColsNumber((int) Math.round(i.getHeight() * (precisionSlider.valueProperty().floatValue() / 200f)));
+                userSettings.setChunkHeight((int) i.getHeight() / userSettings.getRowsNumber());
+                userSettings.setChunkWidth((int) i.getWidth() / userSettings.getColsNumber());
             }
+            main = new Tile[userSettings.getColsNumber() * userSettings.getRowsNumber()];
         });
 
         framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Node thumb = framerateSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/60f) +
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) +
                     ";");
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/60f) + ";");
+            framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) + ";");
             userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
             framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setFrameRate((int) Math.floor((Double) newValue));
@@ -360,31 +306,27 @@ public class MainWindow extends BorderPane {
 
         videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Node thumb = videodurationSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue()/30f) + ";");
-            videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue()/30f) + ";");
+            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
+            videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
             videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
             userSettings.setVideoDuration((int) Math.floor((Double) newValue));
         });
 
         openVideo.setOnAction(event -> userSettings.setOpenFile(openVideo.isSelected()));
 
-        darkMode.selectedProperty().addListener((observable , oldValue , newValue) -> {
-            if(newValue)
-            {
+        darkMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
                 setStyle("-fx-base: black");
                 theme.setStyle(Style.DARK);
-            }
-            else
-            {
+            } else {
                 setStyle("-fx-base: white");
                 theme.setStyle(Style.LIGHT);
             }
         });
 
         pathLabel.setOnAction(event -> {
-            if(userSettings.getOutputDirectory() != null)
-                if(userSettings.getOutputDirectory().isDirectory())
-                {
+            if (userSettings.getOutputDirectory() != null)
+                if (userSettings.getOutputDirectory().isDirectory()) {
                     try {
                         Desktop.getDesktop().open(userSettings.getOutputDirectory());
                     } catch (IOException e) {
@@ -395,79 +337,66 @@ public class MainWindow extends BorderPane {
 
     }
 
+    private boolean checkSortingConditions() {
+
+            if (!userSettings.verifyFfmpegPath()) {
+                ffmpegButton.setStyle(hoverButton);
+                ErrorUtilities.ffmpegPath();
+                return false;
+            }
+            else if (!userSettings.verifyFfprobePath()) {
+                ffprobeButton.setStyle(hoverButton);
+                ErrorUtilities.ffprobePath();
+                return false;
+            }
+            else if (!userSettings.verifyOutputPath()) {
+                outputButton.setStyle(hoverButton);
+                ErrorUtilities.outputPath();
+                return false;
+            }
+            else if (Arrays.stream(main).allMatch(Objects::isNull) || i == null) {
+                ErrorUtilities.noImageError();
+                return false;
+            }
+
+            List<Tile> sorted = new ArrayList<>(List.of(main));
+            Collections.sort(sorted);
+            if (sorted.equals(List.of(main))) {
+                ErrorUtilities.alreadyOrderedImage();
+                return false;
+            }
+
+            return true;
+    }
+
     private void createComboBox() {
         List<String> algos = Arrays.asList("BubbleSort", "CocktailSort", "CycleSort", "GnomeSort", "InsertionSort", "MergeSort", "QuickSort", "RadixSort", "SelectionSort");
         chooseAlgo.setItems(FXCollections.observableList(algos));
         chooseAlgo.setValue("BubbleSort");
     }
 
-    private void removeAllTiles() {
-        gridPane.getChildren().removeAll(gridPane.getChildren());
-    }
-
-    private void disableAll() {
-        randomizeButton.setDisable(true);
-        sortingButton.setDisable(true);
-        cleanButton.setDisable(true);
-        ffmpegButton.setDisable(true);
-        outputButton.setDisable(true);
-        precisionSlider.setDisable(true);
-        videodurationSlider.setDisable(true);
-        ffprobeButton.setDisable(true);
-        framerateSlider.setDisable(true);
-        imageLoaderItem.setDisable(true);
-        songLoaderItem.setDisable(true);
-
-        pauseButton.setDisable(false);
-    }
-
-    public void enableAll() {
-        randomizeButton.setDisable(false);
-        sortingButton.setDisable(false);
-        cleanButton.setDisable(false);
-        ffmpegButton.setDisable(false);
-        outputButton.setDisable(false);
-        precisionSlider.setDisable(false);
-        videodurationSlider.setDisable(false);
-        ffprobeButton.setDisable(false);
-        framerateSlider.setDisable(false);
-        imageLoaderItem.setDisable(false);
-        songLoaderItem.setDisable(false);
-
-        pauseButton.setDisable(true);
-    }
-
-    private boolean verifyFfmpegPath() {
-        return userSettings.getFfmpegPath() != null && userSettings.getFfmpegPath().toString().endsWith("ffmpeg.exe");
-    }
-
-    private boolean verifyFfprobePath() {
-        return userSettings.getFfprobePath() != null && userSettings.getFfprobePath().toString().endsWith("ffprobe.exe");
-    }
-
-    private boolean verifyOutputPath() {
-        return userSettings.getOutputDirectory() != null;
-    }
-
-    private void updateLabels(){
+    private void updateLabels() {
 
         //FRAMERATE SLIDER
         double newValue = framerateSlider.getValue();
-        framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-        framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/60f)) + ";");
-        framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
+        framerateValue.setText(String.valueOf(Math.floor(newValue)));
+        framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 60f)) + ";");
+        framerateValue.setText(String.valueOf(Math.floor(newValue)));
 
         //PRECISION SLIDER
         newValue = precisionSlider.getValue();
-        precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
-        precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/50f)) + ";");
+        precisionValue.setText(String.valueOf(Math.floor(newValue)));
+        precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 50f)) + ";");
 
         //DURATION SLIDER
         newValue = videodurationSlider.getValue();
-        videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue/30f)) + ";");
-        videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
+        videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 30f)) + ";");
+        videodurationValue.setText(String.valueOf(Math.floor(newValue)));
     }
-    //region Utilities methods
-    //endregion
+
+    //TODO SMARTER WAY
+    public void enableAll() {
+        ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, framerateSlider, videodurationSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+    }
 }
 

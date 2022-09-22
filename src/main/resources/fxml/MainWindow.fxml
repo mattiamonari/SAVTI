@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import org.controlsfx.control.*?>
@@ -19,9 +20,10 @@
                        <MenuItem fx:id="changeoutputItem" mnemonicParsing="false" text="Change output file name" />
                    </Menu>
                    <MenuItem fx:id="songLoaderItem" mnemonicParsing="false" text="Load a song.." />
+               <MenuItem fx:id="advSett" mnemonicParsing="false" text="Advanced Settings..." />
                </Menu>
            </MenuBar>
-           <HBox maxWidth="1.7976931348623157E308">
+           <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
                <VBox.margin>
                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
@@ -84,7 +86,7 @@
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" />
                 </VBox.margin>
-                <Slider fx:id="precisionSlider" blockIncrement="1.0" majorTickUnit="5.0" max="50.0" minorTickCount="1" prefHeight="38.0" prefWidth="175.0" showTickLabels="true" showTickMarks="true" value="8.0" />
+                <Slider fx:id="precisionSlider" blockIncrement="1.0" majorTickUnit="5.0" minorTickCount="1" prefHeight="38.0" prefWidth="175.0" showTickLabels="true" showTickMarks="true" value="8.0" />
                 <Label fx:id="precisionValue" prefWidth="30.0" />
             </HBox>
             <Label text="Choose the framerate">
@@ -129,24 +131,9 @@
              </font>
          </Hyperlink>
    </bottom>
-   <right>
-      <StackPane fx:id="container">
-         <children>
-            <Group fx:id="group">
-               <children>
-                    <VBox prefHeight="200.0" prefWidth="100.0">
-                        <GridPane fx:id="gridPane">
-                        <VBox.margin>
-                           <Insets />
-                        </VBox.margin>
-                     </GridPane>
-                    </VBox>
-               </children>
-            </Group>
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="20.0" right="20.0" top="20.0" />
-         </BorderPane.margin>
-      </StackPane>
-   </right>
+   <center>
+      <Group BorderPane.alignment="CENTER">
+            <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+      </Group>
+   </center>
 </fx:root>

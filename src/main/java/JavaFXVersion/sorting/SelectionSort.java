@@ -4,14 +4,10 @@ import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
 import JavaFXVersion.UserSettings;
 import javafx.application.Platform;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.ImageView;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-
-import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
 import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class SelectionSort extends AbstractSort {
     public SelectionSort(UserSettings userSettings) {
@@ -19,14 +15,10 @@ public class SelectionSort extends AbstractSort {
     }
 
     @Override
-    public void sort(Tile[] array , GridPane gridPane , MainWindow mainWindow) {
-        running = true;
-        deleteAllPreviousFiles(userSettings);
-        calculateNumberOfSwaps(array);
-        setupEnv(gridPane);
-        countSwaps = 0;
-        int width = (int) (array[0].getImage().getWidth() % 2 == 0 ? array[0].getImage().getWidth() : array[0].getImage().getWidth() - 1);
-        int height = (int) (array[0].getImage().getHeight() % 2 == 0 ? array[0].getImage().getHeight() : array[0].getImage().getHeight() - 1);
+    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+
+        setupEnv(imageView, array);
+
         thread = new Thread(() -> {
             int size = array.length;
             for (int step = 0; step < size - 1; step++) {
@@ -45,29 +37,19 @@ public class SelectionSort extends AbstractSort {
                 SortUtils.swap(array , step , min_idx);
                 ++countSwaps;
                 progressBar.setProgress(progress += increment);
-                if ((countSwaps % delay) == 0) {
-                    writeImage(userSettings , array , width , height , imageIndex++ , countComparison , countSwaps);
-                }
+                if (countSwaps % delay == 0)
+                    writeImage(userSettings , array , width , height , imageIndex++ , countComparison , countSwaps, imageView.getFitWidth() / 150f);
                 if (!running)
                     break;
             }
-            writeImage(userSettings , array , width , height , imageIndex , countComparison , countSwaps);
-            if (!userSettings.saveImage)
-                deleteAllPreviousFiles(userSettings);
-            if (userSettings.isOpenFile()) {
-                File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
-                try {
-                    Desktop.getDesktop().open(out);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            Platform.runLater(() -> resumeProgram(gridPane, mainWindow, array));
+            runFFMPEG(array, imageView);
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
         });
         thread.start();
     }
 
-    private void calculateNumberOfSwaps(Tile[] array) {
+    @Override
+    public void calculateNumberOfSwaps(Tile[] array) {
         Tile[] tmp = new Tile[array.length];
         System.arraycopy(array , 0 , tmp , 0 , array.length);
         int size = tmp.length;
@@ -82,5 +64,6 @@ public class SelectionSort extends AbstractSort {
             SortUtils.swap(tmp , step , min_idx);
             ++countSwaps;
         }
+        resetCoordinates(userSettings, array);
     }
 }

@@ -53,4 +53,25 @@ public class ErrorUtilities {
 
     public static void FFError() {
     }
+
+    public static void ffmpegPath(){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText("Ffmpeg path non valido");
+        errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
+        errorAlert.showAndWait();
+    }
+
+    public static void ffprobePath(){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText("Ffprobe path non valido");
+        errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
+        errorAlert.showAndWait();
+    }
+
+    public static void outputPath(){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText("Output path non valido");
+        errorAlert.setContentText("Selezionare un percorso valido per l'output");
+        errorAlert.showAndWait();
+    }
 }
