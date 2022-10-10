@@ -2,50 +2,69 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class GnomeSort extends AbstractSort {
 
 
-
-    public GnomeSort(UserSettings userSettings) {
-        super(userSettings);
+    public GnomeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, array);
+        setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
+
             int i = 1;
-            int n = array.length;
+            int n = image.getArray().length;
             while (i < n) {
-                if (!running)
-                    break;
                 ++countComparison;
-                if (i == 0 || SortUtils.greater(array[i], array[i - 1])) {
+                if (i == 0 || SortUtils.greater(image.getArray()[i], image.getArray()[i - 1]))
                     i++;
-                } else {
-                    ++countSwaps;
-                    Tile tmp = array[i];
-                    array[i] = array[i - 1];
-                    array[--i] = tmp;
-                    if (countSwaps % delay == 0)
-                        writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps, imageView.getFitWidth() / 150f);
-                    progressBar.setProgress(progress += increment);
+                else
+                {
+                    countSwaps++;
+                    SortUtils.swap(image.getArray(), i, i-1);
+                    i--;
+
+                    if (countSwaps % delay == 0) {
+                        writeFrame(encoder, image, userSettings, increment, progressBar);
+                    }
                 }
             }
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }
+
     @Override
     protected void calculateNumberOfSwaps(Tile[] array) {
 

@@ -1,54 +1,69 @@
 package JavaFXVersion;
 
 import JavaFXVersion.sorting.*;
-import JavaFXVersion.utilities.ColorUtilities;
 import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
+import org.jcodec.common.model.Rational;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.*;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static JavaFXVersion.sorting.SortAlgorithm.rand;
+import static JavaFXVersion.sorting.SortUtils.swap;
+import static JavaFXVersion.utilities.FileUtilities.*;
 import static JavaFXVersion.utilities.GUIUtilities.ableNodes;
-import static JavaFXVersion.utilities.ImageUtilities.*;
+import static JavaFXVersion.utilities.ImageUtilities.fillImage;
+import static JavaFXVersion.utilities.ImageUtilities.splitImage;
 
 public class MainWindow extends BorderPane {
 
-    //region Local variables' declaration
     final String hoverButton = "-fx-background-color: #cd5c5c; \n-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);";
+    //region Local variables' declaration
+    SeekableByteChannel out = null;
+    AWTSequenceEncoder encoder = null;
     UserSettings userSettings;
-    Tile[] main;
     SortAlgorithm algorithm;
     WritableImage i;
     JMetro theme;
+    TiledImage image;
+    int imageIndex = 0;
+
+    ProgressBar progressBar;
+    ProgressIndicator progressIndicator;
+    HBox progressBox;
     //endregion
 
     //region FXML variables declaration
@@ -67,23 +82,9 @@ public class MainWindow extends BorderPane {
     @FXML
     Button cleanButton;
     @FXML
-    Slider precisionSlider;
-    @FXML
-    Label precisionValue;
-    @FXML
     Button ffmpegButton;
     @FXML
     Button outputButton;
-    @FXML
-    Button pauseButton;
-    @FXML
-    Slider framerateSlider;
-    @FXML
-    Label framerateValue;
-    @FXML
-    Slider videodurationSlider;
-    @FXML
-    Label videodurationValue;
     @FXML
     ComboBox<String> chooseAlgo;
     @FXML
@@ -94,6 +95,8 @@ public class MainWindow extends BorderPane {
     ToggleSwitch darkMode;
     @FXML
     Hyperlink pathLabel;
+    @FXML
+    Button burstMode;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -117,10 +120,9 @@ public class MainWindow extends BorderPane {
         //Create a default UserSettings object
         userSettings = new UserSettings();
         //We choose bubblesort as default algorithm
-        algorithm = new BubbleSort(userSettings);
-        //By default, the image is split in 8x8 grid
-        main = new Tile[64];
-        //display output path
+        algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
+
+        image = new TiledImage();
 
         HBox.setHgrow(headerText, Priority.ALWAYS);
 
@@ -130,9 +132,14 @@ public class MainWindow extends BorderPane {
 
         createComboBox();
 
-        updateLabels();
-
         theme = new JMetro(this, Style.DARK);
+
+        try {
+            out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\output.mp4");
+            encoder = new AWTSequenceEncoder(out, Rational.R(25, 1));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private void addCssFiles() {
@@ -145,23 +152,24 @@ public class MainWindow extends BorderPane {
     private void addEventListeners() {
 
         cleanButton.setOnAction(e -> {
-            Arrays.fill(main, null);
-            i = null;
+            image.clearImage();
+            imageView.setImage(null);
+            deleteAllPreviousFiles(userSettings);
         });
 
         randomizeButton.setOnAction(e -> {
             if (i != null) {
-                splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), main);
-                Thread t = new Thread(() -> {
-                    ableNodes(List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of(pauseButton));
-                    rand(main, userSettings);
-                    ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+                randomizeButton.setDisable(true);
+                splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
+                Platform.runLater(() -> {
+                    ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+                    rand(userSettings, image);
+                    ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
                     int width = (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20);
                     int height = (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50);
-                    fillImage(userSettings, main, imageView, width, height);
+                    fillImage(userSettings, image, imageView, width, height);
                 });
-                t.setPriority(Thread.MAX_PRIORITY);
-                t.start();
+                randomizeButton.setDisable(false);
             }
         });
 
@@ -169,27 +177,29 @@ public class MainWindow extends BorderPane {
             if (checkSortingConditions()) {
                 String choice = chooseAlgo.getValue();
                 switch (choice) {
-                    case "QuickSort" -> algorithm = new QuickSort(userSettings);
-                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings);
-                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings);
-                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings);
-                    case "RadixSort" -> algorithm = new RadixSort(userSettings);
-                    case "MergeSort" -> algorithm = new MergeSort(userSettings);
-                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings);
-                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings);
-                    case "CycleSort" -> algorithm = new CycleSort(userSettings);
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out);
+                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, encoder, out);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
+                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, encoder, out);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out);
+                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, encoder, out);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out);
                     default -> ErrorUtilities.SWW();
                 }
-                ableNodes(List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of(pauseButton));
-                algorithm.sort(imageView, main, this);
+                ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+                algorithm.sort(imageView, image, this);
             }
         }));
 
         advSett.setOnAction(e -> {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UTILITY);
             stage.initOwner(this.getScene().getWindow());
-            Scene scene = new Scene(new AdvancedSettings(stage, userSettings, theme), 600, 400);
+            stage.getIcons().add(new Image("icon.png"));
+            Scene scene = new Scene(new AdvancedSettings(stage, userSettings, theme, image));
             stage.setTitle("Advanced Settings");
             stage.setScene(scene);
             stage.showAndWait();
@@ -207,26 +217,16 @@ public class MainWindow extends BorderPane {
                     i = SwingFXUtils.toFXImage(ImageIO.read(chosenFile), null);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
-                }
-                userSettings.setRowsNumber((int) Math.round(i.getWidth() * (precisionSlider.valueProperty().floatValue() / 200f)));
-                userSettings.setColsNumber((int) Math.round(i.getHeight() * (precisionSlider.valueProperty().floatValue() / 200f)));
-                userSettings.setChunkHeight((int) i.getHeight() / userSettings.getRowsNumber());
-                userSettings.setChunkWidth((int) i.getWidth() / userSettings.getColsNumber());
-                main = new Tile[userSettings.getColsNumber() * userSettings.getRowsNumber()];
-                fillImage(i, imageView, width, height);
-            }
-        });
 
-        changeoutputItem.setOnAction(e -> {
-            TextInputDialog output = new TextInputDialog();
-            output.setTitle("Choose the name of the output file.");
-            output.setContentText("Filename: ");
-            Optional<String> out = output.showAndWait();
-            if (out.isPresent()) {
-                if (out.get().endsWith(".mp4"))
-                    userSettings.setOutName(out.get());
-                else
-                    userSettings.setOutName(out.get() + ".mp4");
+                }
+                image.setImage(i);
+                //Set the intial precision to a default value
+                userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / 8));
+                userSettings.setChunkHeight((int) Math.round(image.getImage().getHeight() / 8));
+                userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
+                userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
+                image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());
+                fillImage(i, imageView, width, height);
             }
         });
 
@@ -237,8 +237,6 @@ public class MainWindow extends BorderPane {
             File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
             userSettings.setMusic(chosenFile);
         });
-
-        saveimageItem.setOnAction(event -> userSettings.setSaveImage(saveimageItem.isSelected()));
 
         outputButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -273,47 +271,6 @@ public class MainWindow extends BorderPane {
             }
         });
 
-        //TODO
-        pauseButton.setOnAction(e -> {
-            algorithm.killTask();
-            ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, videodurationSlider, framerateSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
-        });
-
-        precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = precisionSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
-            precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
-            if (i != null) {
-                userSettings.setRowsNumber((int) Math.round(i.getWidth() * (precisionSlider.valueProperty().floatValue() / 200f)));
-                userSettings.setColsNumber((int) Math.round(i.getHeight() * (precisionSlider.valueProperty().floatValue() / 200f)));
-                userSettings.setChunkHeight((int) i.getHeight() / userSettings.getRowsNumber());
-                userSettings.setChunkWidth((int) i.getWidth() / userSettings.getColsNumber());
-            }
-            main = new Tile[userSettings.getColsNumber() * userSettings.getRowsNumber()];
-        });
-
-        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = framerateSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) +
-                    ";");
-            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) + ";");
-            userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
-            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setFrameRate((int) Math.floor((Double) newValue));
-        });
-
-        videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = videodurationSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
-            videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
-            videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setVideoDuration((int) Math.floor((Double) newValue));
-        });
-
-        openVideo.setOnAction(event -> userSettings.setOpenFile(openVideo.isSelected()));
-
         darkMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 setStyle("-fx-base: black");
@@ -335,38 +292,62 @@ public class MainWindow extends BorderPane {
                 }
         });
 
+        burstMode.setOnAction(e -> {
+            ExecutorService pool = Executors.newFixedThreadPool(8);
+            ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+            for (String s : chooseAlgo.getItems()) {
+                try {
+                    out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\" + s + ".mp4");
+                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
+                JavaFXVersion.sorting.SortUtils.rand(userSettings, image, encoder, out);
+                switch (s) {
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out);
+                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, encoder, out);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
+                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, encoder, out);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out);
+                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, encoder, out);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out);
+                }
+                pool.execute(() -> {
+                    try {
+                        algorithm.sort(imageView, image.clone(), this);
+                    } catch (CloneNotSupportedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+            }
+        });
     }
 
     private boolean checkSortingConditions() {
 
-            if (!userSettings.verifyFfmpegPath()) {
-                ffmpegButton.setStyle(hoverButton);
-                ErrorUtilities.ffmpegPath();
-                return false;
-            }
-            else if (!userSettings.verifyFfprobePath()) {
-                ffprobeButton.setStyle(hoverButton);
-                ErrorUtilities.ffprobePath();
-                return false;
-            }
-            else if (!userSettings.verifyOutputPath()) {
-                outputButton.setStyle(hoverButton);
-                ErrorUtilities.outputPath();
-                return false;
-            }
-            else if (Arrays.stream(main).allMatch(Objects::isNull) || i == null) {
-                ErrorUtilities.noImageError();
-                return false;
-            }
-
-            List<Tile> sorted = new ArrayList<>(List.of(main));
-            Collections.sort(sorted);
-            if (sorted.equals(List.of(main))) {
-                ErrorUtilities.alreadyOrderedImage();
-                return false;
-            }
-
-            return true;
+        if (!userSettings.verifyFfmpegPath()) {
+            ffmpegButton.setStyle(hoverButton);
+            ErrorUtilities.ffmpegPath();
+            return false;
+        } else if (!userSettings.verifyFfprobePath()) {
+            ffprobeButton.setStyle(hoverButton);
+            ErrorUtilities.ffprobePath();
+            return false;
+        } else if (!userSettings.verifyOutputPath()) {
+            outputButton.setStyle(hoverButton);
+            ErrorUtilities.outputPath();
+            return false;
+        } else if (image == null || image.isArrayEmpty()) {
+            ErrorUtilities.noImageError();
+            return false;
+        } else if (image.isAlreadyOrdere()) {
+            ErrorUtilities.alreadyOrderedImage();
+            return false;
+        }
+        return true;
     }
 
     private void createComboBox() {
@@ -375,28 +356,72 @@ public class MainWindow extends BorderPane {
         chooseAlgo.setValue("BubbleSort");
     }
 
-    private void updateLabels() {
-
-        //FRAMERATE SLIDER
-        double newValue = framerateSlider.getValue();
-        framerateValue.setText(String.valueOf(Math.floor(newValue)));
-        framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 60f)) + ";");
-        framerateValue.setText(String.valueOf(Math.floor(newValue)));
-
-        //PRECISION SLIDER
-        newValue = precisionSlider.getValue();
-        precisionValue.setText(String.valueOf(Math.floor(newValue)));
-        precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 50f)) + ";");
-
-        //DURATION SLIDER
-        newValue = videodurationSlider.getValue();
-        videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 30f)) + ";");
-        videodurationValue.setText(String.valueOf(Math.floor(newValue)));
-    }
-
     //TODO SMARTER WAY
     public void enableAll() {
-        ableNodes(List.of(pauseButton), List.of(randomizeButton,sortingButton,cleanButton,ffmpegButton, ffprobeButton, outputButton, precisionSlider, framerateSlider, videodurationSlider, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+        ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+    }
+
+    public void rand(UserSettings userSettings, TiledImage image) {
+        int delay = Math.max(4 * image.getArray().length / (userSettings.getFrameRate() * userSettings.getVideoDuration()), 1);
+        // Creating object for Random class
+        Random rd = new Random();
+        deleteAllPreviousFiles(userSettings);
+        progressBar = new ProgressBar(0);
+        progressIndicator = new ProgressIndicator(0);
+        progressBox = new HBox();
+        double increment = 1d / image.getArray().length;
+        progressBox.getChildren().addAll(progressBar, progressIndicator);
+        ((Group) imageView.getParent()).getChildren().add(progressBox);
+        imageView.setVisible(false);
+        imageView.setManaged(false);
+        progressBar.setPrefWidth(1000);
+        progressBar.setMinWidth(1000);
+        progressBar.setPrefHeight(50);
+        progressBar.setMinHeight(50);
+        VBox.setMargin(progressBar, new Insets(10));
+
+        progressIndicator.progressProperty().bind(progressBar.progressProperty());
+
+        new Thread(() -> {
+
+            if(!out.isOpen())
+            {
+                try {
+                    out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\output.mp4");
+                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else {
+                try {
+                    out.setPosition(0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            for (int i = image.getArray().length - 1; i > 0; i--) {
+                writeFrame(encoder, image, userSettings, increment, progressBar);
+                // Pick a random index from 0 to i
+                int j = rd.nextInt(i + 1);
+                // Swap array[i] with the element at random index
+                swap(image.getArray(), i, j);
+            }
+
+            Platform.runLater(() -> {
+                imageView.setVisible(true);
+                imageView.setManaged(true);
+                ((Group) imageView.getParent()).getChildren().remove(progressBox);
+                fillImage(userSettings, image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
+                userSettings.setStartingImageIndex(imageIndex);
+                imageIndex = 0;
+            });
+
+        }).start();
+
     }
 }
 

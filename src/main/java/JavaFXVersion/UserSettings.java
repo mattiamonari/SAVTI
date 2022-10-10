@@ -3,7 +3,8 @@ package JavaFXVersion;
 import java.io.File;
 
 public class UserSettings {
-    public boolean saveImage = false;
+
+    private boolean saveImage = false;
     private int rowsNumber, colsNumber;
     private File outputDirectory;
     private File ffmpegPath;
@@ -23,9 +24,9 @@ public class UserSettings {
     //?Maybe add a time of the video feature?
     public UserSettings() {
         colsNumber = rowsNumber = 1;
-        outputDirectory = new File("D:\\IdeaProjects\\sortingVisualization\\ext");
-        ffmpegPath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
-        ffprobePath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
+        outputDirectory = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext");
+        ffmpegPath = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
+        ffprobePath = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
         outName = "sorted.mp4";
         frameRate = 30;
         music = null;
@@ -85,6 +86,10 @@ public class UserSettings {
         this.openFile = openFile;
     }
 
+    public boolean getSaveImage() {
+        return saveImage;
+    }
+
     public void setSaveImage(boolean saveImage) {
         this.saveImage = saveImage;
     }
@@ -108,20 +113,20 @@ public class UserSettings {
             this.videoDuration = videoDuration;
     }
 
-    public void setChunkHeight(int chunkHeight) {
-        this.chunkHeight = chunkHeight;
+    public int getChunkWidth() {
+        return chunkWidth;
     }
 
     public void setChunkWidth(int chunkWidth) {
         this.chunkWidth = chunkWidth;
     }
 
-    public int getChunkWidth() {
-        return chunkWidth;
-    }
-
     public int getChunkHeight() {
         return chunkHeight;
+    }
+
+    public void setChunkHeight(int chunkHeight) {
+        this.chunkHeight = chunkHeight;
     }
 
     public int getRowsNumber() {
@@ -146,7 +151,6 @@ public class UserSettings {
             this.colsNumber = colsNumber;
     }
 
-    //TODO FIND A SMART WAY!!!
     public boolean verifyFfmpegPath() {
         return ffmpegPath != null && ffmpegPath.toString().endsWith("ffmpeg.exe");
     }

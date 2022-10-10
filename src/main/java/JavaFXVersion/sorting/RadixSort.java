@@ -2,11 +2,23 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static JavaFXVersion.sorting.SortUtils.replace;
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class RadixSort extends AbstractSort {
@@ -15,30 +27,37 @@ public class RadixSort extends AbstractSort {
     ImageView imageView;
 
 
-    public RadixSort(UserSettings userSettings) {
-        super(userSettings);
+    public RadixSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, array);
+        setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
             write = true;
 
+
             // Get maximum element
-            int size = array.length;
-            Tile max = getMax(array, size);
+            int size = image.getArray().length;
+            Tile max = getMax(image.getArray(), size);
 
             // Apply counting sort to sort elements based on place value.
             for (int place = 1; max.currentPosition / place > 0; place *= 10) {
-                if (!running)
-                    break;
-                countingSort(array, size, place, delay, width, height, write);
+                countingSort(image.getArray(), size, place);
             }
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
 
@@ -54,11 +73,9 @@ public class RadixSort extends AbstractSort {
         return max;
     }
 
-    void countingSort(Tile[] array, int size, int place, double delay, int width, int height, boolean write) {
+    void countingSort(Tile[] array, int size, int place) {
         Tile[] output = new Tile[size + 1];
         Tile max = array[0];
-        if (!running)
-            return;
         for (int i = 1; i < size; i++) {
             ++countComparison;
             if (SortUtils.greater(array[i], max))
@@ -85,12 +102,10 @@ public class RadixSort extends AbstractSort {
 
         for (int i = 0; i < size; i++) {
             ++countSwaps;
-            array[i] = output[i];
-            if (countSwaps % delay == 0 && write)
-                writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps, imageView.getFitWidth() / 150f);
-            if(write)
-                progressBar.setProgress(progress += increment);
-            //progressBar.setProgress(progress+=increment);
+            replace(array, i, output[i]);
+            if (countSwaps % delay == 0 && write) {
+                writeFrame(encoder, image, userSettings, increment, progressBar);
+            }
 
         }
     }
@@ -106,7 +121,7 @@ public class RadixSort extends AbstractSort {
 
         // Apply counting sort to sort elements based on place value.
         for (int place = 1; max.currentPosition / place > 0; place *= 10)
-            countingSort(tmp, size, place, 1, 0, 0, write);
+            countingSort(tmp, size, place);
 
         resetCoordinates(userSettings, array);
     }

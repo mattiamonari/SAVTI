@@ -12,7 +12,7 @@ public class ColorUtilities {
             G = 1f;
             R = (value * 2);
         }
-        Color c = new Color((float) R , (float) G , 0.15f);
+        Color c = new Color((float) R, (float) G, 0.15f);
         return Integer.toHexString(c.getRGB()).substring(2);
     }
 }

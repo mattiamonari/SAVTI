@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" prefWidth="500.0" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/11.0.14-internal">
+
+    <left>
+        <VBox BorderPane.alignment="CENTER">
+            <Label text="Choose precision">
+                <VBox.margin>
+                    <Insets left="10.0" top="10.0"/>
+                </VBox.margin>
+            </Label>
+            <HBox>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0"/>
+                </VBox.margin>
+                <Slider fx:id="precisionSlider" blockIncrement="1.0" majorTickUnit="5.0" minorTickCount="1"
+                        prefHeight="38.0" prefWidth="175.0" showTickLabels="true" showTickMarks="true" value="8.0"/>
+                <Label fx:id="precisionValue" prefWidth="30.0"/>
+            </HBox>
+            <Label text="Choose the framerate">
+                <VBox.margin>
+                    <Insets left="10.0" top="10.0"/>
+                </VBox.margin>
+            </Label>
+            <HBox>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0"/>
+                </VBox.margin>
+                <Slider fx:id="framerateSlider" blockIncrement="1.0" majorTickUnit="3.0" max="60.0" minorTickCount="0"
+                        prefHeight="38.0" prefWidth="175.0" showTickLabels="true" showTickMarks="true" value="30.0">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                </Slider>
+                <Label fx:id="framerateValue" prefWidth="30.0"/>
+            </HBox>
+            <Label text="Video duration (seconds)">
+                <VBox.margin>
+                    <Insets left="10.0" top="10.0"/>
+                </VBox.margin>
+            </Label>
+            <HBox>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0"/>
+                </VBox.margin>
+                <Slider fx:id="videodurationSlider" blockIncrement="1.0" majorTickUnit="1.0" max="30.0"
+                        minorTickCount="0" prefHeight="38.0" prefWidth="175.0" showTickLabels="true"
+                        showTickMarks="true" value="15.0"/>
+                <Label fx:id="videodurationValue" prefWidth="30.0"/>
+            </HBox>
+            <CheckBox fx:id="openVideoBox" mnemonicParsing="false" text="Play video after creation">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </CheckBox>
+            <CheckBox fx:id="saveImageBox" mnemonicParsing="false" text="Keep video frame in out directory">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </CheckBox>
+            <HBox alignment="CENTER_LEFT">
+                <children>
+                    <Button fx:id="changeOutputName" alignment="CENTER" mnemonicParsing="false" styleClass="dark-blue"
+                            text="Change output name">
+                        <HBox.margin>
+                            <Insets/>
+                        </HBox.margin>
+                    </Button>
+                    <Label fx:id="currentOutName" text="Current output name:">
+                        <HBox.margin>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                    </Label>
+                </children>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </HBox>
+        </VBox>
+    </left>
+    <bottom>
+        <Hyperlink fx:id="pathLabel" text="Path to output:" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </BorderPane.margin>
+        </Hyperlink>
+    </bottom>
+</fx:root>

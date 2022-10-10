@@ -2,33 +2,58 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static JavaFXVersion.sorting.SortUtils.replace;
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class MergeSort extends AbstractSort {
 
     ImageView imageView;
 
-    public MergeSort(UserSettings userSettings) {
-        super(userSettings);
+    public MergeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, array);
+        setupEnv(imageView, image.getArray());
 
         this.imageView = imageView;
 
+        if (!userSettings.getOutputDirectory().isDirectory())
+            if (!userSettings.getOutputDirectory().mkdir())
+                ErrorUtilities.SWW();
+
         thread = new Thread(() -> {
 
-            mergeSort(array, 0, array.length - 1, true);
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+            mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
 
         });
 
@@ -71,8 +96,13 @@ public class MergeSort extends AbstractSort {
             Tile[] M = new Tile[n2];
 
             System.arraycopy(arr, p, L, 0, n1);
-            for (int j = 0; j < n2; j++)
-                M[j] = arr[q + 1 + j];
+            for (int j = 0; j < n2; j++) {
+                try {
+                    M[j] = arr[q + 1 + j].clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             // Maintain current index of sub-arrays and main array
             int i, j, k;
@@ -86,41 +116,35 @@ public class MergeSort extends AbstractSort {
                 ++countComparison;
                 if (SortUtils.greater(M[j], L[i])) {
                     ++countSwaps;
-                    arr[k] = L[i];
+                    replace(arr, k, L[i]);
                     i++;
 
                 } else {
                     ++countSwaps;
-                    arr[k] = M[j];
+                    replace(arr, k, M[j]);
                     j++;
                 }
                 if (countSwaps % delay == 0 && write)
-                    writeImage(userSettings, arr, width, height, imageIndex++, countComparison, countSwaps, imageView.getFitWidth() / 150f);
-                if (write)
-                    progressBar.setProgress(progress += increment);
+                    writeFrame(encoder, image, userSettings, increment, progressBar);
                 k++;
             }
 
             // When we run out of elements in either L or M,
             // pick up the remaining elements and put in A[p..r]
             while (i < n1) {
-                arr[k] = L[i];
+                replace(arr, k, L[i]);
                 i++;
                 k++;
                 if (countSwaps % delay == 0 && write)
-                    writeImage(userSettings, arr, width, height, imageIndex++, countComparison, countSwaps, imageView.getFitWidth() / 150f);
-                if (write)
-                    progressBar.setProgress(progress += increment);
+                    writeFrame(encoder, image, userSettings, increment, progressBar);
             }
 
             while (j < n2) {
-                arr[k] = M[j];
+                replace(arr, k, M[j]);
                 j++;
                 k++;
                 if (countSwaps % delay == 0 && write)
-                    writeImage(userSettings, arr, width, height, imageIndex++, countComparison, countSwaps,imageView.getFitWidth() / 150f);
-                if (write)
-                    progressBar.setProgress(progress += increment);
+                    writeFrame(encoder, image, userSettings, increment, progressBar);
             }
         }
     }

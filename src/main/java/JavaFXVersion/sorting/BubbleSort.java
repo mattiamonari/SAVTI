@@ -2,18 +2,27 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import static JavaFXVersion.utilities.FileUtilities.*;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
-public class BubbleSort extends AbstractSort{
-    //Random object used for lock the threads in this class
+public class BubbleSort extends AbstractSort {
 
-    public BubbleSort(UserSettings userSettings) {
-        super(userSettings);
+    public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
@@ -27,40 +36,54 @@ public class BubbleSort extends AbstractSort{
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
         //We use a new thread to pause/resume its execution whenever we want
 
-        setupEnv(imageView, array);
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
         thread = new Thread(() -> {
             thread.setPriority(Thread.MAX_PRIORITY);
 
-            writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps, imageView.getImage().getWidth() / 100f);
+            //------------NOT IN HERE!!!----------------
+            if (!userSettings.getOutputDirectory().isDirectory())
+                if (!userSettings.getOutputDirectory().mkdir())
+                    ErrorUtilities.SWW();
+            //-------------------------------------------
 
-            for (int size = array.length, i = 1; i < size; ++i) {
+            for (int size = image.getArray().length, i = 1; i < size; ++i) {
+                boolean swapped = false;
+                for (int j = 0; j < size - i; ++j) {
+                    countComparison++;
 
-                if (running) {
-                    boolean swapped = false;
+                    /*      SWAP SECTION     */
+                    if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
+                        countSwaps++;
+                        SortUtils.swap(image.getArray(), j, j + 1);
+                        swapped = true;
 
-                    for (int j = 0; j < size - i; ++j) {
-                        countComparison++;
-                        if (SortUtils.greater(array[j], array[j + 1])) {
-                            countSwaps++;
-                            SortUtils.swap(array, j, j + 1);
-                            swapped = true;
-                            if (countSwaps % delay == 0)
-                                writeImage(userSettings, array, width, height, imageIndex++, countComparison, countSwaps,imageView.getImage().getWidth() / 100f);
+                        /*      FRAMEWRITING SECTION     */
+                        if (countSwaps % delay == 0)
+                            writeFrame(encoder, image, userSettings, increment, progressBar);
 
-                            progressBar.setProgress(progress += increment);
-                        }
-                    }
-                    if (!swapped) {
-                        break;
                     }
                 }
+                if (!swapped) {
+                    break;
+                }
             }
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+
+            //runFFMPEG(image.getArray(), imageView);
+
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }
@@ -86,4 +109,5 @@ public class BubbleSort extends AbstractSort{
         }
         resetCoordinates(userSettings, array);
     }
+
 }

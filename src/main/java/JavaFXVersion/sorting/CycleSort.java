@@ -2,18 +2,29 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import static JavaFXVersion.sorting.SortUtils.less;
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class CycleSort extends AbstractSort {
 
-    public CycleSort(UserSettings userSettings) {
-        super(userSettings);
+    public CycleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
@@ -34,24 +45,24 @@ public class CycleSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, array);
+        setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
 
-            int n = array.length;
+            int n = image.getArray().length;
 
             // traverse array elements
             for (int j = 0; j <= n - 2; j++) {
                 // initialize item as starting point
-                Tile item = array[j];
+                Tile item = image.getArray()[j];
 
                 // Find position where we put the item.
                 int pos = j;
                 for (int i = j + 1; i < n; i++) {
                     countComparison++;
-                    if (less(array[i], item)) {
+                    if (less(image.getArray()[i], item)) {
                         pos++;
                     }
                 }
@@ -62,17 +73,17 @@ public class CycleSort extends AbstractSort {
                 }
 
                 // ignore all duplicate elements
-                while (item.compareTo(array[pos]) == 0) {
+                while (item.compareTo(image.getArray()[pos]) == 0) {
                     pos += 1;
                 }
 
                 // put the item to it's right position
                 if (pos != j) {
                     countSwaps++;
-                    progressBar.setProgress(progress += increment);
-                    if (countSwaps % delay == 0)
-                        writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps, imageView.getFitWidth() / 150f);
-                    item = replace(array, pos, item);
+                    if (countSwaps % delay == 0) {
+                        writeFrame(encoder, image, userSettings, increment, progressBar);
+                    }
+                    item = replace(image.getArray(), pos, item);
                 }
 
                 // Rotate rest of the cycle
@@ -82,28 +93,36 @@ public class CycleSort extends AbstractSort {
                     // Find position where we put the element
                     for (int i = j + 1; i < n; i++) {
                         countComparison++;
-                        if (less(array[i], item)) {
+                        if (less(image.getArray()[i], item)) {
                             pos += 1;
                         }
                     }
 
                     // ignore all duplicate elements
-                    while (item.compareTo(array[pos]) == 0) {
+                    while (item.compareTo(image.getArray()[pos]) == 0) {
                         pos += 1;
                     }
 
                     // put the item to it's right position
-                    if (item != array[pos]) {
+                    if (item != image.getArray()[pos]) {
                         countSwaps++;
-                        item = replace(array, pos, item);
-                        if(countSwaps % delay == 0)
-                            writeImage(userSettings,array,width,height,imageIndex++,countComparison,countSwaps, imageView.getFitWidth() / 150f);                      progressBar.setProgress(progress += increment);
+                        item = replace(image.getArray(), pos, item);
+                        if (countSwaps % delay == 0) {
+                            writeFrame(encoder, image, userSettings, increment, progressBar);
+                        }
                     }
                 }
             }
 
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }
@@ -111,7 +130,7 @@ public class CycleSort extends AbstractSort {
     @Override
     protected void calculateNumberOfSwaps(Tile[] a) {
         Tile[] array = new Tile[a.length];
-        System.arraycopy(a,0, array,0, a.length);
+        System.arraycopy(a, 0, array, 0, a.length);
         int n = a.length;
         // traverse array elements
         for (int j = 0; j <= n - 2; j++) {
@@ -167,7 +186,7 @@ public class CycleSort extends AbstractSort {
                 }
             }
         }
-        resetCoordinates(userSettings, array);
+        resetCoordinates(userSettings, a);
     }
 }
 

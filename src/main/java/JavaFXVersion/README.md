@@ -1,9 +1,10 @@
 # Setuppare un JDK per JavaFX
+
 Per far partire la versione JavaFX bisogna avere un JDK valido settato.
 
-Io personalmente ho scaricato [Azul Zulu](https://www.azul.com/downloads/?package=jdk) (quello gratuito) come JDK, 
+Io personalmente ho scaricato [Azul Zulu](https://www.azul.com/downloads/?package=jdk) (quello gratuito) come JDK,
 ricordarsi di selezionare al momento del download il JDK FX, non il semplice JDK.
 
-Dopo averlo scaricato ed estratto in una cartella a piacimento 
+Dopo averlo scaricato ed estratto in una cartella a piacimento
 seguire questa [guida](https://www.jetbrains.com/help/idea/sdk.html#change-project-sdk). 
 

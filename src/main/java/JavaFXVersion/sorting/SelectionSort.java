@@ -2,25 +2,37 @@ package JavaFXVersion.sorting;
 
 import JavaFXVersion.MainWindow;
 import JavaFXVersion.Tile;
+import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
+import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import org.jcodec.api.awt.AWTSequenceEncoder;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.io.SeekableByteChannel;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class SelectionSort extends AbstractSort {
-    public SelectionSort(UserSettings userSettings) {
-        super(userSettings);
+    public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, Tile[] array, MainWindow mainWindow) {
+    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, array);
+        setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
-            int size = array.length;
+
+            int size = image.getArray().length;
             for (int step = 0; step < size - 1; step++) {
                 int min_idx = step;
                 for (int k = step + 1; k < size; k++) {
@@ -29,21 +41,32 @@ public class SelectionSort extends AbstractSort {
                     // To sort in descending order, change > to < in this line.
                     // Select the minimum element in each loop.
                     ++countComparison;
-                    if (SortUtils.greater(array[min_idx] , array[k])) {
+                    if (SortUtils.greater(image.getArray()[min_idx], image.getArray()[k])) {
                         min_idx = k;
                     }
                 }
                 // put min at the correct position
-                SortUtils.swap(array , step , min_idx);
+                SortUtils.swap(image.getArray(), step, min_idx);
                 ++countSwaps;
                 progressBar.setProgress(progress += increment);
-                if (countSwaps % delay == 0)
-                    writeImage(userSettings , array , width , height , imageIndex++ , countComparison , countSwaps, imageView.getFitWidth() / 150f);
+                if (countSwaps % delay == 0) {
+                    writeFrame(encoder, image, userSettings, increment, progressBar);
+
+                }
                 if (!running)
                     break;
             }
-            runFFMPEG(array, imageView);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, array));
+
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+
+            try {
+                encoder.finish();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            NIOUtils.closeQuietly(out);
+
+            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }
@@ -51,17 +74,17 @@ public class SelectionSort extends AbstractSort {
     @Override
     public void calculateNumberOfSwaps(Tile[] array) {
         Tile[] tmp = new Tile[array.length];
-        System.arraycopy(array , 0 , tmp , 0 , array.length);
+        System.arraycopy(array, 0, tmp, 0, array.length);
         int size = tmp.length;
         for (int step = 0; step < size - 1; step++) {
             int min_idx = step;
             for (int k = step + 1; k < size; k++) {
-                if (SortUtils.greater(tmp[min_idx] , tmp[k])) {
+                if (SortUtils.greater(tmp[min_idx], tmp[k])) {
                     min_idx = k;
                 }
             }
             // put min at the correct position
-            SortUtils.swap(tmp , step , min_idx);
+            SortUtils.swap(tmp, step, min_idx);
             ++countSwaps;
         }
         resetCoordinates(userSettings, array);
