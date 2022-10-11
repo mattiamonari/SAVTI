@@ -30,7 +30,7 @@ public class GnomeSort extends AbstractSort {
     @Override
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, image.getArray());
+        //setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
 
@@ -47,12 +47,12 @@ public class GnomeSort extends AbstractSort {
                     i--;
 
                     if (countSwaps % delay == 0) {
-                        writeFrame(encoder, image, userSettings, increment, progressBar);
+                        writeFrame(encoder, image, userSettings);
                     }
                 }
             }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
@@ -60,7 +60,7 @@ public class GnomeSort extends AbstractSort {
                 throw new RuntimeException(e);
             }
             NIOUtils.closeQuietly(out);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }

@@ -39,10 +39,10 @@ public class BubbleSort extends AbstractSort {
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
         //We use a new thread to pause/resume its execution whenever we want
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        //Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
-            thread.setPriority(Thread.MAX_PRIORITY);
+//        thread = new Thread(() -> {
+//            thread.setPriority(Thread.MAX_PRIORITY);
 
             //------------NOT IN HERE!!!----------------
             if (!userSettings.getOutputDirectory().isDirectory())
@@ -63,7 +63,7 @@ public class BubbleSort extends AbstractSort {
 
                         /*      FRAMEWRITING SECTION     */
                         if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings, increment, progressBar);
+                            writeFrame(encoder, image, userSettings);
 
                     }
                 }
@@ -72,7 +72,7 @@ public class BubbleSort extends AbstractSort {
                 }
             }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
@@ -83,9 +83,9 @@ public class BubbleSort extends AbstractSort {
 
             //runFFMPEG(image.getArray(), imageView);
 
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
+//            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+//        });
+//        thread.start();
     }
 
     @Override

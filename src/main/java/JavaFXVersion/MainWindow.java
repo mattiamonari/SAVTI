@@ -293,35 +293,37 @@ public class MainWindow extends BorderPane {
         });
 
         burstMode.setOnAction(e -> {
-            ExecutorService pool = Executors.newFixedThreadPool(8);
             ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+            SeekableByteChannel bOut = null;
+            AWTSequenceEncoder bEncoder = null;
             for (String s : chooseAlgo.getItems()) {
                 try {
-                    out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\" + s + ".mp4");
-                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
+                    bOut = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\" + s + ".mp4");
+                    bEncoder = new AWTSequenceEncoder(bOut, Rational.R(userSettings.getFrameRate(), 1));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
                 splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
-                JavaFXVersion.sorting.SortUtils.rand(userSettings, image, encoder, out);
+                JavaFXVersion.sorting.SortUtils.rand(userSettings, image, bEncoder, bOut);
                 switch (s) {
-                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out);
-                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, encoder, out);
-                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
-                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, encoder, out);
-                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out);
-                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out);
-                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, encoder, out);
-                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out);
-                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out);
-                }
-                pool.execute(() -> {
-                    try {
-                        algorithm.sort(imageView, image.clone(), this);
-                    } catch (CloneNotSupportedException ex) {
-                        throw new RuntimeException(ex);
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, bEncoder, bOut);
+                    default -> {
+                        continue;
+//                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, bEncoder, bOut);
+//                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, bEncoder, bOut);
                     }
-                });
+                }
+                try {
+                    algorithm.sort(imageView, image.clone(), this);
+                } catch (CloneNotSupportedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
     }

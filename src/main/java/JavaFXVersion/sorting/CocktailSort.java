@@ -29,7 +29,7 @@ public class CocktailSort extends AbstractSort {
     @Override
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, image.getArray());
+        //setupEnv(imageView, image.getArray());
 
 
         thread = new Thread(() -> {
@@ -51,7 +51,7 @@ public class CocktailSort extends AbstractSort {
                         SortUtils.swap(image.getArray(), i, i + 1);
 
                         if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings, increment, progressBar);
+                            writeFrame(encoder, image, userSettings);
                         swap = 1;
                     }
                 }
@@ -70,23 +70,23 @@ public class CocktailSort extends AbstractSort {
                         ++countSwaps;
                         SortUtils.swap(image.getArray(), i, i + 1);
                         if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings, increment, progressBar);
+                            writeFrame(encoder, image, userSettings);
                         swap = 1;
                     }
                 }
                 ++beg;
             }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            NIOUtils.closeQuietly(out);
+            //NIOUtils.closeQuietly(out);
 
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
 
         thread.start();

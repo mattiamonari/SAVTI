@@ -36,16 +36,16 @@ public class QuickSort extends AbstractSort {
     @Override
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, image.getArray());
+        //setupEnv(imageView, image.getArray());
 
         this.imageView = imageView;
         this.image = image;
 
-        thread = new Thread(() -> {
+//        thread = new Thread(() -> {
 
             doSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
@@ -54,9 +54,9 @@ public class QuickSort extends AbstractSort {
             }
             NIOUtils.closeQuietly(out);
 
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
+            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+//        });
+//        thread.start();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class QuickSort extends AbstractSort {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
         countSwaps++;
         if (countSwaps % delay == 0 && write)
-            writeFrame(encoder, image, userSettings, increment, progressBar);
+            writeFrame(encoder, image, userSettings);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, write);
@@ -121,7 +121,7 @@ public class QuickSort extends AbstractSort {
             if (left <= right) {
                 countSwaps++;
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(encoder, image, userSettings, increment, progressBar);
+                    writeFrame(encoder, image, userSettings);
                 swap(array, left, right);
                 ++left;
                 --right;

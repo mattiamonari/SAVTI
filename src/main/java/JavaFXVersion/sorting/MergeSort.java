@@ -32,7 +32,7 @@ public class MergeSort extends AbstractSort {
     @Override
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, image.getArray());
+        //setupEnv(imageView, image.getArray());
 
         this.imageView = imageView;
 
@@ -44,7 +44,7 @@ public class MergeSort extends AbstractSort {
 
             mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
@@ -53,7 +53,7 @@ public class MergeSort extends AbstractSort {
             }
             NIOUtils.closeQuietly(out);
 
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
 
         });
 
@@ -125,7 +125,7 @@ public class MergeSort extends AbstractSort {
                     j++;
                 }
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(encoder, image, userSettings, increment, progressBar);
+                    writeFrame(encoder, image, userSettings);
                 k++;
             }
 
@@ -136,7 +136,7 @@ public class MergeSort extends AbstractSort {
                 i++;
                 k++;
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(encoder, image, userSettings, increment, progressBar);
+                    writeFrame(encoder, image, userSettings);
             }
 
             while (j < n2) {
@@ -144,7 +144,7 @@ public class MergeSort extends AbstractSort {
                 j++;
                 k++;
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(encoder, image, userSettings, increment, progressBar);
+                    writeFrame(encoder, image, userSettings);
             }
         }
     }

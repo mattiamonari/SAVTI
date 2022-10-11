@@ -47,7 +47,7 @@ public class CycleSort extends AbstractSort {
     @Override
     public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
 
-        setupEnv(imageView, image.getArray());
+        //setupEnv(imageView, image.getArray());
 
         thread = new Thread(() -> {
 
@@ -81,7 +81,7 @@ public class CycleSort extends AbstractSort {
                 if (pos != j) {
                     countSwaps++;
                     if (countSwaps % delay == 0) {
-                        writeFrame(encoder, image, userSettings, increment, progressBar);
+                        writeFrame(encoder, image, userSettings);
                     }
                     item = replace(image.getArray(), pos, item);
                 }
@@ -108,13 +108,13 @@ public class CycleSort extends AbstractSort {
                         countSwaps++;
                         item = replace(image.getArray(), pos, item);
                         if (countSwaps % delay == 0) {
-                            writeFrame(encoder, image, userSettings, increment, progressBar);
+                            writeFrame(encoder, image, userSettings);
                         }
                     }
                 }
             }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings, increment, progressBar);
+            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
             try {
                 encoder.finish();
@@ -122,7 +122,7 @@ public class CycleSort extends AbstractSort {
                 throw new RuntimeException(e);
             }
             NIOUtils.closeQuietly(out);
-            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
         });
         thread.start();
     }
