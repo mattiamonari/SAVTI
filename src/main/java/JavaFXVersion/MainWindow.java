@@ -33,14 +33,11 @@ import org.jcodec.common.model.Rational;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static JavaFXVersion.sorting.SortUtils.swap;
 import static JavaFXVersion.utilities.FileUtilities.*;
@@ -95,8 +92,6 @@ public class MainWindow extends BorderPane {
     ToggleSwitch darkMode;
     @FXML
     Hyperlink pathLabel;
-    @FXML
-    Button burstMode;
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -290,39 +285,6 @@ public class MainWindow extends BorderPane {
                         ErrorUtilities.SWW();
                     }
                 }
-        });
-
-        burstMode.setOnAction(e -> {
-            ExecutorService pool = Executors.newFixedThreadPool(8);
-            ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
-            for (String s : chooseAlgo.getItems()) {
-                try {
-                    out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\" + s + ".mp4");
-                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
-                JavaFXVersion.sorting.SortUtils.rand(userSettings, image, encoder, out);
-                switch (s) {
-                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out);
-                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, encoder, out);
-                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
-                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, encoder, out);
-                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out);
-                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out);
-                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, encoder, out);
-                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out);
-                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out);
-                }
-                pool.execute(() -> {
-                    try {
-                        algorithm.sort(imageView, image.clone(), this);
-                    } catch (CloneNotSupportedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
-            }
         });
     }
 
