@@ -35,7 +35,6 @@ public class AlgorithmProgressBar extends VBox {
         progressBar.setMinHeight(50);
         progressIndicator.setMinHeight(65);
         progressIndicator.setPrefHeight(65);
-        System.out.println();
         algoName.setText(algorithmName);
         algoName.setFont(Font.font("", FontWeight.BOLD, 33));
         algoName.setAlignment(Pos.CENTER);
