@@ -1,28 +1,25 @@
 package JavaFXVersion.sorting;
 
-import JavaFXVersion.MainWindow;
+import JavaFXVersion.AlgorithmProgressBar;
 import JavaFXVersion.Tile;
 import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
 import JavaFXVersion.utilities.ErrorUtilities;
-import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.*;
+import static JavaFXVersion.utilities.FileUtilities.writeFrame;
+import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
 import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class BubbleSort extends AbstractSort {
 
-    public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
-        super(userSettings, image, imageView, encoder, out);
+    public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
+        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
     }
 
     @Override
@@ -51,22 +48,21 @@ public class BubbleSort extends AbstractSort {
             boolean swapped = false;
             for (int j = 0; j < size - i; ++j) {
                 countComparison++;
-
                 /*      SWAP SECTION     */
                 if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
                     countSwaps++;
-                    progress += increment;
-                    progressBar.setProgress(increment);
+                    algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), j, j + 1);
                     swapped = true;
 
                     /*      FRAMEWRITING SECTION     */
                     if (countSwaps % delay == 0)
                         writeFrame(encoder, image, userSettings);
+
                 }
-                if (!swapped) {
-                    break;
-                }
+            }
+            if (!swapped) {
+                break;
             }
         }
 

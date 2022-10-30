@@ -33,14 +33,11 @@ import org.jcodec.common.model.Rational;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static JavaFXVersion.sorting.SortUtils.swap;
 import static JavaFXVersion.utilities.FileUtilities.*;
@@ -120,7 +117,7 @@ public class MainWindow extends BorderPane {
         //Create a default UserSettings object
         userSettings = new UserSettings();
         //We choose bubblesort as default algorithm
-        algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
+        algorithm = new BubbleSort(userSettings, image, imageView, encoder, out, null);
 
         image = new TiledImage();
 
@@ -175,21 +172,34 @@ public class MainWindow extends BorderPane {
 
         sortingButton.setOnAction(e -> Platform.runLater(() -> {
             if (checkSortingConditions()) {
+                AlgorithmProgressBar al = new AlgorithmProgressBar("AlgoName");
                 String choice = chooseAlgo.getValue();
                 switch (choice) {
-                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out);
-                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, encoder, out);
-                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out);
-                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, encoder, out);
-                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out);
-                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out);
-                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, encoder, out);
-                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out);
-                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out);
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, encoder, out, al);
+                    case "SelectionSort" ->
+                            algorithm = new SelectionSort(userSettings, image, imageView, encoder, out, al);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, encoder, out, al);
+                    case "InsertionSort" ->
+                            algorithm = new InsertionSort(userSettings, image, imageView, encoder, out, al);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, encoder, out, al);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, encoder, out, al);
+                    case "CocktailSort" ->
+                            algorithm = new CocktailSort(userSettings, image, imageView, encoder, out, al);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, encoder, out, al);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, encoder, out, al);
                     default -> ErrorUtilities.SWW();
                 }
                 ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+                al.setAlgoName(choice);
+                ((Group) imageView.getParent()).getChildren().add(al);
+                imageView.setVisible(false);
+                imageView.setManaged(false);
                 new Thread(algorithm).start();
+                /*
+                imageView.setVisible(true);
+                imageView.setManaged(true);
+                ((Group) imageView.getParent()).getChildren().remove(progressBox);
+                 */
             }
         }));
 
@@ -303,20 +313,36 @@ public class MainWindow extends BorderPane {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+                AlgorithmProgressBar al = new AlgorithmProgressBar("AlgoName");
                 splitImage(i, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
                 JavaFXVersion.sorting.SortUtils.rand(userSettings, image, bEncoder, bOut);
                 switch (s) {
-                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, bEncoder, bOut);
-                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "SelectionSort" ->
+                            algorithm = new SelectionSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "InsertionSort" ->
+                            algorithm = new InsertionSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "CocktailSort" ->
+                            algorithm = new CocktailSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, bEncoder, bOut, al);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, bEncoder, bOut, al);
                 }
-                new Thread(algorithm).start();
+                Thread t = new Thread(algorithm);
+                t.start();
+
+                //TODO
+                //ADD THE FUTURECALLBACK.
+                //TODO
+                //CHANGE HOW THE BURSTMODE WORKS
+                //TODO
+                //ADD THE FUNCTIONS IN BUBBLESORT TO EVERY OTHER ALGORITHM
+                //TODO
+                //REORDER ALGORITHMPROGRESSBARCLASS
+                //TODO PrimaProvaTODO
+
             }
         });
     }
@@ -379,8 +405,7 @@ public class MainWindow extends BorderPane {
 
         new Thread(() -> {
 
-            if(!out.isOpen())
-            {
+            if (!out.isOpen()) {
                 try {
                     out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\output.mp4");
                     encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));

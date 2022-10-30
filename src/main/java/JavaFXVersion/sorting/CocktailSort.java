@@ -1,19 +1,15 @@
 package JavaFXVersion.sorting;
 
-import JavaFXVersion.MainWindow;
+import JavaFXVersion.AlgorithmProgressBar;
 import JavaFXVersion.Tile;
 import JavaFXVersion.TiledImage;
 import JavaFXVersion.UserSettings;
-import JavaFXVersion.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import static JavaFXVersion.utilities.FileUtilities.writeFrame;
@@ -22,14 +18,14 @@ import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class CocktailSort extends AbstractSort {
 
-    public CocktailSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
-        super(userSettings, image, imageView, encoder, out);
+    public CocktailSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
+        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
     }
 
     @Override
     public void sort() {
 
-    Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
         int n = image.getArray().length;
         int swap = 1;

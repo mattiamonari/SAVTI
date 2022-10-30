@@ -22,26 +22,24 @@ import static JavaFXVersion.utilities.ImageUtilities.fillImage;
 abstract public class AbstractSort implements SortAlgorithm {
     final UserSettings userSettings;
     final ImageView imageView;
-    Thread thread;
     long countComparison = 0, imageIndex = 1, countSwaps = 0;
     boolean running = true;
-    ProgressBar progressBar;
-    ProgressIndicator progressIndicator;
-    HBox progressBox;
     double progress = 0;
     double increment, delay = 1;
     TiledImage image;
 
+    AlgorithmProgressBar algorithmProgressBar;
     AWTSequenceEncoder encoder;
 
     SeekableByteChannel out;
 
-    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView,AWTSequenceEncoder encoder, SeekableByteChannel out) {
+    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView,AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
         this.userSettings = userSettings;
         this.image = image;
         this.imageView = imageView;
         this.encoder = encoder;
         this.out = out;
+        this.algorithmProgressBar = algorithmProgressBar;
     }
 
     @Override
@@ -57,29 +55,15 @@ abstract public class AbstractSort implements SortAlgorithm {
     protected abstract void calculateNumberOfSwaps(Tile[] array);
 
     void setupEnv(ImageView imageView, Tile[] array) {
+
         running = true;
+
         calculateNumberOfSwaps(array);
 
-        progressBar = new ProgressBar(0);
-        progressIndicator = new ProgressIndicator(0);
-        progressBox = new HBox();
         increment = 1d / countSwaps;
 
-        Platform.runLater(() -> {
-            progressBox.getChildren().addAll(progressBar, progressIndicator);
-            ((Group) imageView.getParent()).getChildren().add(progressBox);
-            imageView.setVisible(false);
-            imageView.setManaged(false);
-            progressBar.setPrefWidth(1000);
-            progressBar.setMinWidth(1000);
-            progressBar.setPrefHeight(50);
-            progressBar.setMinHeight(50);
-            VBox.setMargin(progressBar, new Insets(10));
-        });
-
-        progressIndicator.progressProperty().bind(progressBar.progressProperty());
-
         delay = Math.max(countSwaps / ((long) userSettings.getFrameRate() * userSettings.getVideoDuration()), 1);
+
         countSwaps = 0;
 
         imageIndex = userSettings.getStartingImageIndex();
@@ -104,10 +88,6 @@ abstract public class AbstractSort implements SortAlgorithm {
                 e.printStackTrace();
             }
         }
-
-        imageView.setVisible(true);
-        imageView.setManaged(true);
-        ((Group) imageView.getParent()).getChildren().remove(progressBox);
         fillImage(userSettings, image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
         mainWindow.enableAll();
     }

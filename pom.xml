@@ -78,6 +78,13 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/listenablefuture -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>listenablefuture</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
         <dependency>
             <groupId>org.xerial</groupId>
