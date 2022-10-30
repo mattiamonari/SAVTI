@@ -332,17 +332,6 @@ public class MainWindow extends BorderPane {
                 }
                 Thread t = new Thread(algorithm);
                 t.start();
-
-                //TODO
-                //ADD THE FUTURECALLBACK.
-                //TODO
-                //CHANGE HOW THE BURSTMODE WORKS
-                //TODO
-                //ADD THE FUNCTIONS IN BUBBLESORT TO EVERY OTHER ALGORITHM
-                //TODO
-                //REORDER ALGORITHMPROGRESSBARCLASS
-                //TODO PrimaProvaTODO
-
             }
         });
     }
