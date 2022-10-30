@@ -1,6 +1,7 @@
 package JavaFXVersion.sorting;
 
 import JavaFXVersion.*;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.ProgressBar;
@@ -63,15 +64,18 @@ abstract public class AbstractSort implements SortAlgorithm {
         progressIndicator = new ProgressIndicator(0);
         progressBox = new HBox();
         increment = 1d / countSwaps;
-        progressBox.getChildren().addAll(progressBar, progressIndicator);
-        ((Group) imageView.getParent()).getChildren().add(progressBox);
-        imageView.setVisible(false);
-        imageView.setManaged(false);
-        progressBar.setPrefWidth(1000);
-        progressBar.setMinWidth(1000);
-        progressBar.setPrefHeight(50);
-        progressBar.setMinHeight(50);
-        VBox.setMargin(progressBar, new Insets(10));
+
+        Platform.runLater(() -> {
+            progressBox.getChildren().addAll(progressBar, progressIndicator);
+            ((Group) imageView.getParent()).getChildren().add(progressBox);
+            imageView.setVisible(false);
+            imageView.setManaged(false);
+            progressBar.setPrefWidth(1000);
+            progressBar.setMinWidth(1000);
+            progressBar.setPrefHeight(50);
+            progressBar.setMinHeight(50);
+            VBox.setMargin(progressBar, new Insets(10));
+        });
 
         progressIndicator.progressProperty().bind(progressBar.progressProperty());
 
@@ -79,6 +83,13 @@ abstract public class AbstractSort implements SortAlgorithm {
         countSwaps = 0;
 
         imageIndex = userSettings.getStartingImageIndex();
+
+        //TODO
+        /*
+        if (!userSettings.getOutputDirectory().isDirectory())
+            if (!userSettings.getOutputDirectory().mkdir())
+                ErrorUtilities.SWW();
+         */
 
     }
 

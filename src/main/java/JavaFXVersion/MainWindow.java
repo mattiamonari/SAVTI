@@ -189,7 +189,7 @@ public class MainWindow extends BorderPane {
                     default -> ErrorUtilities.SWW();
                 }
                 ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
-                algorithm.sort(imageView, image, this);
+                new Thread(algorithm).start();
             }
         }));
 
@@ -308,22 +308,15 @@ public class MainWindow extends BorderPane {
                 switch (s) {
                     case "QuickSort" -> algorithm = new QuickSort(userSettings, image, imageView, bEncoder, bOut);
                     case "BubbleSort" -> algorithm = new BubbleSort(userSettings, image, imageView, bEncoder, bOut);
-                    default -> {
-                        continue;
-//                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, bEncoder, bOut);
-//                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, bEncoder, bOut);
-                    }
+                    case "SelectionSort" -> algorithm = new SelectionSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "InsertionSort" -> algorithm = new InsertionSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "RadixSort" -> algorithm = new RadixSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "MergeSort" -> algorithm = new MergeSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "CocktailSort" -> algorithm = new CocktailSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "GnomeSort" -> algorithm = new GnomeSort(userSettings, image, imageView, bEncoder, bOut);
+                    case "CycleSort" -> algorithm = new CycleSort(userSettings, image, imageView, bEncoder, bOut);
                 }
-                try {
-                    algorithm.sort(imageView, image.clone(), this);
-                } catch (CloneNotSupportedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                new Thread(algorithm).start();
             }
         });
     }
@@ -391,13 +384,6 @@ public class MainWindow extends BorderPane {
                 try {
                     out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\output.mp4");
                     encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            else {
-                try {
-                    out.setPosition(0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

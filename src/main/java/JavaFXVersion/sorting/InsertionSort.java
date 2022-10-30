@@ -27,42 +27,38 @@ public class InsertionSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
+        for (int i = 0; i < image.getArray().length; ++i) {
 
-            for (int i = 0; i < image.getArray().length; ++i) {
+            int j = i;
 
-                int j = i;
+            ++countComparison;
+            //IS THIS CORRECT?
+            while (j > 0 && SortUtils.greater(image.getArray()[j - 1], image.getArray()[j])) {
+                ++countSwaps;
+                SortUtils.swap(image.getArray(), j, j - 1);
+                j = j - 1;
 
-                ++countComparison;
-                //IS THIS CORRECT?
-                while (j > 0 && SortUtils.greater(image.getArray()[j - 1], image.getArray()[j])) {
-                    ++countSwaps;
-                    SortUtils.swap(image.getArray(), j, j - 1);
-                    j = j - 1;
-
-                    if ((countSwaps % delay) == 0) {
-                        writeFrame(encoder, image, userSettings);
-                    }
+                if ((countSwaps % delay) == 0) {
+                    writeFrame(encoder, image, userSettings);
                 }
             }
+        }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
 
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
 
-        });
-        thread.start();
     }
 
 
@@ -83,5 +79,10 @@ public class InsertionSort extends AbstractSort {
             ++countComparison;
         }
         resetCoordinates(userSettings, array);
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }

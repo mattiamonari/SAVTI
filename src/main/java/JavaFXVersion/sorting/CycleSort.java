@@ -45,31 +45,55 @@ public class CycleSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
+        int n = image.getArray().length;
 
-            int n = image.getArray().length;
+        // traverse array elements
+        for (int j = 0; j <= n - 2; j++) {
+            // initialize item as starting point
+            Tile item = image.getArray()[j];
 
-            // traverse array elements
-            for (int j = 0; j <= n - 2; j++) {
-                // initialize item as starting point
-                Tile item = image.getArray()[j];
+            // Find position where we put the item.
+            int pos = j;
+            for (int i = j + 1; i < n; i++) {
+                countComparison++;
+                if (less(image.getArray()[i], item)) {
+                    pos++;
+                }
+            }
 
-                // Find position where we put the item.
-                int pos = j;
+            // If item is already in correct position
+            if (pos == j) {
+                continue;
+            }
+
+            // ignore all duplicate elements
+            while (item.compareTo(image.getArray()[pos]) == 0) {
+                pos += 1;
+            }
+
+            // put the item to it's right position
+            if (pos != j) {
+                countSwaps++;
+                if (countSwaps % delay == 0) {
+                    writeFrame(encoder, image, userSettings);
+                }
+                item = replace(image.getArray(), pos, item);
+            }
+
+            // Rotate rest of the cycle
+            while (pos != j) {
+                pos = j;
+
+                // Find position where we put the element
                 for (int i = j + 1; i < n; i++) {
                     countComparison++;
                     if (less(image.getArray()[i], item)) {
-                        pos++;
+                        pos += 1;
                     }
-                }
-
-                // If item is already in correct position
-                if (pos == j) {
-                    continue;
                 }
 
                 // ignore all duplicate elements
@@ -78,53 +102,25 @@ public class CycleSort extends AbstractSort {
                 }
 
                 // put the item to it's right position
-                if (pos != j) {
+                if (item != image.getArray()[pos]) {
                     countSwaps++;
+                    item = replace(image.getArray(), pos, item);
                     if (countSwaps % delay == 0) {
                         writeFrame(encoder, image, userSettings);
                     }
-                    item = replace(image.getArray(), pos, item);
-                }
-
-                // Rotate rest of the cycle
-                while (pos != j) {
-                    pos = j;
-
-                    // Find position where we put the element
-                    for (int i = j + 1; i < n; i++) {
-                        countComparison++;
-                        if (less(image.getArray()[i], item)) {
-                            pos += 1;
-                        }
-                    }
-
-                    // ignore all duplicate elements
-                    while (item.compareTo(image.getArray()[pos]) == 0) {
-                        pos += 1;
-                    }
-
-                    // put the item to it's right position
-                    if (item != image.getArray()[pos]) {
-                        countSwaps++;
-                        item = replace(image.getArray(), pos, item);
-                        if (countSwaps % delay == 0) {
-                            writeFrame(encoder, image, userSettings);
-                        }
-                    }
                 }
             }
+        }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
     @Override
@@ -187,6 +183,11 @@ public class CycleSort extends AbstractSort {
             }
         }
         resetCoordinates(userSettings, a);
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }
 

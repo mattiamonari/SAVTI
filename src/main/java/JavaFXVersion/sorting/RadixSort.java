@@ -24,43 +24,37 @@ import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 public class RadixSort extends AbstractSort {
 
     boolean write;
-    ImageView imageView;
-
 
     public RadixSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
         super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
-            write = true;
+        write = true;
 
-            // Get maximum element
-            int size = image.getArray().length;
-            Tile max = getMax(image.getArray(), size);
+        // Get maximum element
+        int size = image.getArray().length;
+        Tile max = getMax(image.getArray(), size);
 
-            // Apply counting sort to sort elements based on place value.
-            for (int place = 1; max.currentPosition / place > 0; place *= 10) {
-                countingSort(image.getArray(), size, place);
-            }
+        // Apply counting sort to sort elements based on place value.
+        for (int place = 1; max.currentPosition / place > 0; place *= 10) {
+            countingSort(image.getArray(), size, place);
+        }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
 
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
-
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
     Tile getMax(Tile[] array, int n) {
@@ -124,5 +118,10 @@ public class RadixSort extends AbstractSort {
             countingSort(tmp, size, place);
 
         resetCoordinates(userSettings, array);
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }

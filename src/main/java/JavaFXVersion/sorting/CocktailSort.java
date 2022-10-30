@@ -27,69 +27,63 @@ public class CocktailSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+    Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-
-        thread = new Thread(() -> {
-
-            int n = image.getArray().length;
-            int swap = 1;
-            int beg = 0;
-            int end = n - 1;
-            int i;
-            while (swap == 1) {
-                swap = 0;
-                for (i = beg; i < end; ++i) {
-                    if (!running)
-                        break;
-                    ++countComparison;
-
-                    if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
-                        ++countSwaps;
-                        SortUtils.swap(image.getArray(), i, i + 1);
-
-                        if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings);
-                        swap = 1;
-                    }
-                }
-
-                if (swap == 0)
+        int n = image.getArray().length;
+        int swap = 1;
+        int beg = 0;
+        int end = n - 1;
+        int i;
+        while (swap == 1) {
+            swap = 0;
+            for (i = beg; i < end; ++i) {
+                if (!running)
                     break;
+                ++countComparison;
 
-                swap = 0;
-                --end;
+                if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
+                    ++countSwaps;
+                    SortUtils.swap(image.getArray(), i, i + 1);
 
-                for (i = end - 1; i >= beg; --i) {
-                    if (!running)
-                        break;
-                    ++countComparison;
-                    if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
-                        ++countSwaps;
-                        SortUtils.swap(image.getArray(), i, i + 1);
-                        if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings);
-                        swap = 1;
-                    }
+                    if (countSwaps % delay == 0)
+                        writeFrame(encoder, image, userSettings);
+                    swap = 1;
                 }
-                ++beg;
             }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+            if (swap == 0)
+                break;
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            swap = 0;
+            --end;
+
+            for (i = end - 1; i >= beg; --i) {
+                if (!running)
+                    break;
+                ++countComparison;
+                if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
+                    ++countSwaps;
+                    SortUtils.swap(image.getArray(), i, i + 1);
+                    if (countSwaps % delay == 0)
+                        writeFrame(encoder, image, userSettings);
+                    swap = 1;
+                }
             }
-            //NIOUtils.closeQuietly(out);
+            ++beg;
+        }
 
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-        thread.start();
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
+
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
     @Override
@@ -128,4 +122,10 @@ public class CocktailSort extends AbstractSort {
         }
         resetCoordinates(userSettings, array);
     }
+
+    @Override
+    public void run() {
+        sort();
+    }
 }
+

@@ -25,38 +25,26 @@ import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class QuickSort extends AbstractSort {
 
-    ImageView imageView;
-
-    TiledImage image;
-
     public QuickSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
         super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        this.imageView = imageView;
-        this.image = image;
+        doSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-//        thread = new Thread(() -> {
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            doSort(image.getArray(), 0, image.getArray().length - 1, true);
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
-
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-//        });
-//        thread.start();
     }
 
     @Override
@@ -128,6 +116,11 @@ public class QuickSort extends AbstractSort {
             }
         }
         return left;
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }
 

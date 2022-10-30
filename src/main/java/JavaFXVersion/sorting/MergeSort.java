@@ -23,43 +23,28 @@ import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
 
 public class MergeSort extends AbstractSort {
 
-    ImageView imageView;
 
     public MergeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out) {
         super(userSettings, image, imageView, encoder, out);
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        this.imageView = imageView;
+        mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-        if (!userSettings.getOutputDirectory().isDirectory())
-            if (!userSettings.getOutputDirectory().mkdir())
-                ErrorUtilities.SWW();
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-        thread = new Thread(() -> {
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
 
-            mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
-
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
-
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-
-        });
-
-        thread.start();
-
-
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
     @Override
@@ -147,5 +132,10 @@ public class MergeSort extends AbstractSort {
                     writeFrame(encoder, image, userSettings);
             }
         }
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }

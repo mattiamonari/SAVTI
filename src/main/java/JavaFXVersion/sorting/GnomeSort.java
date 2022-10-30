@@ -28,41 +28,38 @@ public class GnomeSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
+        int i = 1;
+        int n = image.getArray().length;
+        while (i < n) {
+            ++countComparison;
+            if (i == 0 || SortUtils.greater(image.getArray()[i], image.getArray()[i - 1]))
+                i++;
+            else
+            {
+                countSwaps++;
+                SortUtils.swap(image.getArray(), i, i-1);
+                i--;
 
-            int i = 1;
-            int n = image.getArray().length;
-            while (i < n) {
-                ++countComparison;
-                if (i == 0 || SortUtils.greater(image.getArray()[i], image.getArray()[i - 1]))
-                    i++;
-                else
-                {
-                    countSwaps++;
-                    SortUtils.swap(image.getArray(), i, i-1);
-                    i--;
-
-                    if (countSwaps % delay == 0) {
-                        writeFrame(encoder, image, userSettings);
-                    }
+                if (countSwaps % delay == 0) {
+                    writeFrame(encoder, image, userSettings);
                 }
             }
+        }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+
     }
 
     @Override
@@ -83,5 +80,10 @@ public class GnomeSort extends AbstractSort {
             }
         }
         resetCoordinates(userSettings, array);
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }

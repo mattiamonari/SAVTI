@@ -26,48 +26,44 @@ public class SelectionSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
 
-        //setupEnv(imageView, image.getArray());
+        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
 
-        thread = new Thread(() -> {
-
-            int size = image.getArray().length;
-            for (int step = 0; step < size - 1; step++) {
-                int min_idx = step;
-                for (int k = step + 1; k < size; k++) {
-                    if (!running)
-                        break;
-                    // To sort in descending order, change > to < in this line.
-                    // Select the minimum element in each loop.
-                    ++countComparison;
-                    if (SortUtils.greater(image.getArray()[min_idx], image.getArray()[k])) {
-                        min_idx = k;
-                    }
-                }
-                // put min at the correct position
-                SortUtils.swap(image.getArray(), step, min_idx);
-                ++countSwaps;
-                if (countSwaps % delay == 0) {
-                    writeFrame(encoder, image, userSettings);
-                }
+        int size = image.getArray().length;
+        for (int step = 0; step < size - 1; step++) {
+            int min_idx = step;
+            for (int k = step + 1; k < size; k++) {
                 if (!running)
                     break;
+                // To sort in descending order, change > to < in this line.
+                // Select the minimum element in each loop.
+                ++countComparison;
+                if (SortUtils.greater(image.getArray()[min_idx], image.getArray()[k])) {
+                    min_idx = k;
+                }
             }
-
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            // put min at the correct position
+            SortUtils.swap(image.getArray(), step, min_idx);
+            ++countSwaps;
+            if (countSwaps % delay == 0) {
+                writeFrame(encoder, image, userSettings);
             }
-            NIOUtils.closeQuietly(out);
+            if (!running)
+                break;
+        }
 
-            //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-        });
-        thread.start();
-    }
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
+
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        }
 
     @Override
     public void calculateNumberOfSwaps(Tile[] array) {
@@ -86,5 +82,10 @@ public class SelectionSort extends AbstractSort {
             ++countSwaps;
         }
         resetCoordinates(userSettings, array);
+    }
+
+    @Override
+    public void run() {
+        sort();
     }
 }

@@ -36,56 +36,50 @@ public class BubbleSort extends AbstractSort {
     }
 
     @Override
-    public void sort(ImageView imageView, TiledImage image, MainWindow mainWindow) {
+    public void sort() {
         //We use a new thread to pause/resume its execution whenever we want
 
-        //Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(imageView, image.getArray());
 
-//        thread = new Thread(() -> {
-//            thread.setPriority(Thread.MAX_PRIORITY);
+        //------------NOT IN HERE!!!----------------
+        if (!userSettings.getOutputDirectory().isDirectory())
+            if (!userSettings.getOutputDirectory().mkdir())
+                ErrorUtilities.SWW();
+        //-------------------------------------------
 
-            //------------NOT IN HERE!!!----------------
-            if (!userSettings.getOutputDirectory().isDirectory())
-                if (!userSettings.getOutputDirectory().mkdir())
-                    ErrorUtilities.SWW();
-            //-------------------------------------------
+        for (int size = image.getArray().length, i = 1; i < size; ++i) {
+            boolean swapped = false;
+            for (int j = 0; j < size - i; ++j) {
+                countComparison++;
 
-            for (int size = image.getArray().length, i = 1; i < size; ++i) {
-                boolean swapped = false;
-                for (int j = 0; j < size - i; ++j) {
-                    countComparison++;
+                /*      SWAP SECTION     */
+                if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
+                    countSwaps++;
+                    progress += increment;
+                    progressBar.setProgress(increment);
+                    SortUtils.swap(image.getArray(), j, j + 1);
+                    swapped = true;
 
-                    /*      SWAP SECTION     */
-                    if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
-                        countSwaps++;
-                        SortUtils.swap(image.getArray(), j, j + 1);
-                        swapped = true;
-
-                        /*      FRAMEWRITING SECTION     */
-                        if (countSwaps % delay == 0)
-                            writeFrame(encoder, image, userSettings);
-
-                    }
+                    /*      FRAMEWRITING SECTION     */
+                    if (countSwaps % delay == 0)
+                        writeFrame(encoder, image, userSettings);
                 }
                 if (!swapped) {
                     break;
                 }
             }
+        }
 
-            writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
-            try {
-                encoder.finish();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            NIOUtils.closeQuietly(out);
+        try {
+            encoder.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        NIOUtils.closeQuietly(out);
 
-            //runFFMPEG(image.getArray(), imageView);
-
-//            Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
-//        });
-//        thread.start();
+        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
     @Override
@@ -110,4 +104,8 @@ public class BubbleSort extends AbstractSort {
         resetCoordinates(userSettings, array);
     }
 
+    @Override
+    public void run() {
+        sort();
+    }
 }

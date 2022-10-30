@@ -98,18 +98,12 @@ public final class SortUtils {
                 throw new RuntimeException(e);
             }
         }
-        else {
-            try {
-                out.setPosition(0);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
         for (int i = image.getArray().length - 1; i > 0; i--) {
-            writeFrame(encoder, image, userSettings);
+            if(i % delay == 0)
+                writeFrame(encoder, image, userSettings);
             // Pick a random index from 0 to i
             int j = rd.nextInt(i + 1);
             // Swap array[i] with the element at random index
