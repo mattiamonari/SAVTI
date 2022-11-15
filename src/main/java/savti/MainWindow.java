@@ -49,8 +49,7 @@ import java.util.concurrent.Executors;
 import static savti.sorting.SortUtils.rand;
 import static savti.utilities.FileUtilities.deleteAllPreviousFiles;
 import static savti.utilities.GUIUtilities.ableNodes;
-import static savti.utilities.ImageUtilities.fillImage;
-import static savti.utilities.ImageUtilities.splitImage;
+import static savti.utilities.ImageUtilities.*;
 
 public class MainWindow extends BorderPane {
 
@@ -146,6 +145,7 @@ public class MainWindow extends BorderPane {
         this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
     }
 
+
     //Aggiunge i listener agli eventi dei nodi/elementi
     private void addEventListeners() {
 
@@ -208,27 +208,27 @@ public class MainWindow extends BorderPane {
             }
         });
 
-        ffmpegButton.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
-            fileChooser.setTitle("Path to ffmpeg");
-            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
-            if (chosenFile != null) {
-                userSettings.setFfmpegPath(chosenFile);
-                ffmpegButton.setStyle("");
-            }
-        });
-
-        ffprobeButton.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
-            fileChooser.setTitle("Path to ffprobe");
-            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
-            if (chosenFile != null) {
-                userSettings.setFfprobePath(chosenFile);
-                ffprobeButton.setStyle("");
-            }
-        });
+//        ffmpegButton.setOnAction(e -> {
+//            FileChooser fileChooser = new FileChooser();
+//            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
+//            fileChooser.setTitle("Path to ffmpeg");
+//            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
+//            if (chosenFile != null) {
+//                userSettings.setFfmpegPath(chosenFile);
+//                ffmpegButton.setStyle("");
+//            }
+//        });
+//
+//        ffprobeButton.setOnAction(e -> {
+//            FileChooser fileChooser = new FileChooser();
+//            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("EXE", "*.exe"));
+//            fileChooser.setTitle("Path to ffprobe");
+//            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
+//            if (chosenFile != null) {
+//                userSettings.setFfprobePath(chosenFile);
+//                ffprobeButton.setStyle("");
+//            }
+//        });
 
         darkMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -254,10 +254,9 @@ public class MainWindow extends BorderPane {
             if (image.getImage() != null) {
 
                 if (out == null || !out.isOpen()) {
-                    System.out.println(userSettings.getOutputDirectory().getPath()+ "\\" + userSettings.getOutName()    );
                     try {
                         new File(userSettings.getOutputDirectory().getPath()+ "\\" + userSettings.getOutName()).createNewFile();
-                        out = NIOUtils.writableFileChannel(userSettings.getOutputDirectory().getAbsolutePath()+userSettings.getOutName());
+                        out = NIOUtils.writableFileChannel(userSettings.getOutputDirectory().getAbsolutePath()+ "\\" + userSettings.getOutName());
                         encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -268,7 +267,7 @@ public class MainWindow extends BorderPane {
 
                 splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
-                ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+                ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
                 ((Group) imageView.getParent()).getChildren().add(algorithmProgressBar);
                 imageView.setVisible(false);
                 imageView.setManaged(false);
@@ -276,13 +275,12 @@ public class MainWindow extends BorderPane {
                 ListenableFuture<?> future = pool.submit(() -> rand(userSettings, image, encoder, algorithmProgressBar));
                 //TODO CREATE METHOD
                 future.addListener(() -> Platform.runLater(() -> {
-                    fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
+                    fillImageFromArray(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
                     imageView.setVisible(true);
                     imageView.setManaged(true);
                     algorithmProgressBar.setProgress(0);
                     ((Group) imageView.getParent()).getChildren().remove(algorithmProgressBar);
-                    ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
-                    randomizeButton.setDisable(false);
+                    ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
                 }), MoreExecutors.directExecutor());
             }
         });
@@ -312,7 +310,7 @@ public class MainWindow extends BorderPane {
                             algorithm = new CycleSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
                     default -> ErrorUtilities.SWW();
                 }
-                ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+                ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
                 ((Group) imageView.getParent()).getChildren().add(algorithmProgressBar);
                 imageView.setVisible(false);
                 imageView.setManaged(false);
@@ -320,7 +318,7 @@ public class MainWindow extends BorderPane {
                 ListenableFuture<?> future = pool.submit(algorithm);
                 //TODO CREATE METHOD
                 future.addListener(() -> Platform.runLater(() -> {
-                    fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
+                    fillImageFromArray(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
                     imageView.setVisible(true);
                     imageView.setManaged(true);
                     ((Group) imageView.getParent()).getChildren().remove(algorithmProgressBar);
@@ -349,7 +347,7 @@ public class MainWindow extends BorderPane {
                 for (String s : chooseAlgo.getItems()) {
 
                     try {
-                        out = NIOUtils.writableFileChannel("D:\\IdeaProjects\\sortingVisualization\\ext\\" + s + ".mp4");
+                        out = NIOUtils.writableFileChannel("D:\\IdeaProjects\\sortingVisualization\\ext\\" + s + "+.mp4");
                         encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -360,7 +358,7 @@ public class MainWindow extends BorderPane {
 
                     splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
-                    rand(userSettings, image, encoder, algorithmProgressBar);
+                    new Thread(() -> rand(userSettings, image, encoder, algorithmProgressBar)).start();
 
                     try {
                         cloned = image.clone();
@@ -391,6 +389,8 @@ public class MainWindow extends BorderPane {
 
                     createFutureTaskForBurstAlgo(pool, progessBarContainer, algoList, algorithmProgressBar, sortAlgorithm);
 
+                    //TODO Encoder + Out ? Why not? Or even moving to xuggle??
+
 
                     //TODO ADD THE FUTURECALLBACK.
                     //TODO CHANGE HOW THE BURSTMODE WORKS
@@ -401,9 +401,8 @@ public class MainWindow extends BorderPane {
             }).start();
         });
     }
-
     private void setupEnvForBurstMode(VBox progessBarContainer, ObservableList<SortAlgorithm> algoList) {
-        ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
+        ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
         Platform.runLater(() -> ((Group) imageView.getParent()).getChildren().add(progessBarContainer));
         imageView.setVisible(false);
         imageView.setManaged(false);
@@ -427,22 +426,14 @@ public class MainWindow extends BorderPane {
             algoList.remove(sortAlgorithm);
             Platform.runLater(() -> {
                 progessBarContainer.getChildren().remove(algorithmProgressBar);
-                ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+                ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
             });
         }, MoreExecutors.directExecutor());
     }
 
     private boolean checkSortingConditions() {
 
-        if (!userSettings.verifyFfmpegPath()) {
-            ffmpegButton.setStyle(hoverButton);
-            ErrorUtilities.ffmpegPath();
-            return false;
-        } else if (!userSettings.verifyFfprobePath()) {
-            ffprobeButton.setStyle(hoverButton);
-            ErrorUtilities.ffprobePath();
-            return false;
-        } else if (!userSettings.verifyOutputPath()) {
+        if (!userSettings.verifyOutputPath()) {
             outputButton.setStyle(hoverButton);
             ErrorUtilities.outputPath();
             return false;
