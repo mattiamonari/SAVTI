@@ -4,3 +4,4 @@
 /out/
 /resources/
 *.properties
+.DS_Store
