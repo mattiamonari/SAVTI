@@ -52,6 +52,7 @@ public class ErrorUtilities {
     }
 
     public static void FFError() {
+        //Say why it is left blank
     }
 
     public static void ffmpegPath() {

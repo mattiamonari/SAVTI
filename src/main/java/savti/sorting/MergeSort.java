@@ -50,18 +50,18 @@ public class MergeSort extends AbstractSort {
         resetCoordinates(userSettings, array);
     }
 
-    void mergeSort(Tile[] arr, int l, int r, boolean write) {
+    void mergeSort(Tile[] arr, int left, int right, boolean write) {
         ++countComparison;
-        if (l < r) {
+        if (left < right) {
 
-            // m is the point where the array is divided into two subarrays
-            int m = (l + r) / 2;
+            // mid is the point where the array is divided into two subarrays
+            int mid = (left + right) / 2;
 
-            mergeSort(arr, l, m, write);
-            mergeSort(arr, m + 1, r, write);
+            mergeSort(arr, left, mid, write);
+            mergeSort(arr, mid + 1, right, write);
 
             // Merge the sorted subarrays
-            merge(arr, l, m, r, write);
+            merge(arr, left, mid, right, write);
         }
     }
 

@@ -241,14 +241,12 @@ public class MainWindow extends BorderPane {
         });
 
         pathLabel.setOnAction(event -> {
-            if (userSettings.getOutputDirectory() != null)
-                if (userSettings.getOutputDirectory().isDirectory()) {
+            if (userSettings.isADirectory())
                     try {
                         Desktop.getDesktop().open(userSettings.getOutputDirectory());
                     } catch (IOException e) {
                         ErrorUtilities.SWW();
                     }
-                }
         });
 
         randomizeButton.setOnAction(e -> {

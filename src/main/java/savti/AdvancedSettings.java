@@ -146,14 +146,13 @@ public class AdvancedSettings extends BorderPane {
         openVideoBox.selectedProperty().addListener(event -> userSettings.setOpenFile(openVideoBox.isSelected()));
 
         pathLabel.setOnAction(event -> {
-            if (userSettings.getOutputDirectory() != null)
-                if (userSettings.getOutputDirectory().isDirectory()) {
+            //We can put it in a method, maybe better in userSettings and call directly that method
+            if (userSettings.isADirectory())
                     try {
                         Desktop.getDesktop().open(userSettings.getOutputDirectory());
                     } catch (IOException e) {
                         ErrorUtilities.SWW();
                     }
-                }
         });
 
     }

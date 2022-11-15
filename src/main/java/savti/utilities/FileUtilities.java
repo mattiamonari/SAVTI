@@ -18,8 +18,8 @@ public class FileUtilities {
         File directory = userSettings.getOutputDirectory();
         if (directory.listFiles() != null) {
             for (File f : directory.listFiles()) {
-                if (f.getName().startsWith("final")) {
-                    if (!f.delete()) ErrorUtilities.SWW();
+                if (f.getName().startsWith("final") && !f.delete()) {
+                     ErrorUtilities.SWW();
                 }
             }
         }

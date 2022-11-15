@@ -34,7 +34,9 @@ public class UserSettings {
         videoDuration = 15;
         startingImageIndex = 0;
     }
-
+    public boolean isADirectory() {
+        return getOutputDirectory() != null && getOutputDirectory().isDirectory();
+    }
     public File getOutputDirectory() {
         return outputDirectory;
     }
