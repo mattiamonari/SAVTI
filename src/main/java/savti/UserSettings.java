@@ -1,14 +1,17 @@
 package savti;
 
+import savti.utilities.ErrorUtilities;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class UserSettings {
 
     private boolean saveImage = false;
     private int rowsNumber, colsNumber;
     private File outputDirectory;
-    private File ffmpegPath;
-    private File ffprobePath;
     private String outName;
     private int frameRate;
     private File music;
@@ -21,20 +24,26 @@ public class UserSettings {
 
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
-    //?Maybe add a time of the video feature?
     public UserSettings() {
         colsNumber = rowsNumber = 1;
-        outputDirectory = new File("D:\\IdeaProjects\\sortingVisualization\\ext");
-        ffmpegPath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
-        ffprobePath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
         outName = "sorted.mp4";
         frameRate = 30;
         music = null;
         openFile = false;
         videoDuration = 15;
         startingImageIndex = 0;
+        outputDirectory = new File(Path.of("").toAbsolutePath() + "\\out\\");
+
+        if(isOutputDirectory()){
+            try {
+                Files.createDirectories(outputDirectory.toPath());
+            } catch (IOException e) {
+                ErrorUtilities.outputPath();
+            }
+        }
+
     }
-    public boolean isADirectory() {
+    public boolean isOutputDirectory() {
         return getOutputDirectory() != null && getOutputDirectory().isDirectory();
     }
     public File getOutputDirectory() {
@@ -43,14 +52,6 @@ public class UserSettings {
 
     public void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
-    }
-
-    public File getFfmpegPath() {
-        return ffmpegPath;
-    }
-
-    public void setFfmpegPath(File ffmpegDirectory) {
-        this.ffmpegPath = ffmpegDirectory;
     }
 
     public String getOutName() {
@@ -94,14 +95,6 @@ public class UserSettings {
 
     public void setSaveImage(boolean saveImage) {
         this.saveImage = saveImage;
-    }
-
-    public File getFfprobePath() {
-        return ffprobePath;
-    }
-
-    public void setFfprobePath(File ffprobePath) {
-        this.ffprobePath = ffprobePath;
     }
 
     public int getVideoDuration() {
@@ -153,14 +146,6 @@ public class UserSettings {
             this.colsNumber = colsNumber;
     }
 
-    public boolean verifyFfmpegPath() {
-        return ffmpegPath != null && ffmpegPath.toString().endsWith("ffmpeg.exe");
-    }
-
-    public boolean verifyFfprobePath() {
-        return ffprobePath != null && ffprobePath.toString().endsWith("ffprobe.exe");
-    }
-
     public boolean verifyOutputPath() {
         return getOutputDirectory() != null;
     }
@@ -169,7 +154,4 @@ public class UserSettings {
         return startingImageIndex;
     }
 
-    public void setStartingImageIndex(int startingImageIndex) {
-        this.startingImageIndex = startingImageIndex;
-    }
 }

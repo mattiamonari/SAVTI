@@ -147,7 +147,7 @@ public class AdvancedSettings extends BorderPane {
 
         pathLabel.setOnAction(event -> {
             //We can put it in a method, maybe better in userSettings and call directly that method
-            if (userSettings.isADirectory())
+            if (userSettings.isOutputDirectory())
                     try {
                         Desktop.getDesktop().open(userSettings.getOutputDirectory());
                     } catch (IOException e) {

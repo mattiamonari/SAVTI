@@ -21,7 +21,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -39,8 +38,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -241,7 +238,7 @@ public class MainWindow extends BorderPane {
         });
 
         pathLabel.setOnAction(event -> {
-            if (userSettings.isADirectory())
+            if (userSettings.isOutputDirectory())
                     try {
                         Desktop.getDesktop().open(userSettings.getOutputDirectory());
                     } catch (IOException e) {
