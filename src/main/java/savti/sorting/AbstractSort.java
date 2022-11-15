@@ -9,7 +9,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static savti.utilities.ImageUtilities.fillImage;
+import static savti.utilities.ImageUtilities.fillImageFromArray;
 
 abstract public class AbstractSort implements SortAlgorithm {
     final UserSettings userSettings;
@@ -69,7 +69,7 @@ abstract public class AbstractSort implements SortAlgorithm {
                 e.printStackTrace();
             }
         }
-        fillImage(image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
+        fillImageFromArray(image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
         mainWindow.enableAll();
     }
 }
