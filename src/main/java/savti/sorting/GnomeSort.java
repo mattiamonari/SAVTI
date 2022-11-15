@@ -1,10 +1,9 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,21 +11,21 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class GnomeSort extends AbstractSort {
 
 
-    public GnomeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
+    public GnomeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(image.getArray());
 
         int i = 1;
         int n = image.getArray().length;
@@ -36,6 +35,7 @@ public class GnomeSort extends AbstractSort {
                 i++;
             else {
                 countSwaps++;
+                algorithmProgressBar.setProgress(progress += increment);
                 SortUtils.swap(image.getArray(), i, i - 1);
                 i--;
 

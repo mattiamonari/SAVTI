@@ -1,11 +1,9 @@
-package JavaFXVersion.utilities;
+package savti.utilities;
 
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.control.ProgressBar;
-import net.bramp.ffmpeg.progress.Progress;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
 import javax.imageio.ImageIO;
@@ -27,7 +25,7 @@ public class FileUtilities {
         }
     }
 
-//    public static File writeImage(UserSettings userSettings, Tile[] array, int chunkWidth, int chunkHeight, long index, long comparisons, long swaps, double fontSize) {
+    //    public static File writeImage(UserSettings userSettings, Tile[] array, int chunkWidth, int chunkHeight, long index, long comparisons, long swaps, double fontSize) {
 //        int rows = userSettings.getRowsNumber();
 //        int cols = userSettings.getColsNumber();
 //        int width = chunkWidth * cols;
@@ -82,21 +80,21 @@ public class FileUtilities {
         return f;
     }
 
-    public static void writeFreezedFrames(int numOfFrames, AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings, double increment, ProgressBar progressBar){
+    public static void writeFreezedFrames(int numOfFrames, AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
         for (int i = 0; i < numOfFrames; i++) {
-            writeFrame(encoder, image, userSettings, increment, progressBar);
+            writeFrame(encoder, image, userSettings, countSwaps, countComparisons, fontSize);
         }
     }
 
-    public static void writeFreezedFrames(int numOfFrames, AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings){
+    public static void writeFreezedFrames(int numOfFrames, AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings) {
         for (int i = 0; i < numOfFrames; i++) {
             writeFrame(encoder, image, userSettings);
         }
     }
 
     public static void writeFrame(AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings) {
-        int width = (int) ( (image.getArray()[0].getWidth() * userSettings.getColsNumber()) % 2 == 0 ? image.getArray()[0].getWidth() * userSettings.getColsNumber() : image.getArray()[0].getWidth() * userSettings.getColsNumber() + 1);
-        int heigth = (int) ( (image.getArray()[0].getHeight() * userSettings.getRowsNumber()) % 2 == 0 ? image.getArray()[0].getHeight() * userSettings.getRowsNumber() : image.getArray()[0].getHeight() * userSettings.getRowsNumber() + 1);
+        int width = (int) ((image.getArray()[0].getWidth() * userSettings.getColsNumber()) % 2 == 0 ? image.getArray()[0].getWidth() * userSettings.getColsNumber() : image.getArray()[0].getWidth() * userSettings.getColsNumber() + 1);
+        int heigth = (int) ((image.getArray()[0].getHeight() * userSettings.getRowsNumber()) % 2 == 0 ? image.getArray()[0].getHeight() * userSettings.getRowsNumber() : image.getArray()[0].getHeight() * userSettings.getRowsNumber() + 1);
         BufferedImage finalImage = new BufferedImage(width, heigth, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
@@ -111,21 +109,25 @@ public class FileUtilities {
         graphics2D.dispose();
     }
 
-    public static void writeFrame(AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings, double increment, ProgressBar progressBar){
-        int width = (int) ( (image.getArray()[0].getWidth() * userSettings.getColsNumber()) % 2 == 0 ? image.getArray()[0].getWidth() * userSettings.getColsNumber() : image.getArray()[0].getWidth() * userSettings.getColsNumber() + 1);
-        int heigth = (int) ( (image.getArray()[0].getHeight() * userSettings.getRowsNumber()) % 2 == 0 ? image.getArray()[0].getHeight() * userSettings.getRowsNumber() : image.getArray()[0].getHeight() * userSettings.getRowsNumber() + 1);
+
+    private static void writeFrame(AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
+        int width = (int) ((image.getArray()[0].getWidth() * userSettings.getColsNumber()) % 2 == 0 ? image.getArray()[0].getWidth() * userSettings.getColsNumber() : image.getArray()[0].getWidth() * userSettings.getColsNumber() + 1);
+        int heigth = (int) ((image.getArray()[0].getHeight() * userSettings.getRowsNumber()) % 2 == 0 ? image.getArray()[0].getHeight() * userSettings.getRowsNumber() : image.getArray()[0].getHeight() * userSettings.getRowsNumber() + 1);
         BufferedImage finalImage = new BufferedImage(width, heigth, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
             BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
             graphics2D.drawImage(tile, (int) (t.getX() * image.getArray()[0].getWidth()), (int) (t.getY() * image.getArray()[0].getHeight()), null);
         }
+        graphics2D.drawString(String.valueOf(countSwaps), fontSize, fontSize);
+        graphics2D.drawString(String.valueOf(countComparisons), fontSize, 2 * fontSize);
+        graphics2D.drawString(userSettings.getChunkHeight() + "x" + userSettings.getChunkWidth(), fontSize, 3 * fontSize);
+        graphics2D.drawString(String.valueOf(userSettings.getFrameRate()), fontSize, 4 * fontSize);
         try {
             encoder.encodeImage(finalImage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        progressBar.setProgress(progressBar.getProgress() + increment);
         graphics2D.dispose();
     }
 }

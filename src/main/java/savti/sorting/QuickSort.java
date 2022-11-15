@@ -1,10 +1,9 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,22 +11,22 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.sorting.SortUtils.less;
-import static JavaFXVersion.sorting.SortUtils.swap;
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.sorting.SortUtils.less;
+import static savti.sorting.SortUtils.swap;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class QuickSort extends AbstractSort {
 
-    public QuickSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
+    public QuickSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(image.getArray());
 
         doSort(image.getArray(), 0, image.getArray().length - 1, true);
 
@@ -73,6 +72,7 @@ public class QuickSort extends AbstractSort {
                                 boolean write) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
         countSwaps++;
+        algorithmProgressBar.setProgress(progress += increment);
         if (countSwaps % delay == 0 && write)
             writeFrame(encoder, image, userSettings);
         swap(array, randomIndex, right);
@@ -103,6 +103,7 @@ public class QuickSort extends AbstractSort {
             }
             if (left <= right) {
                 countSwaps++;
+                algorithmProgressBar.setProgress(progress += increment);
                 if (countSwaps % delay == 0 && write)
                     writeFrame(encoder, image, userSettings);
                 swap(array, left, right);

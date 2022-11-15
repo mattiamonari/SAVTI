@@ -1,14 +1,7 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.*;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
+import savti.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.SeekableByteChannel;
 
@@ -16,14 +9,12 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.deleteAllPreviousFiles;
-import static JavaFXVersion.utilities.ImageUtilities.fillImage;
+import static savti.utilities.ImageUtilities.fillImage;
 
 abstract public class AbstractSort implements SortAlgorithm {
     final UserSettings userSettings;
     final ImageView imageView;
     long countComparison = 0, imageIndex = 1, countSwaps = 0;
-    boolean running = true;
     double progress = 0;
     double increment, delay = 1;
     TiledImage image;
@@ -33,30 +24,20 @@ abstract public class AbstractSort implements SortAlgorithm {
 
     SeekableByteChannel out;
 
-    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView,AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
+    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
         this.userSettings = userSettings;
         this.image = image;
         this.imageView = imageView;
-        this.encoder = encoder;
         this.out = out;
+        this.encoder = encoder;
         this.algorithmProgressBar = algorithmProgressBar;
-    }
-
-    @Override
-    public void killTask() {
-        running = false;
-    }
-
-    @Override
-    public boolean isThreadAlive() {
-        return running;
     }
 
     protected abstract void calculateNumberOfSwaps(Tile[] array);
 
-    void setupEnv(ImageView imageView, Tile[] array) {
+    void setupEnv(Tile[] array) {
 
-        running = true;
+        algorithmProgressBar.setAlgoName(this.getClass().getSimpleName());
 
         calculateNumberOfSwaps(array);
 
@@ -88,7 +69,7 @@ abstract public class AbstractSort implements SortAlgorithm {
                 e.printStackTrace();
             }
         }
-        fillImage(userSettings, image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
+        fillImage(image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
         mainWindow.enableAll();
     }
 }

@@ -1,7 +1,7 @@
-package JavaFXVersion;
+package savti;
 
-import JavaFXVersion.utilities.ColorUtilities;
-import JavaFXVersion.utilities.ErrorUtilities;
+import savti.utilities.ColorUtilities;
+import savti.utilities.ErrorUtilities;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;

@@ -1,19 +1,16 @@
-package JavaFXVersion.utilities;
+package savti.utilities;
 
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 
-import static JavaFXVersion.utilities.FileUtilities.writeImage;
+import static savti.utilities.FileUtilities.writeImage;
 
 public class ImageUtilities {
 
@@ -26,10 +23,10 @@ public class ImageUtilities {
      * @param rows     Numero di righe in cui l'immagine verrà divisa
      * @param cols     Numero di colonne in cui l'immagine verrà divisa
      */
-    public static void splitImage(Image oldImage, int cols, int rows, TiledImage newImage) {
-        int chunkWidth = (int) oldImage.getWidth() / cols;
-        int chunkHeight = (int) oldImage.getHeight() / rows;
-        PixelReader reader = oldImage.getPixelReader();
+    public static void splitImage(TiledImage oldImage, int cols, int rows, TiledImage newImage) {
+        int chunkWidth = (int) oldImage.getImage().getWidth() / cols;
+        int chunkHeight = (int) oldImage.getImage().getHeight() / rows;
+        PixelReader reader = oldImage.getImage().getPixelReader();
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 newImage.setTileAtPosition(new Tile(new WritableImage(reader, x * chunkWidth, y * chunkHeight, chunkWidth, chunkHeight), y * cols + x, x, y), y * cols + x);
@@ -37,26 +34,15 @@ public class ImageUtilities {
         }
     }
 
-    public static void fillImage(UserSettings userSettings, TiledImage image, ImageView imageView, int width, int height) {
-        File f = writeImage(userSettings, image.getArray(), (int) image.getArray()[0].getWidth(), (int) image.getArray()[0].getHeight(), "TMP");
 
-        Image tmp = new Image(f.getPath());
-        imageView.setImage(tmp);
-        if (tmp.getHeight() / height > tmp.getWidth() / width)
-            imageView.setFitWidth(width);
-        else
-            imageView.setFitHeight(height);
-
-    }
-
-    public static void fillImage(Image image, ImageView imageView, int width, int height) {
+    public static void fillImage(TiledImage image, ImageView imageView, int width, int height) {
         imageView.setPreserveRatio(true);
-        if (image.getHeight() / height > image.getWidth() / width)
+        if (image.getImage().getHeight() / height > image.getImage().getWidth() / width)
             imageView.setFitHeight(height);
         else
             imageView.setFitWidth(width);
 
-        imageView.setImage(image);
+        imageView.setImage(image.getImage());
     }
 
     public static void resetCoordinates(UserSettings userSettings, Tile[] array) {

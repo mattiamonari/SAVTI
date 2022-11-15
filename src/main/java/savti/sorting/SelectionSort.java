@@ -1,10 +1,9 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,26 +11,24 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class SelectionSort extends AbstractSort {
-    public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
+    public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(image.getArray());
 
         int size = image.getArray().length;
         for (int step = 0; step < size - 1; step++) {
             int min_idx = step;
             for (int k = step + 1; k < size; k++) {
-                if (!running)
-                    break;
                 // To sort in descending order, change > to < in this line.
                 // Select the minimum element in each loop.
                 ++countComparison;
@@ -42,11 +39,10 @@ public class SelectionSort extends AbstractSort {
             // put min at the correct position
             SortUtils.swap(image.getArray(), step, min_idx);
             ++countSwaps;
+            algorithmProgressBar.setProgress(progress += increment);
             if (countSwaps % delay == 0) {
                 writeFrame(encoder, image, userSettings);
             }
-            if (!running)
-                break;
         }
 
         writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);

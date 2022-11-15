@@ -1,10 +1,10 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import JavaFXVersion.utilities.ErrorUtilities;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
+import savti.utilities.ErrorUtilities;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,33 +12,23 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class BubbleSort extends AbstractSort {
 
-    public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
-    }
-
-    @Override
-    public void killTask() {
-        running = false;
-    }
-
-    @Override
-    public boolean isThreadAlive() {
-        return running;
+    public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
         //We use a new thread to pause/resume its execution whenever we want
 
-        setupEnv(imageView, image.getArray());
+        setupEnv(image.getArray());
 
-        //------------NOT IN HERE!!!----------------
+        //------------TODO NOT IN HERE!!!----------------
         if (!userSettings.getOutputDirectory().isDirectory())
             if (!userSettings.getOutputDirectory().mkdir())
                 ErrorUtilities.SWW();

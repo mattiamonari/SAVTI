@@ -1,4 +1,4 @@
-package JavaFXVersion.utilities;
+package savti.utilities;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;

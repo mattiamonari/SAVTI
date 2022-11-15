@@ -1,10 +1,9 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,20 +11,20 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class InsertionSort extends AbstractSort {
 
-    public InsertionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
+    public InsertionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(image.getArray());
 
         for (int i = 0; i < image.getArray().length; ++i) {
 
@@ -35,6 +34,7 @@ public class InsertionSort extends AbstractSort {
             //IS THIS CORRECT?
             while (j > 0 && SortUtils.greater(image.getArray()[j - 1], image.getArray()[j])) {
                 ++countSwaps;
+                algorithmProgressBar.setProgress(progress += increment);
                 SortUtils.swap(image.getArray(), j, j - 1);
                 j = j - 1;
 
@@ -67,7 +67,7 @@ public class InsertionSort extends AbstractSort {
 
             int j = i;
 
-            while (j > 0 && SortUtils.greater(tmp[j - 1], tmp[j]) && running) {
+            while (j > 0 && SortUtils.greater(tmp[j - 1], tmp[j])) {
                 ++countSwaps;
                 SortUtils.swap(tmp, j, j - 1);
                 j = j - 1;

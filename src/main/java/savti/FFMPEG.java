@@ -1,6 +1,6 @@
-package JavaFXVersion;
+package savti;
 
-import JavaFXVersion.utilities.ErrorUtilities;
+import savti.utilities.ErrorUtilities;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import net.bramp.ffmpeg.FFmpeg;

@@ -1,30 +1,15 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-import org.jcodec.common.model.Rational;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import static JavaFXVersion.utilities.FileUtilities.*;
-import static JavaFXVersion.utilities.GUIUtilities.ableNodes;
-import static JavaFXVersion.utilities.ImageUtilities.fillImage;
-import static JavaFXVersion.utilities.ImageUtilities.splitImage;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
 
 public final class SortUtils {
     /**
@@ -85,29 +70,27 @@ public final class SortUtils {
         }
     }
 
-    public static void rand(UserSettings userSettings, TiledImage image, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+    public static void rand(UserSettings userSettings, TiledImage image, AWTSequenceEncoder encoder, AlgorithmProgressBar algorithmProgressBar) {
+        double progress = 0;
+        double increment = 1d / (image.getArray().length - 1);
         int delay = Math.max(4 * image.getArray().length / (userSettings.getFrameRate() * userSettings.getVideoDuration()), 1);
         Random rd = new Random();
 
-        if(!out.isOpen())
-        {
-            try {
-                out = NIOUtils.writableFileChannel("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\output.mp4");
-                encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        algorithmProgressBar.setAlgoName("Randomizing the image...");
 
         writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
 
         for (int i = image.getArray().length - 1; i > 0; i--) {
-            if(i % delay == 0)
+            if (i % delay == 0)
                 writeFrame(encoder, image, userSettings);
             // Pick a random index from 0 to i
             int j = rd.nextInt(i + 1);
             // Swap array[i] with the element at random index
             swap(image.getArray(), i, j);
+
+            progress += increment;
+
+            algorithmProgressBar.setProgress(progress);
         }
     }
 }

@@ -1,4 +1,4 @@
-package JavaFXVersion;
+package savti;
 
 import javafx.scene.image.WritableImage;
 

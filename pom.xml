@@ -44,7 +44,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>JavaFXVersion.EntryPoint</mainClass>
+                            <mainClass>savti.EntryPoint</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -69,10 +69,6 @@
                     <source>16</source>
                     <target>16</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
             </plugin>
         </plugins>
     </build>

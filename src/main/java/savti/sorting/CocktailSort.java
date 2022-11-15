@@ -1,10 +1,9 @@
-package JavaFXVersion.sorting;
+package savti.sorting;
 
-import JavaFXVersion.AlgorithmProgressBar;
-import JavaFXVersion.Tile;
-import JavaFXVersion.TiledImage;
-import JavaFXVersion.UserSettings;
-import javafx.application.Platform;
+import savti.AlgorithmProgressBar;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -12,20 +11,20 @@ import org.jcodec.common.io.SeekableByteChannel;
 
 import java.io.IOException;
 
-import static JavaFXVersion.utilities.FileUtilities.writeFrame;
-import static JavaFXVersion.utilities.FileUtilities.writeFreezedFrames;
-import static JavaFXVersion.utilities.ImageUtilities.resetCoordinates;
+import static savti.utilities.FileUtilities.writeFrame;
+import static savti.utilities.FileUtilities.writeFreezedFrames;
+import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class CocktailSort extends AbstractSort {
 
-    public CocktailSort(UserSettings userSettings, TiledImage image, ImageView imageView, AWTSequenceEncoder encoder, SeekableByteChannel out, AlgorithmProgressBar algorithmProgressBar) {
-        super(userSettings, image, imageView, encoder, out, algorithmProgressBar);
+    public CocktailSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
     }
 
     @Override
     public void sort() {
 
-        Platform.runLater(() -> setupEnv(imageView, image.getArray()));
+        setupEnv(image.getArray());
 
         int n = image.getArray().length;
         int swap = 1;
@@ -35,12 +34,11 @@ public class CocktailSort extends AbstractSort {
         while (swap == 1) {
             swap = 0;
             for (i = beg; i < end; ++i) {
-                if (!running)
-                    break;
                 ++countComparison;
 
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
+                    algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), i, i + 1);
 
                     if (countSwaps % delay == 0)
@@ -56,11 +54,10 @@ public class CocktailSort extends AbstractSort {
             --end;
 
             for (i = end - 1; i >= beg; --i) {
-                if (!running)
-                    break;
                 ++countComparison;
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
+                    algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), i, i + 1);
                     if (countSwaps % delay == 0)
                         writeFrame(encoder, image, userSettings);

@@ -1,4 +1,4 @@
-package JavaFXVersion;
+package savti;
 
 import java.io.File;
 
@@ -24,9 +24,9 @@ public class UserSettings {
     //?Maybe add a time of the video feature?
     public UserSettings() {
         colsNumber = rowsNumber = 1;
-        outputDirectory = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext");
-        ffmpegPath = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
-        ffprobePath = new File("C:\\Users\\andrea\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
+        outputDirectory = new File("D:\\IdeaProjects\\sortingVisualization\\ext");
+        ffmpegPath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffmpeg.exe");
+        ffprobePath = new File("D:\\IdeaProjects\\sortingVisualization\\ext\\ffprobe.exe");
         outName = "sorted.mp4";
         frameRate = 30;
         music = null;

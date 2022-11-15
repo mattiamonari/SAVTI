@@ -1,4 +1,4 @@
-package JavaFXVersion;
+package savti;
 
 import javafx.scene.image.Image;
 
@@ -43,7 +43,7 @@ public class TiledImage {
     }
 
     public boolean isArrayEmpty() {
-        return Arrays.stream(array).allMatch(Objects::isNull);
+        return Arrays.stream(array).allMatch(Objects::isNull) || image==null;
     }
 
     public boolean isAlreadyOrdere() {
@@ -54,7 +54,7 @@ public class TiledImage {
     }
 
     @Override
-    protected TiledImage clone() throws CloneNotSupportedException {
+    public TiledImage clone() throws CloneNotSupportedException {
         TiledImage clone = new TiledImage();
         Tile[] arr = new Tile[this.getArray().length];
         System.arraycopy(this.getArray(), 0, arr, 0, this.array.length);
