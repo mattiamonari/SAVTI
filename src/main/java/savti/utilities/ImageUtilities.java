@@ -1,5 +1,6 @@
 package savti.utilities;
 
+import javafx.embed.swing.SwingFXUtils;
 import savti.Tile;
 import savti.TiledImage;
 import savti.UserSettings;
@@ -8,6 +9,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import static savti.utilities.FileUtilities.writeImage;
@@ -43,6 +46,25 @@ public class ImageUtilities {
             imageView.setFitWidth(width);
 
         imageView.setImage(image.getImage());
+    }
+
+    public static void fillImageFromArray(TiledImage image, ImageView imageView, int width, int height) {
+
+        BufferedImage finalImage = new BufferedImage((int) image.getImage().getWidth(), (int) image.getImage().getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D graphics2D = finalImage.createGraphics();
+        for (Tile t : image.getArray()) {
+            BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
+            graphics2D.drawImage(tile, (int) (t.getX() * t.getTile().getWidth()), (int) (t.getY() * t.getTile().getHeight()), null);
+        }
+        graphics2D.dispose();
+
+        imageView.setPreserveRatio(true);
+        if (image.getImage().getHeight() / height > image.getImage().getWidth() / width)
+            imageView.setFitHeight(height);
+        else
+            imageView.setFitWidth(width);
+
+        imageView.setImage(SwingFXUtils.toFXImage(finalImage, null));
     }
 
     public static void resetCoordinates(UserSettings userSettings, Tile[] array) {
