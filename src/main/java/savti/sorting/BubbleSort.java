@@ -10,6 +10,8 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 import static savti.utilities.FileUtilities.writeFrame;
@@ -65,6 +67,16 @@ public class BubbleSort extends AbstractSort {
         }
         NIOUtils.closeQuietly(out);
 
+        if (userSettings.isOpenFile()) {
+            File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
+            try {
+                Desktop.getDesktop().open(out);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //TODO WHY I DON'T USE IT?
         //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
     }
 
