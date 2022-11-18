@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+
+    <Button fx:id="randomizeButton" mnemonicParsing="false" styleClass="dark-blue" stylesheets="@../css/main.css" text="Shuffle the image">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="sortingButton" mnemonicParsing="false" styleClass="dark-blue" stylesheets="@../css/main.css" text="Start sorting!">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="cleanButton" layoutX="10.0" layoutY="36.0" mnemonicParsing="false" styleClass="dark-blue" stylesheets="@../css/main.css" text="Remove the image">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="outputButton" layoutX="20.0" layoutY="155.0" mnemonicParsing="false" styleClass="dark-blue" stylesheets="@../css/main.css" text="Set output directory">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="burstMode" layoutX="20.0" layoutY="308.0" mnemonicParsing="false" styleClass="dark-blue" stylesheets="@../css/main.css" text="Burst Mode">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Hyperlink fx:id="pathLabel" alignment="CENTER" contentDisplay="CENTER" text="Path to output: " wrapText="true">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Hyperlink>
+    <ComboBox fx:id="chooseAlgo" stylesheets="@../css/combobox.css">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </ComboBox>
+</fx:root>
