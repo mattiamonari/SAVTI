@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
 import savti.AdvancedSettings;
-import savti.Tile;
 import savti.TiledImage;
 import savti.UserSettings;
 /**

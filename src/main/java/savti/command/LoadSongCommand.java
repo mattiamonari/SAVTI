@@ -1,11 +1,10 @@
-package savti.Command;
+package savti.command;
 
 import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import savti.UserSettings;
 
 import java.io.File;
-import java.net.UnknownServiceException;
 
 /**
  * LoadSongCommand is used to create the command to load songs.

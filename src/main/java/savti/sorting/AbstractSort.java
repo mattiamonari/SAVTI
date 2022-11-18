@@ -70,6 +70,6 @@ abstract public class AbstractSort implements SortAlgorithm {
             }
         }
         fillImageFromArray(image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
-        mainWindow.enableAll();
+        //mainWindow.enableAll();
     }
 }

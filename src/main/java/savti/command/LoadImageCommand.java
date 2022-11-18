@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;

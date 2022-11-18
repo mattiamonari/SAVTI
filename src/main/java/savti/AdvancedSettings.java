@@ -48,7 +48,7 @@ public class AdvancedSettings extends BorderPane {
 
     public AdvancedSettings(Stage primaryStage, UserSettings userSettings, JMetro theme, TiledImage image) {
         //Load FXML for the scene
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/Menu.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AdvancedSettings.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         try {

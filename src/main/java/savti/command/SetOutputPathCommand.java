@@ -1,10 +1,11 @@
-package savti.Command;
+package savti.command;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.stage.DirectoryChooser;
+import savti.MainVBox;
 import savti.UserSettings;
 
 import java.io.File;
@@ -16,19 +17,15 @@ import java.io.File;
  */
 public class SetOutputPathCommand extends Node implements Command{
     private UserSettings userSettings;
-    @FXML
-    private Hyperlink pathLabel;
-    private Button outputButton;
+    private MainVBox mainVBox;
     /**
      * Constructor for SetOutputCommand class.
      * @param userSettings are the settings that fill be changed after the load of the song
-     * @param pathlabel is the hyperlink to get the output path on your device.
-     * @param outputButton is the output button that will be disabled after the execution of the command
+     * @param mainVBox is the VBox containing all the nodes on the left of the main window
      */
-    public SetOutputPathCommand(UserSettings userSettings, Hyperlink pathlabel,Button outputButton){
+    public SetOutputPathCommand(UserSettings userSettings, MainVBox mainVBox){
         this.userSettings = userSettings;
-        this.pathLabel = pathlabel;
-        this.outputButton = outputButton;
+        this.mainVBox = mainVBox;
     }
     @Override
     public void execute() {
@@ -37,8 +34,8 @@ public class SetOutputPathCommand extends Node implements Command{
         File chosenDirectory = directoryChooser.showDialog(getScene().getWindow());
         if (chosenDirectory != null) {
             userSettings.setOutputDirectory(chosenDirectory);
-            pathLabel.setText("Path to output: " + userSettings.getOutputDirectory().toString());
-            outputButton.setStyle("");
+            mainVBox.getPathLabel().setText("Path to output: " + userSettings.getOutputDirectory().toString());
+            mainVBox.getOutputButton().setStyle("");
         }
     }
 }

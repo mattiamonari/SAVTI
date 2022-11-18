@@ -1,11 +1,11 @@
-package savti.Command;
+package savti.command;
 
 import savti.UserSettings;
 import savti.utilities.ErrorUtilities;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.UnknownServiceException;
+
 /**
  * ClickToPathCommand is used to create the command to reach the path on their device.
  *

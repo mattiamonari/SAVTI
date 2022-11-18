@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

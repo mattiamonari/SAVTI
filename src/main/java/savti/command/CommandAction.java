@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

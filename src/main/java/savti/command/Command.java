@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 /**
  * Interface Command is used to create commands for buttons.
  *

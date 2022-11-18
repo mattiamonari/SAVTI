@@ -25,35 +25,6 @@ public class FileUtilities {
         }
     }
 
-    //    public static File writeImage(UserSettings userSettings, Tile[] array, int chunkWidth, int chunkHeight, long index, long comparisons, long swaps, double fontSize) {
-//        int rows = userSettings.getRowsNumber();
-//        int cols = userSettings.getColsNumber();
-//        int width = chunkWidth * cols;
-//        int heigth = chunkHeight * rows;
-//        if (width % 2 != 0) width++;
-//        if (heigth % 2 != 0) heigth++;
-//        BufferedImage finalImage = new BufferedImage(width, heigth, BufferedImage.TYPE_3BYTE_BGR);
-//        Graphics2D graphics2D = finalImage.createGraphics();
-//        for (Tile t : array) {
-//            BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
-//            graphics2D.drawImage(tile, t.getX() * chunkWidth, t.getY() * chunkHeight, null);
-//        }
-//        graphics2D.setFont(new Font("Segoe UI Bold", Font.BOLD, (int) fontSize));
-//        graphics2D.drawString("Comparisons = " + comparisons, 20, (int) (fontSize + fontSize / 5));
-//        graphics2D.drawString("Swaps = " + swaps, 20, (int) (2 * (fontSize + fontSize / 5)));
-//        graphics2D.dispose();
-//        if (!userSettings.getOutputDirectory().isDirectory())
-//            if (!userSettings.getOutputDirectory().mkdir()) ErrorUtilities.SWW();
-//        File f = new File(userSettings.getOutputDirectory().getAbsolutePath() + "\\final" + index + ".jpg");
-//
-//        try {
-//            ImageIO.write(finalImage, "JPG", f);
-//        } catch (IOException imageWriteException) {
-//            ErrorUtilities.writeError();
-//        }
-//        return f;
-//    }
-//
     public static File writeImage(UserSettings userSettings, Tile[] array, int chunkWidth, int chunkHeight, String fileName) {
         int rows = userSettings.getRowsNumber();
         int cols = userSettings.getColsNumber();

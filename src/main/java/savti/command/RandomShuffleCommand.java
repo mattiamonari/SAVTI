@@ -1,4 +1,4 @@
-package savti.Command;
+package savti.command;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -13,6 +13,7 @@ import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.model.Rational;
 import savti.AlgorithmProgressBar;
+import savti.MainVBox;
 import savti.TiledImage;
 import savti.UserSettings;
 
@@ -37,11 +38,20 @@ public class RandomShuffleCommand implements Command{
     UserSettings userSettings;
     SeekableByteChannel out;
     AWTSequenceEncoder encoder;
-    @FXML
+
     ImageView imageView;
     AlgorithmProgressBar algorithmProgressBar;
-    //I don't know if in this class is good to add all these buttons, review it!
-    Button randomizeButton;
+    MainVBox mainVBox;
+
+    public RandomShuffleCommand(TiledImage image, UserSettings userSettings, SeekableByteChannel out, AWTSequenceEncoder encoder, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, MainVBox mainVBox) {
+        this.image = image;
+        this.userSettings = userSettings;
+        this.out = out;
+        this.encoder = encoder;
+        this.imageView = imageView;
+        this.algorithmProgressBar = algorithmProgressBar;
+        this.mainVBox = mainVBox;
+    }
 
     //TODO constructor and comment
     @Override
@@ -58,11 +68,10 @@ public class RandomShuffleCommand implements Command{
                 }
             }
 
-            randomizeButton.setDisable(true);
+            mainVBox.disableOrEnableAll(true);
 
             splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
-            ableNodes(List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()), List.of());
             ((Group) imageView.getParent()).getChildren().add(algorithmProgressBar);
             imageView.setVisible(false);
             imageView.setManaged(false);
@@ -70,12 +79,12 @@ public class RandomShuffleCommand implements Command{
             ListenableFuture<?> future = pool.submit(() -> rand(userSettings, image, encoder, algorithmProgressBar));
             //TODO CREATE METHOD
             future.addListener(() -> Platform.runLater(() -> {
-                fillImageFromArray(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
+                fillImageFromArray(image, imageView, (int) Math.round(imageView.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 30));
                 imageView.setVisible(true);
                 imageView.setManaged(true);
                 algorithmProgressBar.setProgress(0);
                 ((Group) imageView.getParent()).getChildren().remove(algorithmProgressBar);
-                ableNodes(List.of(), List.of(randomizeButton, sortingButton, cleanButton, ffmpegButton, ffprobeButton, outputButton, burstMode, imageLoaderItem.getStyleableNode(), songLoaderItem.getStyleableNode()));
+                mainVBox.disableOrEnableAll(false);
             }), MoreExecutors.directExecutor());
         }
     }
