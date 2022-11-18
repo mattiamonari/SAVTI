@@ -77,7 +77,6 @@ public class SortImageCommand implements Command{
     }
     @Override
     public void execute() {
-        if (checkSortingConditions()) {
             SortAlgorithm algorithm = choiche();
             mainVBox.disableOrEnableAll(true);
             ableNodes(List.of(mainMenu.getImageLoaderItem().getStyleableNode(), mainMenu.getSongLoaderItem().getStyleableNode()), List.of());
@@ -95,7 +94,6 @@ public class SortImageCommand implements Command{
                 mainVBox.disableOrEnableAll(false);
                 ableNodes(List.of(), List.of(mainMenu.getImageLoaderItem().getStyleableNode(), mainMenu.getSongLoaderItem().getStyleableNode()));
             }), MoreExecutors.directExecutor());
-        }
     }
 
 

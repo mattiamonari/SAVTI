@@ -178,13 +178,14 @@ public class MainWindow extends BorderPane {
     private void addEventListeners() {
 
         //Is this okay?
-        mainVBox.getCleanButton().setOnAction(e -> new CleanImageCommand(image, userSettings, imageView));
-        mainVBox.getOutputButton().setOnAction(e -> new SetOutputPathCommand(userSettings, mainVBox));
-        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, encoder, out, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu));
+        mainVBox.getCleanButton().setOnAction(e -> new CleanImageCommand(image, userSettings, imageView).execute());
+        mainVBox.getOutputButton().setOnAction(e -> new SetOutputPathCommand(userSettings, mainVBox).execute());
+        //TODO IMPLEMENT A CLASS FOR OUT AND ENCODER TOGHETER, OTHERWISE IT WILL NOT WORK
+        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, encoder, out, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
         mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, out, encoder, imageView, algorithmProgressBar, mainVBox).execute());
-        mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu));
-        mainVBox.getBurstMode().setOnMouseEntered(e -> new BurstModeToolTipComand(mainVBox.getBurstMode()));
-        mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings));
+        mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu).execute());
+        mainVBox.getBurstMode().setOnMouseEntered(e -> new BurstModeToolTipComand(mainVBox.getBurstMode()).execute());
+        mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings).execute());
 
         loadImageListener();
         loadSongListener();

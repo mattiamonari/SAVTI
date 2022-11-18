@@ -15,6 +15,7 @@ import java.io.File;
  * @author: Daniele Gasparini && Mattia Monari
  * @version: 2022.11.17
  */
+//WHY EXTENDS NODE???
 public class SetOutputPathCommand extends Node implements Command{
     private UserSettings userSettings;
     private MainVBox mainVBox;
@@ -31,7 +32,7 @@ public class SetOutputPathCommand extends Node implements Command{
     public void execute() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Choose where to save your images!");
-        File chosenDirectory = directoryChooser.showDialog(getScene().getWindow());
+        File chosenDirectory = directoryChooser.showDialog(mainVBox.getScene().getWindow());
         if (chosenDirectory != null) {
             userSettings.setOutputDirectory(chosenDirectory);
             mainVBox.getPathLabel().setText("Path to output: " + userSettings.getOutputDirectory().toString());
