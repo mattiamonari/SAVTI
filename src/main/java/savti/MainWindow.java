@@ -118,18 +118,18 @@ public class MainWindow extends BorderPane {
             }
         });
     }
-    //Aggiunge i listener agli eventi dei nodi/elementi
+
     private void addEventListeners() {
 
         mainVBox.getCleanButton().setOnAction(e -> new CleanImageCommand(image, userSettings, imageView).execute());
         mainVBox.getOutputButton().setOnAction(e -> new SetOutputPathCommand(userSettings, mainVBox).execute());
-        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler.getEncoder(), outputHandler.getOut(), userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
-        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler.getOut(), outputHandler.getEncoder(), imageView, algorithmProgressBar, mainVBox).execute());
+        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
+        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler, imageView, algorithmProgressBar, mainVBox).execute());
         mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu).execute());
         mainVBox.getBurstMode().setOnMouseEntered(e -> new BurstModeToolTipComand(mainVBox.getBurstMode()).execute());
         mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings).execute());
 
-        mainMenu.getSongLoaderItem().setOnAction(e -> new LoadSongCommand(userSettings).execute());
+        mainMenu.getSongLoaderItem().setOnAction(e -> new LoadSongCommand(userSettings, this).execute());
         mainMenu.getImageLoaderItem().setOnAction(e -> new LoadImageCommand(image, userSettings, imageView, mainVBox).execute());
         mainMenu.getAdvSett().setOnAction(e -> new SetAdvancedSettingCommand(image, userSettings, theme).execute());
 

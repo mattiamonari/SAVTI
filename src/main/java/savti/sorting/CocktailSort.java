@@ -1,5 +1,6 @@
 package savti.sorting;
 
+import javafx.application.Platform;
 import savti.*;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
@@ -39,7 +40,7 @@ public class CocktailSort extends AbstractSort {
                     SortUtils.swap(image.getArray(), i, i + 1);
 
                     if (countSwaps % delay == 0)
-                        writeFrame(encoder, image, userSettings);
+                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                     swap = 1;
                 }
             }
@@ -57,23 +58,18 @@ public class CocktailSort extends AbstractSort {
                     algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), i, i + 1);
                     if (countSwaps % delay == 0)
-                        writeFrame(encoder, image, userSettings);
+                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                     swap = 1;
                 }
             }
             ++beg;
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();        outputHandler.closeOutputChannel();
 
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
 
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     @Override

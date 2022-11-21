@@ -1,12 +1,8 @@
 package savti.sorting;
 
-import savti.*;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-
-import java.io.IOException;
+import savti.*;
 
 import static savti.sorting.SortUtils.replace;
 import static savti.utilities.FileUtilities.writeFrame;
@@ -27,16 +23,11 @@ public class MergeSort extends AbstractSort {
 
         mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
 
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
+        outputHandler.closeOutputChannel();
 
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     @Override
@@ -103,7 +94,7 @@ public class MergeSort extends AbstractSort {
                 j++;
             }
             if (countSwaps % delay == 0 && write)
-                writeFrame(encoder, image, userSettings);
+               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
             k++;
         }
 
@@ -116,7 +107,7 @@ public class MergeSort extends AbstractSort {
             i++;
             k++;
             if (countSwaps % delay == 0 && write)
-                writeFrame(encoder, image, userSettings);
+               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
         }
 
         while (j < n2) {
@@ -126,7 +117,7 @@ public class MergeSort extends AbstractSort {
             j++;
             k++;
             if (countSwaps % delay == 0 && write)
-                writeFrame(encoder, image, userSettings);
+               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
         }
     }
 

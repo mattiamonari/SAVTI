@@ -1,5 +1,6 @@
 package savti.sorting;
 
+import javafx.application.Platform;
 import savti.*;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
@@ -27,14 +28,11 @@ public class QuickSort extends AbstractSort {
 
         doSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
 
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
+        outputHandler.closeOutputChannel();
+
+        Platform.runLater(() -> resumeProgram(imageView, image));
 
     }
 
@@ -71,7 +69,7 @@ public class QuickSort extends AbstractSort {
         countSwaps++;
         algorithmProgressBar.setProgress(progress += increment);
         if (countSwaps % delay == 0 && write)
-            writeFrame(encoder, image, userSettings);
+           writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, write);
@@ -102,7 +100,7 @@ public class QuickSort extends AbstractSort {
                 countSwaps++;
                 algorithmProgressBar.setProgress(progress += increment);
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(encoder, image, userSettings);
+                   writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                 swap(array, left, right);
                 ++left;
                 --right;

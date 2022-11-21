@@ -1,9 +1,6 @@
 package savti.sorting;
 
-import savti.AlgorithmProgressBar;
-import savti.Tile;
-import savti.TiledImage;
-import savti.UserSettings;
+import savti.*;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 
 import java.util.Random;
@@ -75,7 +72,7 @@ public final class SortUtils {
         return v.compareTo(w) > 0;
     }
 
-    public static void rand(UserSettings userSettings, TiledImage image, AWTSequenceEncoder encoder, AlgorithmProgressBar algorithmProgressBar) {
+    public static void rand(UserSettings userSettings, TiledImage image, OutputHandler outputHandler, AlgorithmProgressBar algorithmProgressBar) {
         double progress = 0;
         double increment = 1d / (image.getArray().length - 1);
         int delay = Math.max(4 * image.getArray().length / (userSettings.getFrameRate() * userSettings.getVideoDuration()), 1);
@@ -83,11 +80,11 @@ public final class SortUtils {
 
         algorithmProgressBar.setAlgoName("Randomizing the image...");
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler , image);
 
         for (int i = image.getArray().length - 1; i > 0; i--) {
             if (i % delay == 0)
-                writeFrame(encoder, image);
+                writeFrame(outputHandler, image);
             // Pick a random index from 0 to i
             int j = rd.nextInt(i + 1);
             // Swap array[i] with the element at random index

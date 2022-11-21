@@ -1,10 +1,9 @@
 package savti.sorting;
 
-import savti.*;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
+import savti.*;
 
 import java.io.IOException;
 
@@ -38,20 +37,19 @@ public class SelectionSort extends AbstractSort {
             ++countSwaps;
             algorithmProgressBar.setProgress(progress += increment);
             if (countSwaps % delay == 0) {
-                writeFrame(encoder, image, userSettings);
+               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
             }
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-        try {
+writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();        try {
             encoder.finish();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         NIOUtils.closeQuietly(out);
 
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     @Override

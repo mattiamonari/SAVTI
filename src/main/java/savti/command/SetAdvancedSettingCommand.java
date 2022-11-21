@@ -16,7 +16,7 @@ import savti.UserSettings;
  * @author: Daniele Gasparini && Mattia Monari
  * @version: 2022.11.17
  */
-public class SetAdvancedSettingCommand extends Node implements Command{
+public class SetAdvancedSettingCommand implements Command{
     UserSettings userSettings;
     TiledImage image;
     JMetro theme;
@@ -36,7 +36,7 @@ public class SetAdvancedSettingCommand extends Node implements Command{
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.UTILITY);
-        stage.initOwner(this.getScene().getWindow());
+        stage.initOwner(theme.getParent().getScene().getWindow());
         stage.getIcons().add(new Image("icon.png"));
         Scene scene = new Scene(new AdvancedSettings(stage, userSettings, theme, image));
         stage.setTitle("Advanced Settings");

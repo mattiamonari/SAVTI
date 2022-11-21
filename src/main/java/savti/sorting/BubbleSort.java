@@ -1,5 +1,6 @@
 package savti.sorting;
 
+import javafx.application.Platform;
 import savti.*;
 import savti.utilities.ErrorUtilities;
 import javafx.scene.image.ImageView;
@@ -46,7 +47,7 @@ public class BubbleSort extends AbstractSort {
 
                     /*      FRAMEWRITING SECTION     */
                     if (countSwaps % delay == 0)
-                        writeFrame(encoder, image, userSettings);
+                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
 
                 }
             }
@@ -55,26 +56,11 @@ public class BubbleSort extends AbstractSort {
             }
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
-
-        if (userSettings.isOpenFile()) {
-            File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
-            try {
-                Desktop.getDesktop().open(out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();
 
         //TODO WHY I DON'T USE IT?
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     @Override

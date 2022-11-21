@@ -6,9 +6,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.SeekableByteChannel;
 import savti.*;
 import savti.sorting.*;
 import savti.utilities.ErrorUtilities;
@@ -33,7 +30,7 @@ public class SortImageCommand implements Command{
     ImageView imageView;
     SortAlgorithm algorithm;
     AlgorithmProgressBar algorithmProgressBar;
-
+    OutputHandler outputHandler;
     MainMenu mainMenu;
 
     public SortImageCommand(MainVBox mainVBox, TiledImage image, OutputHandler outputHandler, UserSettings userSettings, ImageView imageView, SortAlgorithm algorithm, AlgorithmProgressBar algorithmProgressBar, MainMenu mainMenu) {
@@ -44,6 +41,7 @@ public class SortImageCommand implements Command{
         this.algorithm = algorithm;
         this.algorithmProgressBar = algorithmProgressBar;
         this.mainMenu = mainMenu;
+        this.outputHandler = outputHandler;
     }
 
     public SortAlgorithm choiche() {
@@ -73,6 +71,7 @@ public class SortImageCommand implements Command{
     }
     @Override
     public void execute() {
+        if(checkSortingConditions()) {
             SortAlgorithm algorithm = choiche();
             mainVBox.disableOrEnableAll(true);
             ableNodes(List.of(mainMenu.getImageLoaderItem().getStyleableNode(), mainMenu.getSongLoaderItem().getStyleableNode()), List.of());
@@ -83,13 +82,10 @@ public class SortImageCommand implements Command{
             ListenableFuture<?> future = pool.submit(algorithm);
             //TODO CREATE METHOD
             future.addListener(() -> Platform.runLater(() -> {
-                fillImageFromArray(image, imageView, (int) Math.round(imageView.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 50));
-                imageView.setVisible(true);
-                imageView.setManaged(true);
-                ((Group) imageView.getParent()).getChildren().remove(algorithmProgressBar);
                 mainVBox.disableOrEnableAll(false);
                 ableNodes(List.of(), List.of(mainMenu.getImageLoaderItem().getStyleableNode(), mainMenu.getSongLoaderItem().getStyleableNode()));
             }), MoreExecutors.directExecutor());
+        }
     }
 
 
@@ -99,10 +95,10 @@ public class SortImageCommand implements Command{
             mainVBox.getOutputButton().setStyle(hoverButton);
             ErrorUtilities.outputPath();
             return false;
-        } else if (image == null || image.isArrayEmpty()) {
+        } else if (image == null || image.getImage() == null) {
             ErrorUtilities.noImageError();
             return false;
-        } else if (image.isAlreadyOrdere()) {
+        } else if (image.isAlreadyOrdered() || image.isArrayEmpty()) {
             ErrorUtilities.alreadyOrderedImage();
             return false;
         }

@@ -12,10 +12,7 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.model.Rational;
-import savti.AlgorithmProgressBar;
-import savti.MainVBox;
-import savti.TiledImage;
-import savti.UserSettings;
+import savti.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,20 +31,18 @@ import static savti.utilities.ImageUtilities.splitImage;
  */
 
 public class RandomShuffleCommand implements Command{
+    OutputHandler outputHandler;
     TiledImage image;
     UserSettings userSettings;
-    SeekableByteChannel out;
-    AWTSequenceEncoder encoder;
 
     ImageView imageView;
     AlgorithmProgressBar algorithmProgressBar;
     MainVBox mainVBox;
 
-    public RandomShuffleCommand(TiledImage image, UserSettings userSettings, SeekableByteChannel out, AWTSequenceEncoder encoder, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, MainVBox mainVBox) {
+    public RandomShuffleCommand(TiledImage image, UserSettings userSettings, OutputHandler outputHandler, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, MainVBox mainVBox) {
         this.image = image;
         this.userSettings = userSettings;
-        this.out = out;
-        this.encoder = encoder;
+        this.outputHandler = outputHandler;
         this.imageView = imageView;
         this.algorithmProgressBar = algorithmProgressBar;
         this.mainVBox = mainVBox;
@@ -58,15 +53,7 @@ public class RandomShuffleCommand implements Command{
     public void execute() {
         if (image.getImage() != null) {
 
-            if (out == null || !out.isOpen()) {
-                try {
-                    new File(userSettings.getOutputDirectory().getPath()+ "\\" + userSettings.getOutName()).createNewFile();
-                    out = NIOUtils.writableFileChannel(userSettings.getOutputDirectory().getAbsolutePath()+ "\\" + userSettings.getOutName());
-                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            outputHandler.initializeHandler(userSettings.getOutputDirectory().getPath(), userSettings.getOutName(), userSettings.getFrameRate());
 
             mainVBox.disableOrEnableAll(true);
 
@@ -76,7 +63,7 @@ public class RandomShuffleCommand implements Command{
             imageView.setVisible(false);
             imageView.setManaged(false);
             ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
-            ListenableFuture<?> future = pool.submit(() -> rand(userSettings, image, encoder, algorithmProgressBar));
+            ListenableFuture<?> future = pool.submit(() -> rand(userSettings, image, outputHandler, algorithmProgressBar));
             //TODO CREATE METHOD
             future.addListener(() -> Platform.runLater(() -> {
                 fillImageFromArray(image, imageView, (int) Math.round(imageView.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 30));

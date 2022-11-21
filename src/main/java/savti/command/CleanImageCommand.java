@@ -5,7 +5,6 @@ import javafx.scene.image.ImageView;
 import savti.TiledImage;
 import savti.UserSettings;
 
-import static savti.utilities.FileUtilities.deleteAllPreviousFiles;
 
 /**
  * CleanImageCommand is used to create the command for the clean image button.
@@ -33,6 +32,5 @@ public class CleanImageCommand implements Command{
     public void execute() {
         image.clearImage();
         imageView.setImage(null);
-        deleteAllPreviousFiles(userSettings);
     }
 }

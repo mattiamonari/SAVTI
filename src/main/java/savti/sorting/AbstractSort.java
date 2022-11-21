@@ -1,5 +1,6 @@
 package savti.sorting;
 
+import javafx.scene.Group;
 import savti.*;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
@@ -21,15 +22,14 @@ abstract public class AbstractSort implements SortAlgorithm {
 
     AlgorithmProgressBar algorithmProgressBar;
     AWTSequenceEncoder encoder;
-
+    OutputHandler outputHandler;
     SeekableByteChannel out;
 
     public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
         this.userSettings = userSettings;
         this.image = image;
         this.imageView = imageView;
-        this.out = out;
-        this.encoder = encoder;
+        this.outputHandler = outputHandler;
         this.algorithmProgressBar = algorithmProgressBar;
     }
 
@@ -59,7 +59,7 @@ abstract public class AbstractSort implements SortAlgorithm {
     }
 
     //TODO SMARTER WAY
-    void resumeProgram(ImageView imageView, MainWindow mainWindow, TiledImage image) {
+    void resumeProgram(ImageView imageView, TiledImage image) {
 
         if (userSettings.isOpenFile()) {
             File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
@@ -70,6 +70,8 @@ abstract public class AbstractSort implements SortAlgorithm {
             }
         }
         fillImageFromArray(image, imageView, (int) imageView.getFitWidth(), (int) imageView.getFitHeight());
-        //mainWindow.enableAll();
+        imageView.setVisible(true);
+        imageView.setManaged(true);
+        ((Group) imageView.getParent()).getChildren().remove(algorithmProgressBar);
     }
 }

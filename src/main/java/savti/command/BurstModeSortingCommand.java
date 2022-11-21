@@ -3,7 +3,6 @@ package savti.command;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.sun.tools.javac.Main;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -12,13 +11,10 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.io.SeekableByteChannel;
-import org.jcodec.common.model.Rational;
 import savti.*;
 import savti.sorting.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -60,19 +56,16 @@ public class BurstModeSortingCommand implements Command{
 
             for (String s : mainVBox.getChooseAlgo().getItems()) {
 
-                try {
-                    out = NIOUtils.writableFileChannel(userSettings.getOutputDirectory().getPath()+ "\\" + s + ".mp4");
-                    encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                OutputHandler outputHandler = new OutputHandler();
+
+                outputHandler.initializeHandler(userSettings.getOutputDirectory().getPath(), s, userSettings.getFrameRate());
 
                 AlgorithmProgressBar algorithmProgressBar = new AlgorithmProgressBar("AlgoName");
                 SortAlgorithm sortAlgorithm = null;
 
                 splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
-                rand(userSettings, image, encoder, algorithmProgressBar);
+                rand(userSettings, image, outputHandler, algorithmProgressBar);
 
                 try {
                     cloned = image.clone();

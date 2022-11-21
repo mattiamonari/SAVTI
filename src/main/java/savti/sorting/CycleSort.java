@@ -1,10 +1,8 @@
 package savti.sorting;
 
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import org.jcodec.common.io.NIOUtils;
 import savti.*;
-
-import java.io.IOException;
 
 import static savti.sorting.SortUtils.less;
 import static savti.utilities.FileUtilities.writeFrame;
@@ -60,7 +58,7 @@ public class CycleSort extends AbstractSort {
                 countSwaps++;
                 algorithmProgressBar.setProgress(progress += increment);
                 if (countSwaps % delay == 0) {
-                    writeFrame(encoder, image, userSettings);
+                   writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                 }
                 item = replace(image.getArray(), pos, item);
             }
@@ -88,21 +86,15 @@ public class CycleSort extends AbstractSort {
                     algorithmProgressBar.setProgress(progress += increment);
                     item = replace(image.getArray(), pos, item);
                     if (countSwaps % delay == 0) {
-                        writeFrame(encoder, image, userSettings);
+                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                     }
                 }
             }
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
-
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();        outputHandler.closeOutputChannel();
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     @Override

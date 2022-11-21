@@ -49,7 +49,7 @@ public class LoadImageCommand extends Node implements Command {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png"));
         fileChooser.setTitle("Open Resource File");
-        File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
+        File chosenFile = fileChooser.showOpenDialog(imageView.getScene().getWindow());
         if (chosenFile != null) {
             try {
                 image.setImage(SwingFXUtils.toFXImage(ImageIO.read(chosenFile), null));
@@ -62,7 +62,7 @@ public class LoadImageCommand extends Node implements Command {
             userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
             userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
             image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());
-            fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 30));
+            fillImage(image, imageView, (int) Math.round(imageView.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 30));
         }
 
     }

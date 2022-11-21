@@ -1,12 +1,8 @@
 package savti.sorting;
 
-import savti.*;
+import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-
-import java.io.IOException;
+import savti.*;
 
 import static savti.sorting.SortUtils.replace;
 import static savti.utilities.FileUtilities.writeFrame;
@@ -37,16 +33,10 @@ public class RadixSort extends AbstractSort {
             countingSort(image.getArray(), size, place);
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();
 
-        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
-
-        //Platform.runLater(() -> resumeProgram(imageView, mainWindow, image));
+        Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
     Tile getMax(Tile[] array, int n) {
@@ -91,7 +81,7 @@ public class RadixSort extends AbstractSort {
             algorithmProgressBar.setProgress(progress += increment);
             replace(array, i, output[i]);
             if (countSwaps % delay == 0 && write) {
-                writeFrame(encoder, image, userSettings);
+               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
             }
 
         }
