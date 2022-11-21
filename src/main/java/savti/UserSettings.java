@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class UserSettings {
-
-    private boolean saveImage = false;
     private int rowsNumber, colsNumber;
     private File outputDirectory;
     private String outName;
@@ -87,14 +85,6 @@ public class UserSettings {
 
     public void setOpenFile(boolean openFile) {
         this.openFile = openFile;
-    }
-
-    public boolean getSaveImage() {
-        return saveImage;
-    }
-
-    public void setSaveImage(boolean saveImage) {
-        this.saveImage = saveImage;
     }
 
     public int getVideoDuration() {
