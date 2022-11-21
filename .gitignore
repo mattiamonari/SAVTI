@@ -3,5 +3,10 @@
 /.idea/
 /out/
 /resources/
+/target/
 *.properties
 .DS_Store
+*.mp4
+*.jpg
+*.html
+*.xml
