@@ -20,8 +20,6 @@ import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.SeekableByteChannel;
 import savti.command.*;
 import savti.sorting.BubbleSort;
 import savti.sorting.SortAlgorithm;
@@ -36,9 +34,7 @@ import static savti.utilities.ImageUtilities.fillImage;
 public class MainWindow extends BorderPane {
 
     //region Local variables' declaration
-    //TODO CREATE A SINGLE CLASS SEEKABLE+AWT
-    SeekableByteChannel out = null;
-    AWTSequenceEncoder encoder = null;
+    OutputHandler outputHandler = new OutputHandler();
     UserSettings userSettings;
     SortAlgorithm algorithm;
     JMetro theme;
@@ -55,11 +51,8 @@ public class MainWindow extends BorderPane {
     ToggleSwitch darkMode;
     @FXML
     VBox menuVBox;
-
     MainVBox mainVBox;
-
     MainMenu mainMenu;
-
     AlgorithmProgressBar algorithmProgressBar;
     //endregion
 
@@ -84,7 +77,7 @@ public class MainWindow extends BorderPane {
         //Create a default UserSettings object
         userSettings = new UserSettings();
         //We choose bubblesort as default algorithm
-        algorithm = new BubbleSort(userSettings, image, imageView, null, encoder, out);
+        algorithm = new BubbleSort(userSettings, image, imageView, null, outputHandler);
 
         image = new TiledImage();
 
@@ -110,58 +103,10 @@ public class MainWindow extends BorderPane {
 
         algorithmProgressBar = new AlgorithmProgressBar("AlgoName");
     }
-
     private void addCssFiles() {
         setStyle("-fx-base: black");
         this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
     }
-    private void setAdvancedSettingsListener() {
-        mainMenu.getAdvSett().setOnAction(e -> {
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UTILITY);
-            stage.initOwner(this.getScene().getWindow());
-            stage.getIcons().add(new Image("icon.png"));
-            Scene scene = new Scene(new AdvancedSettings(stage, userSettings, theme, image));
-            stage.setTitle("Advanced Settings");
-            stage.setScene(scene);
-            stage.showAndWait();
-        });
-    }
-    private void loadImageListener() {
-        mainMenu.getImageLoaderItem().setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png"));
-            fileChooser.setTitle("Open Resource File");
-            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
-            if (chosenFile != null) {
-                try {
-                    image.setImage(SwingFXUtils.toFXImage(ImageIO.read(chosenFile), null));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-
-                }
-                //Set the intial precision to a default value
-                userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / 8));
-                userSettings.setChunkHeight((int) Math.round(image.getImage().getHeight() / 8));
-                userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
-                userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
-                image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());
-                fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 50));
-            }
-        });
-    }
-
-    private void loadSongListener() {
-        mainMenu.getSongLoaderItem().setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP3", "*.mp3"));
-            fileChooser.setTitle("Open Song File");
-            File chosenFile = fileChooser.showOpenDialog(getScene().getWindow());
-            userSettings.setMusic(chosenFile);
-        });
-    }
-
     private void setDarkModeListener() {
         darkMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -173,24 +118,21 @@ public class MainWindow extends BorderPane {
             }
         });
     }
-
     //Aggiunge i listener agli eventi dei nodi/elementi
     private void addEventListeners() {
 
-        //Is this okay?
         mainVBox.getCleanButton().setOnAction(e -> new CleanImageCommand(image, userSettings, imageView).execute());
         mainVBox.getOutputButton().setOnAction(e -> new SetOutputPathCommand(userSettings, mainVBox).execute());
-        //TODO IMPLEMENT A CLASS FOR OUT AND ENCODER TOGHETER, OTHERWISE IT WILL NOT WORK
-        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, encoder, out, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
-        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, out, encoder, imageView, algorithmProgressBar, mainVBox).execute());
+        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler.getEncoder(), outputHandler.getOut(), userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
+        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler.getOut(), outputHandler.getEncoder(), imageView, algorithmProgressBar, mainVBox).execute());
         mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu).execute());
         mainVBox.getBurstMode().setOnMouseEntered(e -> new BurstModeToolTipComand(mainVBox.getBurstMode()).execute());
         mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings).execute());
 
-        loadImageListener();
-        loadSongListener();
-        setDarkModeListener();
-        setAdvancedSettingsListener();
+        mainMenu.getSongLoaderItem().setOnAction(e -> new LoadSongCommand(userSettings).execute());
+        mainMenu.getImageLoaderItem().setOnAction(e -> new LoadImageCommand(image, userSettings, imageView, mainVBox).execute());
+        mainMenu.getAdvSett().setOnAction(e -> new SetAdvancedSettingCommand(image, userSettings, theme).execute());
 
+        setDarkModeListener();
     }
 }

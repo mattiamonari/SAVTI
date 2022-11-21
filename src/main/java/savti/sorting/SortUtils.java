@@ -26,11 +26,24 @@ public final class SortUtils {
         swapCoordinates(array[idx], array[idy]);
     }
 
+
+    /**
+     * Given an array of Tiles, replace the element at position idx with a new tile
+     * @param array Array of tiles
+     * @param idx Position of the element which will be replaced
+     * @param newTile The new element
+     */
     static void replace(Tile[] array, int idx, Tile newTile) {
         swapCoordinates(array[idx], newTile);
         array[idx] = newTile;
     }
 
+
+    /**
+     * Swap the coordinates of two tiles.
+     * @param t1 First tile
+     * @param t2 Second tile
+     */
     public static void swapCoordinates(Tile t1, Tile t2) {
         int x1 = t1.getX();
         int y1 = t1.getY();
@@ -62,14 +75,6 @@ public final class SortUtils {
         return v.compareTo(w) > 0;
     }
 
-    public static <T extends Comparable<T>> void reverse(T[] array) {
-        for (int i = 0; i < array.length / 2; i++) {
-            T temp = array[i];
-            array[i] = array[array.length - i - 1];
-            array[array.length - i - 1] = temp;
-        }
-    }
-
     public static void rand(UserSettings userSettings, TiledImage image, AWTSequenceEncoder encoder, AlgorithmProgressBar algorithmProgressBar) {
         double progress = 0;
         double increment = 1d / (image.getArray().length - 1);
@@ -78,11 +83,11 @@ public final class SortUtils {
 
         algorithmProgressBar.setAlgoName("Randomizing the image...");
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image, userSettings);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, encoder, image);
 
         for (int i = image.getArray().length - 1; i > 0; i--) {
             if (i % delay == 0)
-                writeFrame(encoder, image, userSettings);
+                writeFrame(encoder, image);
             // Pick a random index from 0 to i
             int j = rd.nextInt(i + 1);
             // Swap array[i] with the element at random index

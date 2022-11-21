@@ -13,11 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import static savti.utilities.FileUtilities.writeImage;
-
 public class ImageUtilities {
-
-    //? Could it be better to return a Tile[] vector?
 
     /**
      * Divide un'immagine in tante WritableImage, le quali verranno poi inserite nel vettore array

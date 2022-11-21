@@ -1,9 +1,6 @@
 package savti.sorting;
 
-import savti.AlgorithmProgressBar;
-import savti.Tile;
-import savti.TiledImage;
-import savti.UserSettings;
+import savti.*;
 import javafx.scene.image.ImageView;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
@@ -16,8 +13,8 @@ import static savti.utilities.FileUtilities.writeFreezedFrames;
 import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class SelectionSort extends AbstractSort {
-    public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
-        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+    public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
+        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
     }
 
     @Override

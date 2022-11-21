@@ -3,10 +3,9 @@ package savti.command;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import savti.MainVBox;
 import savti.TiledImage;
 import savti.UserSettings;
 
@@ -28,19 +27,21 @@ public class LoadImageCommand extends Node implements Command {
     TiledImage image;
     @FXML
     ImageView imageView;
-    Button cleanButton;
+
+    MainVBox mainVBox;
+
     /**
      * Constructor for LoadImageCommand class.
      * @param image is the TiledImage that will be loaded.
      * @param userSettings are the settings that will be modified.
      * @param imageView is the GUI that will display the image.
-     * @param cleanButton is used to get the width of the parent class.
+     * @param mainVBox is used to calculate the optimal size for the image
      */
-    public LoadImageCommand(TiledImage image,UserSettings userSettings,javafx.scene.image.ImageView imageView,Button cleanButton) {
+    public LoadImageCommand(TiledImage image, UserSettings userSettings, ImageView imageView, MainVBox mainVBox) {
         this.image = image;
         this.userSettings = userSettings;
         this.imageView = imageView;
-        this.cleanButton = cleanButton;
+        this.mainVBox = mainVBox;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class LoadImageCommand extends Node implements Command {
             userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
             userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
             image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());
-            fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - ((VBox) cleanButton.getParent()).getWidth() - 20), (int) Math.round(((VBox) cleanButton.getParent()).getHeight() - 50));
+            fillImage(image, imageView, (int) Math.round(this.getScene().getWidth() - mainVBox.getWidth() - 20), (int) Math.round(mainVBox.getHeight() - 30));
         }
 
     }

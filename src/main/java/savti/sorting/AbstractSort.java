@@ -24,7 +24,7 @@ abstract public class AbstractSort implements SortAlgorithm {
 
     SeekableByteChannel out;
 
-    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
+    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
         this.userSettings = userSettings;
         this.image = image;
         this.imageView = imageView;

@@ -1,13 +1,8 @@
 package savti.sorting;
 
-import savti.AlgorithmProgressBar;
-import savti.Tile;
-import savti.TiledImage;
-import savti.UserSettings;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
+import savti.*;
 
 import java.io.IOException;
 
@@ -18,8 +13,8 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class CycleSort extends AbstractSort {
 
-    public CycleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, AWTSequenceEncoder encoder, SeekableByteChannel out) {
-        super(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+    public CycleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
+        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
     }
 
     private <T extends Comparable<T>> T replace(T[] arr, int pos, T item) {

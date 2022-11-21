@@ -61,7 +61,7 @@ public class BurstModeSortingCommand implements Command{
             for (String s : mainVBox.getChooseAlgo().getItems()) {
 
                 try {
-                    out = NIOUtils.writableFileChannel("D:\\IdeaProjects\\sortingVisualization\\ext\\" + s + "+.mp4");
+                    out = NIOUtils.writableFileChannel(userSettings.getOutputDirectory().getPath()+ "\\" + s + ".mp4");
                     encoder = new AWTSequenceEncoder(out, Rational.R(userSettings.getFrameRate(), 1));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -72,7 +72,7 @@ public class BurstModeSortingCommand implements Command{
 
                 splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
-                new Thread(() -> rand(userSettings, image, encoder, algorithmProgressBar)).start();
+                rand(userSettings, image, encoder, algorithmProgressBar);
 
                 try {
                     cloned = image.clone();
@@ -82,23 +82,23 @@ public class BurstModeSortingCommand implements Command{
 
                 switch (s) {
                     case "QuickSort" ->
-                            sortAlgorithm = new QuickSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new QuickSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "BubbleSort" ->
-                            sortAlgorithm = new BubbleSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new BubbleSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "SelectionSort" ->
-                            sortAlgorithm = new SelectionSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new SelectionSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "InsertionSort" ->
-                            sortAlgorithm = new InsertionSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new InsertionSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "RadixSort" ->
-                            sortAlgorithm = new RadixSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new RadixSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "MergeSort" ->
-                            sortAlgorithm = new MergeSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new MergeSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "CocktailSort" ->
-                            sortAlgorithm = new CocktailSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new CocktailSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "GnomeSort" ->
-                            sortAlgorithm = new GnomeSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new GnomeSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                     case "CycleSort" ->
-                            sortAlgorithm = new CycleSort(userSettings, cloned, imageView, algorithmProgressBar, encoder, out);
+                            sortAlgorithm = new CycleSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
                 }
 
                 createFutureTaskForBurstAlgo(pool, progessBarContainer, algoList, algorithmProgressBar, sortAlgorithm);

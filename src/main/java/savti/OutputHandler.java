@@ -12,6 +12,7 @@ public class OutputHandler {
     private AWTSequenceEncoder encoder = null;
 
     public OutputHandler(String outPath) {
+
     }
 
     public void encodeImage(BufferedImage bufferedImage){

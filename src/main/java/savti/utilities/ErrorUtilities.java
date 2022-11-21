@@ -42,31 +42,12 @@ public class ErrorUtilities {
 
     public static void writeError() {
         Platform.runLater(() -> {
-            Alert errorAlert = new Alert(ERROR, "Impossible to load the image.", ButtonType.OK);
-            errorAlert.setHeaderText("Try again, and if the problem persists please change the image.");
+            Alert errorAlert = new Alert(ERROR, "Impossible to encode a frame.", ButtonType.OK);
+            errorAlert.setHeaderText("Sorry.");
             errorAlert.showAndWait();
-            //TODO IMPORTANT !!!!!!!!!!
             Platform.exit();
             System.exit(-1);
         });
-    }
-
-    public static void FFError() {
-        //Say why it is left blank
-    }
-
-    public static void ffmpegPath() {
-        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-        errorAlert.setHeaderText("Ffmpeg path non valido");
-        errorAlert.setContentText("Selezionare un percorso valido per il Ffmpeg");
-        errorAlert.showAndWait();
-    }
-
-    public static void ffprobePath() {
-        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-        errorAlert.setHeaderText("Ffprobe path non valido");
-        errorAlert.setContentText("Selezionare un percorso valido per il Ffprobe");
-        errorAlert.showAndWait();
     }
 
     public static void outputPath() {
@@ -75,4 +56,5 @@ public class ErrorUtilities {
         errorAlert.setContentText("Selezionare un percorso valido per l'output");
         errorAlert.showAndWait();
     }
+
 }

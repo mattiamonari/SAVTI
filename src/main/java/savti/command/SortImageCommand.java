@@ -29,8 +29,6 @@ public class SortImageCommand implements Command{
 
     MainVBox mainVBox;
     TiledImage image;
-    AWTSequenceEncoder encoder;
-    SeekableByteChannel out;
     UserSettings userSettings;
     ImageView imageView;
     SortAlgorithm algorithm;
@@ -38,11 +36,9 @@ public class SortImageCommand implements Command{
 
     MainMenu mainMenu;
 
-    public SortImageCommand(MainVBox mainVBox, TiledImage image, AWTSequenceEncoder encoder, SeekableByteChannel out, UserSettings userSettings, ImageView imageView, SortAlgorithm algorithm, AlgorithmProgressBar algorithmProgressBar, MainMenu mainMenu) {
+    public SortImageCommand(MainVBox mainVBox, TiledImage image, OutputHandler outputHandler, UserSettings userSettings, ImageView imageView, SortAlgorithm algorithm, AlgorithmProgressBar algorithmProgressBar, MainMenu mainMenu) {
         this.mainVBox = mainVBox;
         this.image = image;
-        this.encoder = encoder;
-        this.out = out;
         this.userSettings = userSettings;
         this.imageView = imageView;
         this.algorithm = algorithm;
@@ -54,23 +50,23 @@ public class SortImageCommand implements Command{
         String choice = mainVBox.getChooseAlgo().getValue();
         switch (choice) {
             case "QuickSort" ->
-                    algorithm = new QuickSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new QuickSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "SelectionSort" ->
-                    algorithm = new SelectionSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new SelectionSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "BubbleSort" ->
-                    algorithm = new BubbleSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new BubbleSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "InsertionSort" ->
-                    algorithm = new InsertionSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new InsertionSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "RadixSort" ->
-                    algorithm = new RadixSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new RadixSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "MergeSort" ->
-                    algorithm = new MergeSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new MergeSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "CocktailSort" ->
-                    algorithm = new CocktailSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new CocktailSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "GnomeSort" ->
-                    algorithm = new GnomeSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new GnomeSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             case "CycleSort" ->
-                    algorithm = new CycleSort(userSettings, image, imageView, algorithmProgressBar, encoder, out);
+                    algorithm = new CycleSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
             default -> ErrorUtilities.SWW();
         }
         return algorithm;
