@@ -10,8 +10,8 @@ import java.io.File;
 /**
  * LoadSongCommand is used to create the command to load songs.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 public class LoadSongCommand implements Command{
     MainWindow mainWindow;

@@ -26,8 +26,8 @@ import static savti.utilities.ImageUtilities.splitImage;
 /**
  * RandomShuffleCommand is used to create the command to shuffle the image.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 
 public class RandomShuffleCommand implements Command{

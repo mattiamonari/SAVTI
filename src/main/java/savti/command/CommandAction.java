@@ -5,8 +5,8 @@ import java.awt.event.ActionEvent;
 /**
  * CommandAction is used as a listener for the commands when the button is pressed.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 
 public class CommandAction extends AbstractAction {

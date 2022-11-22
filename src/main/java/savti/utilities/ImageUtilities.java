@@ -16,11 +16,11 @@ import java.io.File;
 public class ImageUtilities {
 
     /**
-     * Divide un'immagine in tante WritableImage, le quali verranno poi inserite nel vettore array
+     * Divide an image in several WritableImage that will be inserted in the array.
      *
-     * @param oldImage Immagine da dividere
-     * @param rows     Numero di righe in cui l'immagine verrà divisa
-     * @param cols     Numero di colonne in cui l'immagine verrà divisa
+     * @param oldImage is the Image that will be divided.
+     * @param rows are the number of lines in which the image will be divided.
+     * @param cols are the number of columns in which the image will be divided.
      */
     public static void splitImage(TiledImage oldImage, int cols, int rows, TiledImage newImage) {
         int chunkWidth = (int) oldImage.getImage().getWidth() / cols;

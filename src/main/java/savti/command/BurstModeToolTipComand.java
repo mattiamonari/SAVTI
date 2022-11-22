@@ -4,10 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 
-public class BurstModeToolTipComand implements Command {
+public class BurstModeToolTipCommand implements Command {
     @FXML
     Button burstMode;
-    public BurstModeToolTipComand(Button burstMode) {
+    public BurstModeToolTipCommand(Button burstMode) {
         this.burstMode = burstMode;
     }
     @Override

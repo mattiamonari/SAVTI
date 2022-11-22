@@ -9,8 +9,8 @@ import java.io.IOException;
 /**
  * ClickToPathCommand is used to create the command to reach the path on their device.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 
 public class ClickToPathCommand implements Command{

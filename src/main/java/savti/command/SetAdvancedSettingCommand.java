@@ -1,6 +1,5 @@
 package savti.command;
 
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
@@ -13,8 +12,8 @@ import savti.UserSettings;
 /**
  * SetAdvanceSettings is used to create the command for the settings of advanced instruction.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 public class SetAdvancedSettingCommand implements Command{
     UserSettings userSettings;

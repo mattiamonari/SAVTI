@@ -5,25 +5,21 @@ import savti.Tile;
 import savti.TiledImage;
 import savti.UserSettings;
 import javafx.embed.swing.SwingFXUtils;
-import org.jcodec.api.awt.AWTSequenceEncoder;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+
 
 public class FileUtilities {
-
 
     /**
      * Encode a specific number of frames of a TiledImage inside the given encoder, adding the number of swaps and comparison to it.
      * @param numOfFrames Number of frames that will be encoded
      * @param outputHandler The handler of the frames written to file.
      * @param image TiledImage to encode
-     * @param userSettings Used to get the framerate
-     * @param countSwaps Number of swaps to be written on the top-right corner of the image
-     * @param countComparisons Number of comparisons to be written on the top-right corner of the image
+     * @param userSettings Used to get the frame rate
+     * @param countSwaps Number of swaps to be written in the top-right corner of the image
+     * @param countComparisons Number of comparisons to be written in the top-right corner of the image
      * @param fontSize Size of the font for the number of swaps and comparisons.
      */
     public static void writeFreezedFrames(int numOfFrames, OutputHandler outputHandler, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
@@ -32,6 +28,31 @@ public class FileUtilities {
         }
     }
 
+    /**
+     * Set the frame Width of a given image
+     * @param image TiledImage to encode
+     * @return an int that is the frame width.
+     */
+    public static int setFrameWidth(TiledImage image) {
+        if (image.getImage().getWidth() % 2 == 0) {
+            return (int) image.getImage().getWidth() ;
+        } else {
+            return (int) image.getImage().getWidth()+1;
+        }
+    }
+
+    /**
+     * Set the frame Height of a given image
+     * @param image TiledImage to encode
+     * @return an int that is the frame height.
+     */
+    public static int setFrameHeight(TiledImage image) {
+        if (image.getImage().getHeight() % 2 == 0) {
+            return (int) image.getImage().getHeight();
+        } else {
+            return (int)  image.getImage().getHeight()+1;
+        }
+    }
     /**
      * Encode a specific number of frames of a TiledImage inside the given encoder, adding the number of swaps and comparison to it.
      * @param numOfFrames Number of frames that will be encoded
@@ -47,11 +68,11 @@ public class FileUtilities {
     /**
      *
      * @param outputHandler The handler of the frames written to file.
-     * @param image
+     * @param image TiledImage to encode
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image) {
-        int width = (int)(image.getImage().getWidth() % 2 == 0 ? image.getImage().getWidth() : image.getImage().getWidth()+1);
-        int height = (int)(image.getImage().getHeight() % 2 == 0 ? image.getImage().getHeight() : image.getImage().getHeight()+1);
+        int width = setFrameWidth(image);
+        int height = setFrameHeight(image);
         BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
@@ -72,8 +93,8 @@ public class FileUtilities {
      * @param fontSize
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
-        int width = (int)(image.getImage().getWidth() % 2 == 0 ? image.getImage().getWidth() : image.getImage().getWidth()+1);
-        int height = (int)(image.getImage().getHeight() % 2 == 0 ? image.getImage().getHeight() : image.getImage().getHeight()+1);
+        int width = setFrameWidth(image);
+        int height = setFrameHeight(image);
         BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {

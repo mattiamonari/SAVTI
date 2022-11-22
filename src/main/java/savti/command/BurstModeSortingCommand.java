@@ -14,6 +14,7 @@ import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.SeekableByteChannel;
 import savti.*;
 import savti.sorting.*;
+import savti.utilities.ErrorUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,12 @@ import java.util.concurrent.Executors;
 import static savti.sorting.SortUtils.rand;
 import static savti.utilities.GUIUtilities.ableNodes;
 import static savti.utilities.ImageUtilities.splitImage;
-
+/**
+ * BurstModeSortingCommand is used to sort image using burst mode.
+ *
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.22
+ */
 public class BurstModeSortingCommand implements Command{
 
     MainVBox mainVBox;
@@ -31,15 +37,16 @@ public class BurstModeSortingCommand implements Command{
     SeekableByteChannel out;
     UserSettings userSettings;
     ImageView imageView;
-
+    OutputHandler outputHandler;
     MainMenu mainMenu;
-
+    SortAlgorithm sortAlgorithm = null;
     public BurstModeSortingCommand(MainVBox mainVBox, TiledImage image, UserSettings userSettings, ImageView imageView, MainMenu mainMenu) {
         this.mainVBox = mainVBox;
         this.image = image;
         this.userSettings = userSettings;
         this.imageView = imageView;
         this.mainMenu = mainMenu;
+        this.outputHandler = new OutputHandler();
     }
 
 
@@ -56,12 +63,10 @@ public class BurstModeSortingCommand implements Command{
 
             for (String s : mainVBox.getChooseAlgo().getItems()) {
 
-                OutputHandler outputHandler = new OutputHandler();
-
                 outputHandler.initializeHandler(userSettings.getOutputDirectory().getPath(), s, userSettings.getFrameRate());
 
                 AlgorithmProgressBar algorithmProgressBar = new AlgorithmProgressBar("AlgoName");
-                SortAlgorithm sortAlgorithm = null;
+
 
                 splitImage(image, userSettings.getColsNumber(), userSettings.getRowsNumber(), image);
 
@@ -72,27 +77,8 @@ public class BurstModeSortingCommand implements Command{
                 } catch (CloneNotSupportedException ex) {
                     throw new RuntimeException(ex);
                 }
-
-                switch (s) {
-                    case "QuickSort" ->
-                            sortAlgorithm = new QuickSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "BubbleSort" ->
-                            sortAlgorithm = new BubbleSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "SelectionSort" ->
-                            sortAlgorithm = new SelectionSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "InsertionSort" ->
-                            sortAlgorithm = new InsertionSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "RadixSort" ->
-                            sortAlgorithm = new RadixSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "MergeSort" ->
-                            sortAlgorithm = new MergeSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "CocktailSort" ->
-                            sortAlgorithm = new CocktailSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "GnomeSort" ->
-                            sortAlgorithm = new GnomeSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                    case "CycleSort" ->
-                            sortAlgorithm = new CycleSort(userSettings, cloned, imageView, algorithmProgressBar,outputHandler);
-                }
+                //Controlla se puoi mettere algorithmProgressBar come field al posto che passarla ad ogni iterazione
+                sortAlgorithm = choice(algorithmProgressBar);
 
                 createFutureTaskForBurstAlgo(pool, progessBarContainer, algoList, algorithmProgressBar, sortAlgorithm);
 
@@ -103,6 +89,32 @@ public class BurstModeSortingCommand implements Command{
             }
 
         }).start();
+    }
+    public SortAlgorithm choice(AlgorithmProgressBar algorithmProgressBar) {
+        String choice = mainVBox.getChooseAlgo().getValue();
+        SortAlgorithm algorithm = null;
+        switch (choice) {
+            case "QuickSort" ->
+                    algorithm = new QuickSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "SelectionSort" ->
+                    algorithm = new SelectionSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "BubbleSort" ->
+                    algorithm = new BubbleSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "InsertionSort" ->
+                    algorithm = new InsertionSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "RadixSort" ->
+                    algorithm = new RadixSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "MergeSort" ->
+                    algorithm = new MergeSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "CocktailSort" ->
+                    algorithm = new CocktailSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "GnomeSort" ->
+                    algorithm = new GnomeSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            case "CycleSort" ->
+                    algorithm = new CycleSort(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+            default -> ErrorUtilities.SWW();
+        }
+        return algorithm;
     }
 
     private void setupEnvForBurstMode(VBox progessBarContainer, ObservableList<SortAlgorithm> algoList) {

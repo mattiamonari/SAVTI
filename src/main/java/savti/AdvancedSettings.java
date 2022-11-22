@@ -90,6 +90,7 @@ public class AdvancedSettings extends BorderPane {
         precisionSlider.setTooltip(new Tooltip("This value represent, in percentage, how much the image will be divided.\nA 100% value means that each single tile will be 2x2px."));
     }
 
+    //Fare stesso lavoro che abbiamo fatto con MainWindow?
     private void addEventListeners() {
 
         changeOutputName.setOnAction((e -> {
@@ -106,7 +107,7 @@ public class AdvancedSettings extends BorderPane {
             }
             updateNameLabel();
         }));
-
+        //Nella classe userSettings non ci sono ne setSaveImage ne getSaveImage
         saveImageBox.selectedProperty().addListener(event -> userSettings.setSaveImage(saveImageBox.isSelected()));
 
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {

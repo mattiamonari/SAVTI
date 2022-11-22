@@ -9,8 +9,8 @@ import savti.UserSettings;
 /**
  * CleanImageCommand is used to create the command for the clean image button.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 public class CleanImageCommand implements Command{
     TiledImage image;

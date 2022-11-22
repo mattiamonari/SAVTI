@@ -18,8 +18,8 @@ import static savti.utilities.ImageUtilities.fillImage;
 /**
  * LoadImageCommand is used to create the command for the load image button.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 public class LoadImageCommand extends Node implements Command {
 

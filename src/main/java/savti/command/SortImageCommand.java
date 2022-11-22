@@ -19,7 +19,7 @@ import static savti.utilities.ImageUtilities.fillImageFromArray;
  * SortImageCommand is used to create the command to sort the image after the shuffle.
  *
  * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @version: 2022.11.22
  */
 public class SortImageCommand implements Command{
     final static String hoverButton = "-fx-background-color: #cd5c5c; \n-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);";
@@ -44,7 +44,7 @@ public class SortImageCommand implements Command{
         this.outputHandler = outputHandler;
     }
 
-    public SortAlgorithm choiche() {
+    public SortAlgorithm choice() {
         String choice = mainVBox.getChooseAlgo().getValue();
         switch (choice) {
             case "QuickSort" ->
@@ -72,7 +72,7 @@ public class SortImageCommand implements Command{
     @Override
     public void execute() {
         if(checkSortingConditions()) {
-            SortAlgorithm algorithm = choiche();
+            SortAlgorithm algorithm = choice();
             mainVBox.disableOrEnableAll(true);
             ableNodes(List.of(mainMenu.getImageLoaderItem().getStyleableNode(), mainMenu.getSongLoaderItem().getStyleableNode()), List.of());
             ((Group) imageView.getParent()).getChildren().add(algorithmProgressBar);

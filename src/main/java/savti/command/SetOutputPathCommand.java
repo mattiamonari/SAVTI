@@ -1,9 +1,7 @@
 package savti.command;
 
-import javafx.fxml.FXML;
+
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.stage.DirectoryChooser;
 import savti.MainVBox;
 import savti.UserSettings;
@@ -12,10 +10,11 @@ import java.io.File;
 /**
  * SetOutputPathCommand is used to the set the output path of the video that is created by the program.
  *
- * @author: Daniele Gasparini && Mattia Monari
- * @version: 2022.11.17
+ * @author Daniele Gasparini && Mattia Monari
+ * @version 2022.11.17
  */
 //WHY EXTENDS NODE???
+
 public class SetOutputPathCommand extends Node implements Command{
     private UserSettings userSettings;
     private MainVBox mainVBox;
