@@ -1,5 +1,9 @@
 package savti;
 
+import savti.command.ChangeOutputNameCommand;
+import savti.command.FramerateCommand;
+import savti.command.PrecisionCommand;
+import savti.command.VideoDurationCommand;
 import savti.utilities.ColorUtilities;
 import savti.utilities.ErrorUtilities;
 import javafx.fxml.FXML;
@@ -27,8 +31,6 @@ public class AdvancedSettings extends BorderPane {
     Hyperlink pathLabel;
     @FXML
     CheckBox openVideoBox;
-    @FXML
-    CheckBox saveImageBox;
     @FXML
     Button changeOutputName;
     @FXML
@@ -93,68 +95,18 @@ public class AdvancedSettings extends BorderPane {
     //Fare stesso lavoro che abbiamo fatto con MainWindow?
     private void addEventListeners() {
 
-        changeOutputName.setOnAction((e -> {
-            TextInputDialog output = new TextInputDialog();
-            output.getDialogPane().getStyleClass().add(".dialog-pane");
-            output.getDialogPane().getStylesheets().add(getClass().getResource("/css/dialog.css").toExternalForm());
-            output.setContentText("Filename: ");
-            Optional<String> out = output.showAndWait();
-            if (out.isPresent()) {
-                if (out.get().endsWith(".mp4"))
-                    userSettings.setOutName(out.get());
-                else
-                    userSettings.setOutName(out.get() + ".mp4");
-            }
-            updateNameLabel();
-        }));
-        //Nella classe userSettings non ci sono ne setSaveImage ne getSaveImage
-        saveImageBox.selectedProperty().addListener(event -> userSettings.setSaveImage(saveImageBox.isSelected()));
+        changeOutputName.setOnAction(e -> new ChangeOutputNameCommand(userSettings, currentOutName).execute());
 
-        precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = precisionSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
-            precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
-            if (image.getImage() != null) {
-                userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / newValue.intValue()));
-                userSettings.setChunkHeight((int) Math.round(image.getImage().getHeight() / newValue.intValue()));
-                userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
-                userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
-                image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());
-            }
-        });
+        precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> new PrecisionCommand(newValue, userSettings, image, precisionValue, precisionSlider).execute());
 
 
-        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = framerateSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) +
-                    ";");
-            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            framerateValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 60f) + ";");
-            userSettings.setFrameRate((int) Math.floor((Double) newValue) / 2);
-            framerateValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setFrameRate((int) Math.floor((Double) newValue));
-        });
+        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> new FramerateCommand(newValue,framerateSlider, framerateValue, userSettings).execute());
 
-        videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Node thumb = videodurationSlider.lookup(".thumb");
-            thumb.setStyle("-fx-background-color: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
-            videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 30f) + ";");
-            videodurationValue.setText(String.valueOf(Math.floor((Double) newValue)));
-            userSettings.setVideoDuration((int) Math.floor(2f * newValue.doubleValue()));
-        });
+        videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> new VideoDurationCommand(newValue, videodurationSlider, videodurationValue, userSettings).execute());
 
         openVideoBox.selectedProperty().addListener(event -> userSettings.setOpenFile(openVideoBox.isSelected()));
 
-        pathLabel.setOnAction(event -> {
-            //We can put it in a method, maybe better in userSettings and call directly that method
-            if (userSettings.isOutputDirectory())
-                    try {
-                        Desktop.getDesktop().open(userSettings.getOutputDirectory());
-                    } catch (IOException e) {
-                        ErrorUtilities.SWW();
-                    }
-        });
+        pathLabel.setOnAction(event -> userSettings.openOutputDirectory());
 
     }
 
@@ -182,8 +134,6 @@ public class AdvancedSettings extends BorderPane {
         newValue = videodurationSlider.getValue();
         videodurationValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue((float) (newValue / 30f)) + ";");
         videodurationValue.setText(String.valueOf(Math.floor(newValue)));
-
-        saveImageBox.setSelected(userSettings.getSaveImage());
 
         openVideoBox.setSelected(userSettings.isOpenFile());
     }

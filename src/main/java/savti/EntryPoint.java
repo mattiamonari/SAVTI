@@ -25,7 +25,6 @@ public class EntryPoint extends Application {
         stage.setHeight(bounds.getHeight());
         MainWindow mw = new MainWindow(stage);
         Scene scene = new Scene(mw);
-        //stage.setMaximized(true);
         stage.getIcons().add(new Image("icon.png"));
         stage.setOnCloseRequest(t -> {
             Platform.exit();

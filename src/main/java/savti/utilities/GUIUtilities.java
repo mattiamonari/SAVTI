@@ -6,6 +6,10 @@ import java.util.List;
 
 public class GUIUtilities {
 
+    private GUIUtilities() {
+
+    }
+
     public static void ableNodes(List<Node> disable, List<Node> enable) {
 
         for (Node n : disable)

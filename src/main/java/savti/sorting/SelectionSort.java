@@ -35,19 +35,15 @@ public class SelectionSort extends AbstractSort {
             // put min at the correct position
             SortUtils.swap(image.getArray(), step, min_idx);
             ++countSwaps;
-            algorithmProgressBar.setProgress(progress += increment);
+            progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
             if (countSwaps % delay == 0) {
                writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
             }
         }
 
-writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
-        outputHandler.closeOutputChannel();        try {
-            encoder.finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        NIOUtils.closeQuietly(out);
+    writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        outputHandler.closeOutputChannel();
 
         Platform.runLater(() -> resumeProgram(imageView, image));
     }

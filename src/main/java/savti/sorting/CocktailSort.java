@@ -36,6 +36,7 @@ public class CocktailSort extends AbstractSort {
 
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
+                    progress += increment;
                     algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), i, i + 1);
 
@@ -55,6 +56,7 @@ public class CocktailSort extends AbstractSort {
                 ++countComparison;
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
+                    progress += increment;
                     algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), i, i + 1);
                     if (countSwaps % delay == 0)

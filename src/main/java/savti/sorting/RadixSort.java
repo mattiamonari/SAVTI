@@ -78,7 +78,8 @@ public class RadixSort extends AbstractSort {
 
         for (int i = 0; i < size; i++) {
             ++countSwaps;
-            algorithmProgressBar.setProgress(progress += increment);
+            progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
             replace(array, i, output[i]);
             if (countSwaps % delay == 0 && write) {
                writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);

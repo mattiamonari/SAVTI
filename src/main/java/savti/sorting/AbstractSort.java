@@ -12,20 +12,19 @@ import java.io.IOException;
 
 import static savti.utilities.ImageUtilities.fillImageFromArray;
 
-abstract public class AbstractSort implements SortAlgorithm {
+public abstract class AbstractSort implements SortAlgorithm {
     final UserSettings userSettings;
     final ImageView imageView;
-    long countComparison = 0, imageIndex = 1, countSwaps = 0;
+    long countComparison = 0;
+    int countSwaps = 0;
     double progress = 0;
     double increment, delay = 1;
     TiledImage image;
 
     AlgorithmProgressBar algorithmProgressBar;
-    AWTSequenceEncoder encoder;
     OutputHandler outputHandler;
-    SeekableByteChannel out;
 
-    public AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
+    protected AbstractSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
         this.userSettings = userSettings;
         this.image = image;
         this.imageView = imageView;
@@ -47,8 +46,6 @@ abstract public class AbstractSort implements SortAlgorithm {
 
         countSwaps = 0;
 
-        imageIndex = userSettings.getStartingImageIndex();
-
         //TODO
         /*
         if (!userSettings.getOutputDirectory().isDirectory())
@@ -62,7 +59,7 @@ abstract public class AbstractSort implements SortAlgorithm {
     void resumeProgram(ImageView imageView, TiledImage image) {
 
         if (userSettings.isOpenFile()) {
-            File out = new File(userSettings.getOutputDirectory() + "\\" + userSettings.getOutName());
+            File out = new File(userSettings.getOutputDirectory() + File.separator + userSettings.getOutName());
             try {
                 Desktop.getDesktop().open(out);
             } catch (IOException e) {

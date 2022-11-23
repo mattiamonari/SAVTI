@@ -41,6 +41,7 @@ public class BubbleSort extends AbstractSort {
                 /*      SWAP SECTION     */
                 if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
                     countSwaps++;
+                    progress += increment;
                     algorithmProgressBar.setProgress(progress += increment);
                     SortUtils.swap(image.getArray(), j, j + 1);
                     swapped = true;

@@ -56,7 +56,8 @@ public class CycleSort extends AbstractSort {
             // put the item to it's right position
             if (pos != j) {
                 countSwaps++;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 if (countSwaps % delay == 0) {
                    writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                 }
@@ -83,6 +84,7 @@ public class CycleSort extends AbstractSort {
                 // put the item to it's right position
                 if (item != image.getArray()[pos]) {
                     countSwaps++;
+                    progress += increment;
                     algorithmProgressBar.setProgress(progress += increment);
                     item = replace(image.getArray(), pos, item);
                     if (countSwaps % delay == 0) {

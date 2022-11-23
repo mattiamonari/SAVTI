@@ -27,7 +27,8 @@ public class InsertionSort extends AbstractSort {
             //IS THIS CORRECT?
             while (j > 0 && SortUtils.greater(image.getArray()[j - 1], image.getArray()[j])) {
                 ++countSwaps;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 SortUtils.swap(image.getArray(), j, j - 1);
                 j = j - 1;
 

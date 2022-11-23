@@ -1,5 +1,6 @@
 package savti.utilities;
 
+import javafx.scene.control.TextInputDialog;
 import savti.OutputHandler;
 import savti.Tile;
 import savti.TiledImage;
@@ -8,9 +9,15 @@ import javafx.embed.swing.SwingFXUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 
 public class FileUtilities {
+
+    private FileUtilities(){
+
+    }
+
 
     /**
      * Encode a specific number of frames of a TiledImage inside the given encoder, adding the number of swaps and comparison to it.
@@ -82,7 +89,6 @@ public class FileUtilities {
         outputHandler.encodeImage(finalImage);
         graphics2D.dispose();
     }
-
 
     /**
      * @param outputHandler The handler of the frames written to file.

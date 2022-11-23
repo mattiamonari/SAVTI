@@ -28,7 +28,8 @@ public class GnomeSort extends AbstractSort {
                 i++;
             else {
                 countSwaps++;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 SortUtils.swap(image.getArray(), i, i - 1);
                 i--;
 

@@ -1,19 +1,21 @@
 package savti.utilities;
 
 import javafx.embed.swing.SwingFXUtils;
-import savti.Tile;
-import savti.TiledImage;
-import savti.UserSettings;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import savti.Tile;
+import savti.TiledImage;
+import savti.UserSettings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class ImageUtilities {
+
+    private ImageUtilities(){
+
+    }
 
     /**
      * Divide an image in several WritableImage that will be inserted in the array.

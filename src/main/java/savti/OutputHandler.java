@@ -6,16 +6,18 @@ import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.model.Rational;
 import savti.utilities.ErrorUtilities;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class OutputHandler {
-    private SeekableByteChannel out = null;
-    private AWTSequenceEncoder encoder = null;
+    private SeekableByteChannel out;
+    private AWTSequenceEncoder encoder;
 
     public OutputHandler() {
-
+        encoder = null;
+        out = null;
     }
 
     public void encodeImage(BufferedImage bufferedImage){
@@ -34,7 +36,7 @@ public class OutputHandler {
     {
         try {
             new File(outPath).createNewFile();
-            out = NIOUtils.writableFileChannel(outPath + "\\" + outName);
+            out = NIOUtils.writableFileChannel(outPath + File.separator + outName);
             encoder = new AWTSequenceEncoder(out, Rational.R(framerate, 1));
         } catch (IOException ex) {
             throw new RuntimeException(ex);

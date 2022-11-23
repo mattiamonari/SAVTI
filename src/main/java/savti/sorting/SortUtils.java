@@ -1,7 +1,6 @@
 package savti.sorting;
 
 import savti.*;
-import org.jcodec.api.awt.AWTSequenceEncoder;
 
 import java.util.Random;
 
@@ -9,6 +8,11 @@ import static savti.utilities.FileUtilities.writeFrame;
 import static savti.utilities.FileUtilities.writeFreezedFrames;
 
 public final class SortUtils {
+
+    private SortUtils(){
+
+    }
+
     /**
      * Helper method for swapping places in array
      *

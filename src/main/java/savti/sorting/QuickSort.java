@@ -67,7 +67,8 @@ public class QuickSort extends AbstractSort {
                                 boolean write) {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
         countSwaps++;
-        algorithmProgressBar.setProgress(progress += increment);
+        progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
         if (countSwaps % delay == 0 && write)
            writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
         swap(array, randomIndex, right);
@@ -98,7 +99,8 @@ public class QuickSort extends AbstractSort {
             }
             if (left <= right) {
                 countSwaps++;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 if (countSwaps % delay == 0 && write)
                    writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
                 swap(array, left, right);

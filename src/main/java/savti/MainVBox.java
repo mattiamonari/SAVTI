@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -47,6 +48,8 @@ public class MainVBox extends VBox {
         createComboBox();
         setStyle("-fx-base: black");
         jMetro = new JMetro(this, Style.DARK);
+
+        burstMode.setTooltip(new Tooltip("Questo bottone serve per fare un video di tutti gli algoritmi"));
     }
 
 

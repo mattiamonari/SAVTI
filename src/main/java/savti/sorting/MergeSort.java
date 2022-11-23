@@ -83,13 +83,15 @@ public class MergeSort extends AbstractSort {
             ++countComparison;
             if (SortUtils.greater(M[j], L[i])) {
                 ++countSwaps;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 replace(arr, k, L[i]);
                 i++;
 
             } else {
                 ++countSwaps;
-                algorithmProgressBar.setProgress(progress += increment);
+                progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
                 replace(arr, k, M[j]);
                 j++;
             }
@@ -103,7 +105,8 @@ public class MergeSort extends AbstractSort {
         while (i < n1) {
             replace(arr, k, L[i]);
             ++countSwaps;
-            algorithmProgressBar.setProgress(progress += increment);
+            progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
             i++;
             k++;
             if (countSwaps % delay == 0 && write)
@@ -113,7 +116,8 @@ public class MergeSort extends AbstractSort {
         while (j < n2) {
             replace(arr, k, M[j]);
             ++countSwaps;
-            algorithmProgressBar.setProgress(progress += increment);
+            progress += increment;
+                    algorithmProgressBar.setProgress(progress += increment);
             j++;
             k++;
             if (countSwaps % delay == 0 && write)

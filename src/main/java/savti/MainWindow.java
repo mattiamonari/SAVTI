@@ -126,7 +126,6 @@ public class MainWindow extends BorderPane {
         mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
         mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler, imageView, algorithmProgressBar, mainVBox).execute());
         mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu).execute());
-        mainVBox.getBurstMode().setOnMouseEntered(e -> new BurstModeToolTipComand(mainVBox.getBurstMode()).execute());
         mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings).execute());
 
         mainMenu.getSongLoaderItem().setOnAction(e -> new LoadSongCommand(userSettings, this).execute());

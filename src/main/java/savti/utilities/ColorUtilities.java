@@ -3,6 +3,11 @@ package savti.utilities;
 import java.awt.*;
 
 public class ColorUtilities {
+
+    private ColorUtilities(){
+
+    }
+
     public static String getHexFromValue(float value) {
         double red, green;
         if (value > 0.5f) {

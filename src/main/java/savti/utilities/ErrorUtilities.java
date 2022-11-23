@@ -8,6 +8,10 @@ import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 public class ErrorUtilities {
+
+    private ErrorUtilities(){
+
+    }
     public static void noImageError() {
         Alert errorAlert = new Alert(ERROR, "Select an image to shuffle first!", ButtonType.OK);
         errorAlert.setHeaderText("Image is not valid");

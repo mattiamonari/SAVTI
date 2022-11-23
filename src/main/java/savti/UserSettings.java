@@ -2,6 +2,7 @@ package savti;
 
 import savti.utilities.ErrorUtilities;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,13 +13,12 @@ public class UserSettings {
     private File outputDirectory;
     private String outName;
     private int frameRate;
-    private File music;
     private boolean openFile;
     private int videoDuration;
     private int chunkWidth;
     private int chunkHeight;
 
-    private int startingImageIndex;
+    private File music;
 
     //By default the program will produce output in the subdirectory of the current directory 'out' (creating it if
     // not existing)
@@ -26,10 +26,8 @@ public class UserSettings {
         colsNumber = rowsNumber = 1;
         outName = "sorted.mp4";
         frameRate = 30;
-        music = null;
         openFile = false;
         videoDuration = 15;
-        startingImageIndex = 0;
         outputDirectory = new File(Path.of("").toAbsolutePath() + "\\out\\");
 
         if(isOutputDirectory()){
@@ -69,14 +67,6 @@ public class UserSettings {
             this.frameRate = 1;
         else
             this.frameRate = frameRate;
-    }
-
-    public File getMusic() {
-        return music;
-    }
-
-    public void setMusic(File music) {
-        this.music = music;
     }
 
     public boolean isOpenFile() {
@@ -140,8 +130,23 @@ public class UserSettings {
         return getOutputDirectory() != null;
     }
 
-    public int getStartingImageIndex() {
-        return startingImageIndex;
+    public void openOutputDirectory(){
+        if (isOutputDirectory()){
+            try {
+                Desktop.getDesktop().open(getOutputDirectory());
+            } catch (IOException e) {
+                ErrorUtilities.SWW();
+            }
+        }
     }
+
+    public File getMusic() {
+        return music;
+    }
+
+    public void setMusic(File music) {
+        this.music = music;
+    }
+
 
 }
