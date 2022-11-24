@@ -9,7 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class UserSettings {
-    private int rowsNumber, colsNumber;
+    int colsNumber;
+    private int rowsNumber;
     private File outputDirectory;
     private String outName;
     private int frameRate;
@@ -30,7 +31,7 @@ public class UserSettings {
         videoDuration = 15;
         outputDirectory = new File(Path.of("").toAbsolutePath() + "\\out\\");
 
-        if(isOutputDirectory()){
+        if (isOutputDirectory()) {
             try {
                 Files.createDirectories(outputDirectory.toPath());
             } catch (IOException e) {
@@ -39,9 +40,11 @@ public class UserSettings {
         }
 
     }
+
     public boolean isOutputDirectory() {
         return getOutputDirectory() != null && getOutputDirectory().isDirectory();
     }
+
     public File getOutputDirectory() {
         return outputDirectory;
     }
@@ -130,12 +133,12 @@ public class UserSettings {
         return getOutputDirectory() != null;
     }
 
-    public void openOutputDirectory(){
-        if (isOutputDirectory()){
+    public void openOutputDirectory() {
+        if (isOutputDirectory()) {
             try {
                 Desktop.getDesktop().open(getOutputDirectory());
             } catch (IOException e) {
-                ErrorUtilities.SWW();
+                ErrorUtilities.somethingWentWrong();
             }
         }
     }

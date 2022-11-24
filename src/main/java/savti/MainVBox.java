@@ -18,6 +18,7 @@ import java.util.List;
 
 public class MainVBox extends VBox {
 
+    JMetro jMetro;
     @FXML
     private Button randomizeButton;
     @FXML
@@ -33,8 +34,6 @@ public class MainVBox extends VBox {
     @FXML
     private Button burstMode;
 
-    JMetro jMetro;
-
     public MainVBox() {
         //Load FXML for the scene
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainVBox.fxml"));
@@ -43,7 +42,7 @@ public class MainVBox extends VBox {
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
         createComboBox();
         setStyle("-fx-base: black");
@@ -65,7 +64,7 @@ public class MainVBox extends VBox {
     /**
      * @param disable If true, disable all the button in the main window, if true enable them all.
      */
-    public void disableOrEnableAll(boolean disable){
+    public void disableOrEnableAll(boolean disable) {
         randomizeButton.setDisable(disable);
         sortingButton.setDisable(disable);
         cleanButton.setDisable(disable);

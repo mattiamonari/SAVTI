@@ -6,7 +6,7 @@ import savti.UserSettings;
 
 import java.util.Optional;
 
-public class ChangeOutputNameCommand implements Command{
+public class ChangeOutputNameCommand implements Command {
 
     UserSettings userSettings;
     Label currentOutName;

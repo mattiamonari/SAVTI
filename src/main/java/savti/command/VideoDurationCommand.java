@@ -1,13 +1,12 @@
 package savti.command;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import savti.UserSettings;
 import savti.utilities.ColorUtilities;
 
-public class VideoDurationCommand implements Command{
+public class VideoDurationCommand implements Command {
     Number newValue;
 
     Slider videoDurationSlider;

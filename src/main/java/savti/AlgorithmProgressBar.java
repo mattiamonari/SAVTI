@@ -53,14 +53,10 @@ public class AlgorithmProgressBar extends VBox {
     }
 
     public void setAlgoName(String name) {
-        Platform.runLater(() -> {
-            algoName.setText(name);
-        });
+        Platform.runLater(() -> algoName.setText(name));
     }
 
     public void setProgress(double progess) {
-        Platform.runLater(() -> {
-            progressBar.setProgress(progess);
-        });
+        Platform.runLater(() -> progressBar.setProgress(progess));
     }
 }

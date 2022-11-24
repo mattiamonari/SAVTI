@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 
 public class ImageUtilities {
 
-    private ImageUtilities(){
+    private ImageUtilities() {
 
     }
 
@@ -21,8 +21,8 @@ public class ImageUtilities {
      * Divide an image in several WritableImage that will be inserted in the array.
      *
      * @param oldImage is the Image that will be divided.
-     * @param rows are the number of lines in which the image will be divided.
-     * @param cols are the number of columns in which the image will be divided.
+     * @param rows     are the number of lines in which the image will be divided.
+     * @param cols     are the number of columns in which the image will be divided.
      */
     public static void splitImage(TiledImage oldImage, int cols, int rows, TiledImage newImage) {
         int chunkWidth = (int) oldImage.getImage().getWidth() / cols;

@@ -1,25 +1,20 @@
 package savti;
 
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
 import savti.command.ChangeOutputNameCommand;
 import savti.command.FramerateCommand;
 import savti.command.PrecisionCommand;
 import savti.command.VideoDurationCommand;
 import savti.utilities.ColorUtilities;
 import savti.utilities.ErrorUtilities;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.Optional;
 
 public class AdvancedSettings extends BorderPane {
 
@@ -56,7 +51,7 @@ public class AdvancedSettings extends BorderPane {
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-            ErrorUtilities.FXMLLoadError();
+            ErrorUtilities.fxmlLoadError();
         }
 
         this.theme = new JMetro(this, theme.getStyle());
@@ -100,7 +95,7 @@ public class AdvancedSettings extends BorderPane {
         precisionSlider.valueProperty().addListener((observable, oldValue, newValue) -> new PrecisionCommand(newValue, userSettings, image, precisionValue, precisionSlider).execute());
 
 
-        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> new FramerateCommand(newValue,framerateSlider, framerateValue, userSettings).execute());
+        framerateSlider.valueProperty().addListener((observable, oldValue, newValue) -> new FramerateCommand(newValue, framerateSlider, framerateValue, userSettings).execute());
 
         videodurationSlider.valueProperty().addListener((observable, oldValue, newValue) -> new VideoDurationCommand(newValue, videodurationSlider, videodurationValue, userSettings).execute());
 

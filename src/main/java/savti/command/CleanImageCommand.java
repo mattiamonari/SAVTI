@@ -12,22 +12,25 @@ import savti.UserSettings;
  * @author Daniele Gasparini && Mattia Monari
  * @version 2022.11.17
  */
-public class CleanImageCommand implements Command{
+public class CleanImageCommand implements Command {
     TiledImage image;
     UserSettings userSettings;
     @FXML
     ImageView imageView;
+
     /**
      * Constructor for the CleanImageCommand class.
-     * @param image is the image that will be removed.
+     *
+     * @param image        is the image that will be removed.
      * @param userSettings are the user settings that will be reset.
-     * @param imageView is the node used to paint the image in the GUI that will be cleared.
+     * @param imageView    is the node used to paint the image in the GUI that will be cleared.
      */
-    public CleanImageCommand(TiledImage image, UserSettings userSettings, javafx.scene.image.ImageView imageView) {
+    public CleanImageCommand(TiledImage image, UserSettings userSettings, ImageView imageView) {
         this.image = image;
         this.userSettings = userSettings;
         this.imageView = imageView;
     }
+
     @Override
     public void execute() {
         image.clearImage();

@@ -9,9 +9,10 @@ import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 public class ErrorUtilities {
 
-    private ErrorUtilities(){
+    private ErrorUtilities() {
 
     }
+
     public static void noImageError() {
         Alert errorAlert = new Alert(ERROR, "Select an image to shuffle first!", ButtonType.OK);
         errorAlert.setHeaderText("Image is not valid");
@@ -24,13 +25,13 @@ public class ErrorUtilities {
         alert.showAndWait();
     }
 
-    public static void SWW() {
+    public static void somethingWentWrong() {
         Alert errorAlert = new Alert(ERROR, "We don't know what happened, but we're sorry.", ButtonType.OK);
         errorAlert.setHeaderText("Something went wrong");
         errorAlert.showAndWait();
     }
 
-    public static void FXMLLoadError() {
+    public static void fxmlLoadError() {
         Alert errorAlert = new Alert(ERROR, "Something went wrong while trying loading UI. Try again!", ButtonType.OK);
         errorAlert.setHeaderText("Oops!");
         errorAlert.showAndWait();
@@ -61,4 +62,10 @@ public class ErrorUtilities {
         errorAlert.showAndWait();
     }
 
+    public static void finishEncodingError() {
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText("");
+        errorAlert.setContentText("");
+        errorAlert.showAndWait();
+    }
 }

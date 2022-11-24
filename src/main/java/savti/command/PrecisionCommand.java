@@ -7,7 +7,7 @@ import savti.TiledImage;
 import savti.UserSettings;
 import savti.utilities.ColorUtilities;
 
-public class PrecisionCommand implements Command{
+public class PrecisionCommand implements Command {
 
     Number newValue;
     UserSettings userSettings;

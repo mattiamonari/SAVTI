@@ -4,12 +4,13 @@ import java.awt.*;
 
 public class ColorUtilities {
 
-    private ColorUtilities(){
+    private ColorUtilities() {
 
     }
 
     public static String getHexFromValue(float value) {
-        double red, green;
+        double red;
+        double green;
         if (value > 0.5f) {
             green = (1f - value) / 0.5f;
             red = 1f;

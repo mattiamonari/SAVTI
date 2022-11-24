@@ -1,22 +1,16 @@
 package savti;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
@@ -25,11 +19,7 @@ import savti.sorting.BubbleSort;
 import savti.sorting.SortAlgorithm;
 import savti.utilities.ErrorUtilities;
 
-import javax.imageio.ImageIO;
-import java.io.File;
 import java.io.IOException;
-
-import static savti.utilities.ImageUtilities.fillImage;
 
 public class MainWindow extends BorderPane {
 
@@ -53,7 +43,7 @@ public class MainWindow extends BorderPane {
     VBox menuVBox;
     MainVBox mainVBox;
     MainMenu mainMenu;
-    AlgorithmProgressBar algorithmProgressBar;
+
     //endregion
 
     public MainWindow(Stage primaryStage) {
@@ -64,7 +54,7 @@ public class MainWindow extends BorderPane {
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-            ErrorUtilities.FXMLLoadError();
+            ErrorUtilities.fxmlLoadError();
         }
         //Instantiating and initializing non-JavaFX variables
         initComponents();
@@ -100,13 +90,13 @@ public class MainWindow extends BorderPane {
         addCssFiles();
 
         theme = new JMetro(this, Style.DARK);
-
-        algorithmProgressBar = new AlgorithmProgressBar("AlgoName");
     }
+
     private void addCssFiles() {
         setStyle("-fx-base: black");
         this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
     }
+
     private void setDarkModeListener() {
         darkMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -123,8 +113,8 @@ public class MainWindow extends BorderPane {
 
         mainVBox.getCleanButton().setOnAction(e -> new CleanImageCommand(image, userSettings, imageView).execute());
         mainVBox.getOutputButton().setOnAction(e -> new SetOutputPathCommand(userSettings, mainVBox).execute());
-        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler, userSettings, imageView, algorithm, algorithmProgressBar, mainMenu).execute());
-        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler, imageView, algorithmProgressBar, mainVBox).execute());
+        mainVBox.getSortingButton().setOnAction(e -> new SortImageCommand(mainVBox, image, outputHandler, userSettings, imageView, algorithm, mainMenu).execute());
+        mainVBox.getRandomizeButton().setOnAction(e -> new RandomShuffleCommand(image, userSettings, outputHandler, imageView, mainVBox).execute());
         mainVBox.getBurstMode().setOnAction(e -> new BurstModeSortingCommand(mainVBox, image, userSettings, imageView, mainMenu).execute());
         mainVBox.getPathLabel().setOnAction(e -> new ClickToPathCommand(userSettings).execute());
 

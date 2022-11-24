@@ -9,7 +9,7 @@ import static savti.utilities.FileUtilities.writeFreezedFrames;
 
 public final class SortUtils {
 
-    private SortUtils(){
+    private SortUtils() {
 
     }
 
@@ -30,8 +30,9 @@ public final class SortUtils {
 
     /**
      * Given an array of Tiles, replace the element at position idx with a new tile
-     * @param array Array of tiles
-     * @param idx Position of the element which will be replaced
+     *
+     * @param array   Array of tiles
+     * @param idx     Position of the element which will be replaced
      * @param newTile The new element
      */
     static void replace(Tile[] array, int idx, Tile newTile) {
@@ -42,6 +43,7 @@ public final class SortUtils {
 
     /**
      * Swap the coordinates of two tiles.
+     *
      * @param t1 First tile
      * @param t2 Second tile
      */
@@ -84,7 +86,7 @@ public final class SortUtils {
 
         algorithmProgressBar.setAlgoName("Randomizing the image...");
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler , image);
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image);
 
         for (int i = image.getArray().length - 1; i > 0; i--) {
             if (i % delay == 0)

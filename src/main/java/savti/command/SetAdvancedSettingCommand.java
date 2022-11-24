@@ -9,27 +9,31 @@ import jfxtras.styles.jmetro.JMetro;
 import savti.AdvancedSettings;
 import savti.TiledImage;
 import savti.UserSettings;
+
 /**
  * SetAdvanceSettings is used to create the command for the settings of advanced instruction.
  *
  * @author Daniele Gasparini && Mattia Monari
  * @version 2022.11.17
  */
-public class SetAdvancedSettingCommand implements Command{
+public class SetAdvancedSettingCommand implements Command {
     UserSettings userSettings;
     TiledImage image;
     JMetro theme;
+
     /**
      * Constructor for AbsoluteCommand class.
-     * @param image is the image on which will be applied the settings.
+     *
+     * @param image        is the image on which will be applied the settings.
      * @param userSettings are the settings parameters that will be changed.
-     * @param theme is the theme of the GUI.
+     * @param theme        is the theme of the GUI.
      */
-    public SetAdvancedSettingCommand(TiledImage image, UserSettings userSettings,JMetro theme) {
+    public SetAdvancedSettingCommand(TiledImage image, UserSettings userSettings, JMetro theme) {
         this.image = image;
         this.userSettings = userSettings;
         this.theme = theme;
     }
+
     @Override
     public void execute() {
         Stage stage = new Stage();

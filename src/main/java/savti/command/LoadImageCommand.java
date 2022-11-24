@@ -8,6 +8,7 @@ import javafx.stage.FileChooser;
 import savti.MainVBox;
 import savti.TiledImage;
 import savti.UserSettings;
+import savti.utilities.ErrorUtilities;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -32,10 +33,11 @@ public class LoadImageCommand extends Node implements Command {
 
     /**
      * Constructor for LoadImageCommand class.
-     * @param image is the TiledImage that will be loaded.
+     *
+     * @param image        is the TiledImage that will be loaded.
      * @param userSettings are the settings that will be modified.
-     * @param imageView is the GUI that will display the image.
-     * @param mainVBox is used to calculate the optimal size for the image
+     * @param imageView    is the GUI that will display the image.
+     * @param mainVBox     is used to calculate the optimal size for the image
      */
     public LoadImageCommand(TiledImage image, UserSettings userSettings, ImageView imageView, MainVBox mainVBox) {
         this.image = image;
@@ -54,7 +56,7 @@ public class LoadImageCommand extends Node implements Command {
             try {
                 image.setImage(SwingFXUtils.toFXImage(ImageIO.read(chosenFile), null));
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                ErrorUtilities.loadImageError();
             }
             //Set the intial precision to a default value
             userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / 8));

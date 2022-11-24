@@ -1,10 +1,9 @@
 package savti.sorting;
 
 import javafx.scene.Group;
-import savti.*;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.SeekableByteChannel;
+import savti.*;
+import savti.utilities.ErrorUtilities;
 
 import java.awt.*;
 import java.io.File;
@@ -18,7 +17,8 @@ public abstract class AbstractSort implements SortAlgorithm {
     long countComparison = 0;
     int countSwaps = 0;
     double progress = 0;
-    double increment, delay = 1;
+    double increment;
+    double delay = 1;
     TiledImage image;
 
     AlgorithmProgressBar algorithmProgressBar;
@@ -46,13 +46,9 @@ public abstract class AbstractSort implements SortAlgorithm {
 
         countSwaps = 0;
 
-        //TODO
-        /*
-        if (!userSettings.getOutputDirectory().isDirectory())
-            if (!userSettings.getOutputDirectory().mkdir())
-                ErrorUtilities.SWW();
-         */
-
+        //------------TODO NOT IN HERE!!!---------------- check condition
+        if (!userSettings.getOutputDirectory().isDirectory() && !userSettings.getOutputDirectory().mkdir())
+            ErrorUtilities.somethingWentWrong();
     }
 
     //TODO SMARTER WAY
