@@ -14,7 +14,7 @@ public class RadixSort extends AbstractSort {
     boolean write;
 
     public RadixSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class RadixSort extends AbstractSort {
         Tile max = getMax(image.getArray(), size);
 
         // Apply counting sort to sort elements based on place value.
-        for (int place = 1; max.currentPosition / place > 0; place *= 10) {
+        for (int place = 1; max.getCurrentPosition() / place > 0; place *= 10) {
             countingSort(image.getArray(), size, place);
         }
 
@@ -57,14 +57,14 @@ public class RadixSort extends AbstractSort {
             if (SortUtils.greater(array[i], max))
                 max = array[i];
         }
-        int[] count = new int[max.currentPosition + 1];
+        int[] count = new int[max.getCurrentPosition() + 1];
 
-        for (int i = 0; i < max.currentPosition; ++i)
+        for (int i = 0; i < max.getCurrentPosition(); ++i)
             count[i] = 0;
 
         // Calculate count of elements
         for (int i = 0; i < size; i++)
-            count[(array[i].currentPosition / place) % 10]++;
+            count[(array[i].getCurrentPosition() / place) % 10]++;
 
         // Calculate cumulative count
         for (int i = 1; i < 10; i++)
@@ -72,17 +72,17 @@ public class RadixSort extends AbstractSort {
 
         // Place the elements in sorted order
         for (int i = size - 1; i >= 0; i--) {
-            output[count[(array[i].currentPosition / place) % 10] - 1] = array[i];
-            count[(array[i].currentPosition / place) % 10]--;
+            output[count[(array[i].getCurrentPosition() / place) % 10] - 1] = array[i];
+            count[(array[i].getCurrentPosition() / place) % 10]--;
         }
 
         for (int i = 0; i < size; i++) {
             ++countSwaps;
             progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+            algorithmProgressBar.setProgress(progress);
             replace(array, i, output[i]);
             if (countSwaps % delay == 0 && write) {
-               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
             }
 
         }
@@ -98,7 +98,7 @@ public class RadixSort extends AbstractSort {
         System.arraycopy(array, 0, tmp, 0, size);
 
         // Apply counting sort to sort elements based on place value.
-        for (int place = 1; max.currentPosition / place > 0; place *= 10)
+        for (int place = 1; max.getCurrentPosition() / place > 0; place *= 10)
             countingSort(tmp, size, place);
 
         resetCoordinates(userSettings, array);

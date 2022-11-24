@@ -2,10 +2,7 @@ package savti.sorting;
 
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import org.jcodec.common.io.NIOUtils;
 import savti.*;
-
-import java.io.IOException;
 
 import static savti.utilities.FileUtilities.writeFrame;
 import static savti.utilities.FileUtilities.writeFreezedFrames;
@@ -13,7 +10,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 
 public class SelectionSort extends AbstractSort {
     public SelectionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -36,13 +33,13 @@ public class SelectionSort extends AbstractSort {
             SortUtils.swap(image.getArray(), step, min_idx);
             ++countSwaps;
             progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+            algorithmProgressBar.setProgress(progress);
             if (countSwaps % delay == 0) {
-               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
             }
         }
 
-    writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
         outputHandler.closeOutputChannel();
 
         Platform.runLater(() -> resumeProgram(imageView, image));

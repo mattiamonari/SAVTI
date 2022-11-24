@@ -1,13 +1,8 @@
 package savti.sorting;
 
 import javafx.application.Platform;
-import savti.*;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-
-import java.io.IOException;
+import savti.*;
 
 import static savti.sorting.SortUtils.less;
 import static savti.sorting.SortUtils.swap;
@@ -18,7 +13,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 public class QuickSort extends AbstractSort {
 
     public QuickSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -68,9 +63,9 @@ public class QuickSort extends AbstractSort {
         int randomIndex = left + (int) (Math.random() * (right - left + 1));
         countSwaps++;
         progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+        algorithmProgressBar.setProgress(progress);
         if (countSwaps % delay == 0 && write)
-           writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+            writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
         swap(array, randomIndex, right);
 
         return partition(array, left, right, write);
@@ -100,9 +95,9 @@ public class QuickSort extends AbstractSort {
             if (left <= right) {
                 countSwaps++;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 if (countSwaps % delay == 0 && write)
-                   writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                 swap(array, left, right);
                 ++left;
                 --right;

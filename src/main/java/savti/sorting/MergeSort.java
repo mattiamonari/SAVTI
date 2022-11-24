@@ -13,7 +13,7 @@ public class MergeSort extends AbstractSort {
 
 
     public MergeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -64,11 +64,7 @@ public class MergeSort extends AbstractSort {
 
         System.arraycopy(arr, p, L, 0, n1);
         for (int j = 0; j < n2; j++) {
-            try {
-                M[j] = arr[q + 1 + j].clone();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
+            M[j] = Tile.newInstance(arr[q + 1 + j]);
         }
 
         // Maintain current index of sub-arrays and main array
@@ -84,19 +80,19 @@ public class MergeSort extends AbstractSort {
             if (SortUtils.greater(M[j], L[i])) {
                 ++countSwaps;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 replace(arr, k, L[i]);
                 i++;
 
             } else {
                 ++countSwaps;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 replace(arr, k, M[j]);
                 j++;
             }
             if (countSwaps % delay == 0 && write)
-               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
             k++;
         }
 
@@ -106,22 +102,22 @@ public class MergeSort extends AbstractSort {
             replace(arr, k, L[i]);
             ++countSwaps;
             progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+            algorithmProgressBar.setProgress(progress);
             i++;
             k++;
             if (countSwaps % delay == 0 && write)
-               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
         }
 
         while (j < n2) {
             replace(arr, k, M[j]);
             ++countSwaps;
             progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+            algorithmProgressBar.setProgress(progress);
             j++;
             k++;
             if (countSwaps % delay == 0 && write)
-               writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
         }
     }
 

@@ -12,7 +12,7 @@ public class GnomeSort extends AbstractSort {
 
 
     public GnomeSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -29,12 +29,12 @@ public class GnomeSort extends AbstractSort {
             else {
                 countSwaps++;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 SortUtils.swap(image.getArray(), i, i - 1);
                 i--;
 
                 if (countSwaps % delay == 0) {
-                   writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                 }
             }
         }

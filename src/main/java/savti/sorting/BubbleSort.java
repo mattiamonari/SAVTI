@@ -1,16 +1,8 @@
 package savti.sorting;
 
 import javafx.application.Platform;
-import savti.*;
-import savti.utilities.ErrorUtilities;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import savti.*;
 
 import static savti.utilities.FileUtilities.writeFrame;
 import static savti.utilities.FileUtilities.writeFreezedFrames;
@@ -19,7 +11,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 public class BubbleSort extends AbstractSort {
 
     public BubbleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -28,10 +20,7 @@ public class BubbleSort extends AbstractSort {
 
         setupEnv(image.getArray());
 
-        //------------TODO NOT IN HERE!!!----------------
-        if (!userSettings.getOutputDirectory().isDirectory())
-            if (!userSettings.getOutputDirectory().mkdir())
-                ErrorUtilities.SWW();
+
         //-------------------------------------------
 
         for (int size = image.getArray().length, i = 1; i < size; ++i) {
@@ -42,13 +31,13 @@ public class BubbleSort extends AbstractSort {
                 if (SortUtils.greater(image.getArray()[j], image.getArray()[j + 1])) {
                     countSwaps++;
                     progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                    algorithmProgressBar.setProgress(progress);
                     SortUtils.swap(image.getArray(), j, j + 1);
                     swapped = true;
 
                     /*      FRAMEWRITING SECTION     */
                     if (countSwaps % delay == 0)
-                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
 
                 }
             }

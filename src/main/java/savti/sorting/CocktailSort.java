@@ -1,13 +1,8 @@
 package savti.sorting;
 
 import javafx.application.Platform;
-import savti.*;
 import javafx.scene.image.ImageView;
-import org.jcodec.api.awt.AWTSequenceEncoder;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.common.io.SeekableByteChannel;
-
-import java.io.IOException;
+import savti.*;
 
 import static savti.utilities.FileUtilities.writeFrame;
 import static savti.utilities.FileUtilities.writeFreezedFrames;
@@ -16,7 +11,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 public class CocktailSort extends AbstractSort {
 
     public CocktailSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -37,11 +32,11 @@ public class CocktailSort extends AbstractSort {
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
                     progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                    algorithmProgressBar.setProgress(progress);
                     SortUtils.swap(image.getArray(), i, i + 1);
 
                     if (countSwaps % delay == 0)
-                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                     swap = 1;
                 }
             }
@@ -57,10 +52,10 @@ public class CocktailSort extends AbstractSort {
                 if (SortUtils.greater(image.getArray()[i], image.getArray()[i + 1])) {
                     ++countSwaps;
                     progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                    algorithmProgressBar.setProgress(progress);
                     SortUtils.swap(image.getArray(), i, i + 1);
                     if (countSwaps % delay == 0)
-                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                     swap = 1;
                 }
             }
@@ -68,7 +63,8 @@ public class CocktailSort extends AbstractSort {
         }
 
         writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
-        outputHandler.closeOutputChannel();        outputHandler.closeOutputChannel();
+        outputHandler.closeOutputChannel();
+        outputHandler.closeOutputChannel();
 
 
         Platform.runLater(() -> resumeProgram(imageView, image));

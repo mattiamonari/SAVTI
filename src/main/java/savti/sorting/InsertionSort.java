@@ -11,7 +11,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 public class InsertionSort extends AbstractSort {
 
     public InsertionSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     @Override
@@ -28,12 +28,12 @@ public class InsertionSort extends AbstractSort {
             while (j > 0 && SortUtils.greater(image.getArray()[j - 1], image.getArray()[j])) {
                 ++countSwaps;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 SortUtils.swap(image.getArray(), j, j - 1);
                 j = j - 1;
 
                 if ((countSwaps % delay) == 0) {
-                    writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                 }
             }
         }

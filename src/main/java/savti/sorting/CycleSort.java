@@ -12,7 +12,7 @@ import static savti.utilities.ImageUtilities.resetCoordinates;
 public class CycleSort extends AbstractSort {
 
     public CycleSort(UserSettings userSettings, TiledImage image, ImageView imageView, AlgorithmProgressBar algorithmProgressBar, OutputHandler outputHandler) {
-        super(userSettings, image, imageView, algorithmProgressBar,outputHandler);
+        super(userSettings, image, imageView, algorithmProgressBar, outputHandler);
     }
 
     private <T extends Comparable<T>> T replace(T[] arr, int pos, T item) {
@@ -57,9 +57,9 @@ public class CycleSort extends AbstractSort {
             if (pos != j) {
                 countSwaps++;
                 progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                algorithmProgressBar.setProgress(progress);
                 if (countSwaps % delay == 0) {
-                   writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                 }
                 item = replace(image.getArray(), pos, item);
             }
@@ -85,17 +85,18 @@ public class CycleSort extends AbstractSort {
                 if (item != image.getArray()[pos]) {
                     countSwaps++;
                     progress += increment;
-                    algorithmProgressBar.setProgress(progress += increment);
+                    algorithmProgressBar.setProgress(progress);
                     item = replace(image.getArray(), pos, item);
                     if (countSwaps % delay == 0) {
-                       writeFrame(outputHandler,image,userSettings,countSwaps,countComparison,10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
                     }
                 }
             }
         }
 
         writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
-        outputHandler.closeOutputChannel();        outputHandler.closeOutputChannel();
+        outputHandler.closeOutputChannel();
+        outputHandler.closeOutputChannel();
         Platform.runLater(() -> resumeProgram(imageView, image));
     }
 
