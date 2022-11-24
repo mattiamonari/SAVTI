@@ -15,7 +15,7 @@
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
-                <Label fx:id="headerText" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Welctome to SAVTI" textFill="#222222">
+                <Label fx:id="headerText" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Welcome to SAVTI" textFill="#222222">
                     <font>
                         <Font name="System Bold" size="25.0" />
                     </font>
