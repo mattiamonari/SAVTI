@@ -76,13 +76,22 @@ public class FileUtilities {
     }
 
     /**
+     * Method that given a TiledImage returned a Buffered image given a width and an height
+     * @param image  TiledImage to encode
+     * @return finalImage is the BufferedImage built from the TieldImage
+     */
+    public static BufferedImage buildFinalImage(TiledImage image) {
+        int width = imageToFrameWidth(image);
+        int height = imageToFrameHeight(image);
+        BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        return finalImage;
+    }
+    /**
      * @param outputHandler The handler of the frames written to file.
      * @param image         TiledImage to encode
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image) {
-        int width = imageToFrameWidth(image);
-        int height = imageToFrameHeight(image);
-        BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage finalImage = buildFinalImage(image);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
             BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
@@ -101,9 +110,7 @@ public class FileUtilities {
      * @param fontSize
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
-        int width = imageToFrameWidth(image);
-        int height = imageToFrameHeight(image);
-        BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage finalImage = buildFinalImage(image);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
             BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
