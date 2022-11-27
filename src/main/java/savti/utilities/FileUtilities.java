@@ -40,7 +40,7 @@ public class FileUtilities {
      * @param image TiledImage to encode
      * @return an int that is the frame width.
      */
-    public static int setFrameWidth(TiledImage image) {
+    public static int imageToFrameWidth(TiledImage image) {
         if (image.getImage().getWidth() % 2 == 0) {
             return (int) image.getImage().getWidth();
         } else {
@@ -54,7 +54,7 @@ public class FileUtilities {
      * @param image TiledImage to encode
      * @return an int that is the frame height.
      */
-    public static int setFrameHeight(TiledImage image) {
+    public static int imageToFrameHeight(TiledImage image) {
         if (image.getImage().getHeight() % 2 == 0) {
             return (int) image.getImage().getHeight();
         } else {
@@ -80,8 +80,8 @@ public class FileUtilities {
      * @param image         TiledImage to encode
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image) {
-        int width = setFrameWidth(image);
-        int height = setFrameHeight(image);
+        int width = imageToFrameWidth(image);
+        int height = imageToFrameHeight(image);
         BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
@@ -101,8 +101,8 @@ public class FileUtilities {
      * @param fontSize
      */
     public static void writeFrame(OutputHandler outputHandler, TiledImage image, UserSettings userSettings, double countSwaps, double countComparisons, int fontSize) {
-        int width = setFrameWidth(image);
-        int height = setFrameHeight(image);
+        int width = imageToFrameWidth(image);
+        int height = imageToFrameHeight(image);
         BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics2D = finalImage.createGraphics();
         for (Tile t : image.getArray()) {
