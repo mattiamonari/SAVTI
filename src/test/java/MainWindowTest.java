@@ -29,6 +29,7 @@ public class MainWindowTest extends ApplicationTest {
         mainWindow = new MainWindow(stage);
         stage.setScene(new Scene(mainWindow));
         stage.setResizable(false);
+        stage.setMaximized(true);
         stage.show();
         stage.toFront();
     }
@@ -44,6 +45,7 @@ public class MainWindowTest extends ApplicationTest {
         BorderPane rootNode = (BorderPane) mainWindow.getScene().getRoot();
         ToggleSwitch toggleSwitch = from(rootNode).lookup("#darkMode").query();
         clickOn(toggleSwitch.lookup(".thumb"));
+        System.out.println();
         assertEquals("-fx-base: white", rootNode.getStyle());
         clickOn(toggleSwitch.lookup(".thumb"));
         assertEquals("-fx-base: black", rootNode.getStyle());

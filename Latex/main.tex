@@ -68,7 +68,7 @@ SAVTI is a desktop application created for scholastic purpose for the \href{http
 
 \section{Refactoring Goals}
 The refactoring we made had two main goals. The first one is to remove code smells inside the code, for this purpose we used SonarQube to detect part of the code whose design could be imporved. 
-(\textcolor{red}{addActionListeners} in \textbf{savti.MainWindow.java} and \textbf{savti.MainWindow.java)}\\
+(addActionListeners in \textbf{savti.MainWindow.java} and \textbf{savti.MainWindow.java)}\\
 The second one is to make the code more readable since the project presents complexity flaws in some classes which have very long methods. In this case we also added javadocs and tests to the project to make the maintenance of the code leaner.
 
 \section{Refactoring examples}
@@ -263,7 +263,7 @@ private void addEventListeners() {
 \end{lstlisting}
 Solved this smell we had to reduce the coupling of the class, for this reason we applied the Command pattern and the principle of separation of concerns, which usually results in breaking an app into layers.
 We build an interface Command that was implemented by each concrete command, which represents a command to execute when a button is pressed.
-Each concrete command then have a receiver the CommandAction, that is used by the Client to perform the command.
+Each concrete command is then called inside the addEventListeners method by a call on action.
 Here is a snippet of the code implementation.
 \begin{comment}
 For doing this we followed this scheme.
@@ -299,7 +299,7 @@ public CleanImageCommand(TiledImage image, UserSettings userSettings, javafx.sce
 \end{lstlisting}
 In this way we have also increased the cohesion, since we developed a set of classes responsible for the execution of the command of each button and we reduced the amount of work made by the god class \textbf{savti.MainWindow.java}.
 The number of lines of the \textbf{savti.MainWindow.java} class were reduce from 520 up to 131: just the addEventListeners method itself were previously occupying 257 lines.
-We used the same approach to improve the readability and to reduce the complexity of the class \textbf{savti.AdvancedSetting.java}.
+We used the same approach to improve the readability and to reduce the complexity of the class \textbf{savti.AdvancedSetting.java}. According to SonarQube the code still presents some method with high Cognitive Complexity, all these cases are methods of the sorting classes, we decided not to refactor it because they follow the standard sorting algorithms that are commonly used by developers community.
 \\
 
 \subsection{Method "clone" should not be overridden}
@@ -333,7 +333,7 @@ According to SunarQube report: "Many consider clone and Cloneable broken in Java
 \subsection{Code clones}
 The project presented numerous pieces of code that were textually very similar to other, in this case we used the extract method refactoring, as in the case of method writeFrame in class \textbf{savti.FileUtilities.java}.
 In this case the class presents two methods with the same name, similar purpose but with different parameters. What we have done was to remove the duplicated parts of the code from the writeFrame method and create two sub methods that execute the cloned code.
-In this case we had also to sole another problem because at first we called imageToFrameHeight method setFrameHeight, but this is a naming anti-pattern since we were calling an accessor method with a mutator naming standard(SET).\\
+In this case we had also to solve another problem because at first we called imageToFrameHeight method setFrameHeight, but this is a naming anti-pattern since we were calling an accessor method with a mutator naming standard(SET).\\
 \begin{minipage}{0.5 \textwidth}
 \begin{lstlisting}
     public static void writeFrame(AWTSequenceEncoder encoder, TiledImage image, UserSettings userSettings) {
@@ -381,7 +381,7 @@ In this case we had also to sole another problem because at first we called imag
 
 \section{Refactoring testing} 
 Eventually, we decided to add also some tests to the application, since they were not present before. In order to that, we used the maven artifact of the \href{https://github.com/TestFX/TestFX}{TestFX} library. It provides a rich collection of matchers and assertions to verify expected states of JavaFX scene-graph nodes. \\
-The test implemented were primarly done on the GUI aspects of the program, such as:
+The test implemented were mainly done on the GUI aspects of the program, such as:
 
 \begin{itemize}
     \item Checking labels of the nodes
@@ -391,18 +391,17 @@ The test implemented were primarly done on the GUI aspects of the program, such 
 In the future, Mattia is planning to add more tests to reach an higher code coverage.
 
 \section{Difficulties}
-During the process we didn't find many difficulties, in some cases the work required us only to modify some variables name or to move some lines of code. Nevertheless we had always to be careful not to change the behaviour of the program with our actions and since we had to develop tests from scatch at the beginning we did not have the certainty that what we were doing was correct.\\
-Morover, the developing of the command pattern to reduce the complexity of the addEventListener method has been the hardest part. This required us to first project the changes we had to make and understand how to adapt our code to the guidlines of the command pattern;
-In this case working step by step ,as we documented in chapter 4.5, helped us because in this way we could check that we were not modifying the behaviour of the code while we were applying heavy edits. Looking at several examples of the pattern application and being inspired by other codes we develped in the past helped us to apply the correct edits to the SAVTI prject.
-
+During the process we didn't find many difficulties, in some cases the work required us only to modify some variables name or to move some lines of code. Nevertheless we had always to be careful not to change the behaviour of the program with our actions and since we had to develop tests from scratch at the beginning we did not have the certainty that what we were doing was correct.\\
+Moreover, the developing of the command pattern to reduce the complexity of the addEventListener method has been the hardest part. This required us to first project the changes we had to make and understand how to adapt our code to the guidlines of the command pattern;
+in this case working step by step ,as we documented in chapter 4.5, helped us because in this way we could check that we were not modifying the behaviour of the code while we were applying heavy edits. Looking at several examples of the pattern application and being inspired by other codes we developed in the past helped us to apply the correct edits to the SAVTI project.\\
+Another hard part was to produce the test for the GUI, even if we used a pre compiled library we have to consider that different operating systems give different rights to the application, so a test that passed in Windows give us problems in MacOS.
 
 \section{Conclusion}
-If we look back to how was the project before the refactoring and how it is now we can state that we get it cleaner and more readable for a developer that has to work on it from scratch, nevertheless numerous modifies can be added.\\
-(\textcolor{red}{Ciò viene confermato anche dal report di SonarQube che da 133 Code smells ora ne rileva..., farei un minimo commento su quelli che vengono ancora rilevati dicendo che sono irrilevanti})\\
-First of all new tests must be added, because there are several branches of the test that are not covered yet.\\
+If we look back to how was the project before the refactoring and how it is now we can state that we get it cleaner and more readable for a developer that has to work on it from scratch, by looking at the SonarQube reports before and after the refactoring a huge improvement of the project design can be seen, just consider that before we had 133 code smells and after only 36, most of them are TODOs that we left in the project for future updates and other are the long methods of the sorting algorithms we mentioned before.
+
+Nevertheless numerous modifies can be added, first of all new tests must be added, because there are several branches of the test that are not covered yet.\\
 Second, an ENUM class to store all the possible algorithms name can be added, in this way you increase compile-time checking and avoid errors from passing invalid constants.\\
 Third, documentation must be improved, because there are several parts of the project which does not have documentation.
 Improve documentation.
-\\
-(\textcolor{red}{se hai altre idee aggiungi})\\
+
 \end{document}
