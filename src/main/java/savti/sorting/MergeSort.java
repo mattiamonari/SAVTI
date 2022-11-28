@@ -23,7 +23,7 @@ public class MergeSort extends AbstractSort {
 
         mergeSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (image.getImage().getWidth() / 100f));
 
         outputHandler.closeOutputChannel();
 
@@ -92,7 +92,7 @@ public class MergeSort extends AbstractSort {
                 j++;
             }
             if (countSwaps % delay == 0 && write)
-                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
             k++;
         }
 
@@ -106,7 +106,7 @@ public class MergeSort extends AbstractSort {
             i++;
             k++;
             if (countSwaps % delay == 0 && write)
-                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
         }
 
         while (j < n2) {
@@ -117,7 +117,7 @@ public class MergeSort extends AbstractSort {
             j++;
             k++;
             if (countSwaps % delay == 0 && write)
-                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
         }
     }
 

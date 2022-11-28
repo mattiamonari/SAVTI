@@ -76,10 +76,6 @@ public class BurstModeSortingCommand implements Command {
 
                 createFutureTaskForBurstAlgo(pool, progessBarContainer, algoList, algorithmProgressBar, sortAlgorithm);
 
-                //TODO Encoder + Out ? Why not? Or even moving to xuggle??
-
-
-                //TODO CHANGE HOW THE BURSTMODE WORKS
             }
 
         }).start();

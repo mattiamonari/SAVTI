@@ -19,6 +19,8 @@ import savti.sorting.BubbleSort;
 import savti.sorting.SortAlgorithm;
 import savti.utilities.ErrorUtilities;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 public class MainWindow extends BorderPane {
@@ -94,7 +96,6 @@ public class MainWindow extends BorderPane {
 
     private void addCssFiles() {
         setStyle("-fx-base: black");
-        this.getStylesheets().add(getClass().getResource("/css/main.css").toExternalForm());
     }
 
     private void setDarkModeListener() {
@@ -102,9 +103,11 @@ public class MainWindow extends BorderPane {
             if (newValue) {
                 setStyle("-fx-base: black");
                 theme.setStyle(Style.DARK);
+                mainVBox.setDarkStyle();
             } else {
                 setStyle("-fx-base: white");
                 theme.setStyle(Style.LIGHT);
+                mainVBox.setLightStyle();
             }
         });
     }

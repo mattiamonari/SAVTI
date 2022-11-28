@@ -59,7 +59,7 @@ public class CycleSort extends AbstractSort {
                 progress += increment;
                 algorithmProgressBar.setProgress(progress);
                 if (countSwaps % delay == 0) {
-                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
                 }
                 item = replace(image.getArray(), pos, item);
             }
@@ -88,13 +88,13 @@ public class CycleSort extends AbstractSort {
                     algorithmProgressBar.setProgress(progress);
                     item = replace(image.getArray(), pos, item);
                     if (countSwaps % delay == 0) {
-                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
                     }
                 }
             }
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (image.getImage().getWidth() / 100f));
         outputHandler.closeOutputChannel();
         outputHandler.closeOutputChannel();
         Platform.runLater(() -> resumeProgram(imageView, image));

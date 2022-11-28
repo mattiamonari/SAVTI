@@ -30,8 +30,8 @@ public class PrecisionCommand implements Command {
         precisionValue.setText(String.valueOf(Math.floor((Double) newValue)));
         precisionValue.setStyle("-fx-text-fill: #" + ColorUtilities.getHexFromValue(newValue.intValue() / 100f) + ";");
         if (image.getImage() != null) {
-            userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / newValue.intValue()));
-            userSettings.setChunkHeight((int) Math.round(image.getImage().getHeight() / newValue.intValue()));
+            userSettings.setChunkWidth((int) Math.round(image.getImage().getWidth() / (2 * newValue.intValue())));
+            userSettings.setChunkHeight((int) Math.round(image.getImage().getHeight() / (2 * newValue.intValue())));
             userSettings.setRowsNumber((int) image.getImage().getHeight() / userSettings.getChunkHeight());
             userSettings.setColsNumber((int) image.getImage().getWidth() / userSettings.getChunkHeight());
             image.resizeArray(userSettings.getColsNumber() * userSettings.getRowsNumber());

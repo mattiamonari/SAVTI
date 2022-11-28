@@ -23,7 +23,7 @@ public class QuickSort extends AbstractSort {
 
         doSort(image.getArray(), 0, image.getArray().length - 1, true);
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (image.getImage().getWidth() / 100f));
 
         outputHandler.closeOutputChannel();
 
@@ -65,7 +65,7 @@ public class QuickSort extends AbstractSort {
         progress += increment;
         algorithmProgressBar.setProgress(progress);
         if (countSwaps % delay == 0 && write)
-            writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+            writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
         swap(array, randomIndex, right);
 
         return partition(array, left, right, write);
@@ -97,7 +97,7 @@ public class QuickSort extends AbstractSort {
                 progress += increment;
                 algorithmProgressBar.setProgress(progress);
                 if (countSwaps % delay == 0 && write)
-                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                    writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
                 swap(array, left, right);
                 ++left;
                 --right;

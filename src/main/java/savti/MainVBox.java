@@ -49,6 +49,7 @@ public class MainVBox extends VBox {
         jMetro = new JMetro(this, Style.DARK);
 
         burstMode.setTooltip(new Tooltip("Questo bottone serve per fare un video di tutti gli algoritmi"));
+        this.setId("mainVBox");
     }
 
 
@@ -103,4 +104,13 @@ public class MainVBox extends VBox {
     }
 
 
+    public void setLightStyle() {
+        setStyle("-fx-base: white");
+        jMetro.setStyle(Style.LIGHT);
+    }
+
+    public void setDarkStyle() {
+        setStyle("-fx-base: black");
+        jMetro.setStyle(Style.DARK);
+    }
 }

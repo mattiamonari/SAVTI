@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -16,13 +17,8 @@ public class EntryPoint extends Application {
 
     @Override
     public void start(Stage stage) {
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
         stage.setTitle("sortingAlgorithmsVisualization");
-        stage.setX(bounds.getMinX());
-        stage.setY(bounds.getMinY());
-        stage.setWidth(bounds.getWidth());
-        stage.setHeight(bounds.getHeight());
+        stage.setMaximized(true);
         MainWindow mw = new MainWindow(stage);
         Scene scene = new Scene(mw);
         stage.getIcons().add(new Image("icon.png"));
@@ -32,6 +28,5 @@ public class EntryPoint extends Application {
         });
         stage.setScene(scene);
         stage.show();
-        stage.setResizable(false);
     }
 }

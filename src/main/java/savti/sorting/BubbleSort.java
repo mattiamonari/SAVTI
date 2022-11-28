@@ -37,7 +37,7 @@ public class BubbleSort extends AbstractSort {
 
                     /*      FRAMEWRITING SECTION     */
                     if (countSwaps % delay == 0)
-                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, 10);
+                        writeFrame(outputHandler, image, userSettings, countSwaps, countComparison, (int)(image.getImage().getWidth() / 100f));
 
                 }
             }
@@ -46,7 +46,7 @@ public class BubbleSort extends AbstractSort {
             }
         }
 
-        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (imageView.getFitWidth() / 150f));
+        writeFreezedFrames(userSettings.getFrameRate() * 2, outputHandler, image, userSettings, countSwaps, countComparison, (int) (image.getImage().getWidth() / 100f));
         outputHandler.closeOutputChannel();
 
         //TODO WHY I DON'T USE IT?

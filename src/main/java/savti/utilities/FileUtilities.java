@@ -8,6 +8,9 @@ import savti.UserSettings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class FileUtilities {
@@ -116,10 +119,12 @@ public class FileUtilities {
             BufferedImage tile = SwingFXUtils.fromFXImage(t.getTile(), null);
             graphics2D.drawImage(tile, (int) (t.getX() * image.getArray()[0].getWidth()), (int) (t.getY() * image.getArray()[0].getHeight()), null);
         }
-        graphics2D.drawString(String.valueOf(countSwaps), fontSize, fontSize);
-        graphics2D.drawString(String.valueOf(countComparisons), fontSize, 2 * fontSize);
-        graphics2D.drawString(userSettings.getChunkHeight() + "x" + userSettings.getChunkWidth(), fontSize, 3 * fontSize);
-        graphics2D.drawString(String.valueOf(userSettings.getFrameRate()), fontSize, 4 * fontSize);
+        //TODO
+        graphics2D.setFont(new Font("Verdana", Font.BOLD, fontSize));
+        graphics2D.drawString("Swaps : " + (int) countSwaps, fontSize, (fontSize + fontSize / 5));
+        graphics2D.drawString("Comparisons : " + (int) countComparisons, fontSize, 2 * (fontSize + fontSize / 5));
+        graphics2D.drawString("Tile size : " + userSettings.getChunkHeight() + "x" + userSettings.getChunkWidth(), fontSize, 3 * (fontSize + fontSize / 5));
+        graphics2D.drawString("FPS : " + userSettings.getFrameRate(), fontSize, 4 * (fontSize + fontSize / 5));
         outputHandler.encodeImage(finalImage);
 
         graphics2D.dispose();

@@ -1,9 +1,11 @@
 # Project exclude paths
+/.github/
 /.gradle/
 /.idea/
 /out/
 /resources/
 /target/
+/ext/
 *.properties
 *.DS_Store
 .DS_Store
@@ -11,3 +13,4 @@
 *.jpg
 *.html
 *.xml
+*.pdf

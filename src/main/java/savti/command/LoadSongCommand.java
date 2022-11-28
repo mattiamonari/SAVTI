@@ -33,5 +33,6 @@ public class LoadSongCommand implements Command {
         fileChooser.setTitle("Open Song File");
         File chosenFile = fileChooser.showOpenDialog(mainWindow.getScene().getWindow());
         userSettings.setMusic(chosenFile);
+        java.util.Queue
     }
 }

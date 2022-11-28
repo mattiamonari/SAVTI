@@ -47,8 +47,10 @@ public class MainWindowTest extends ApplicationTest {
         clickOn(toggleSwitch.lookup(".thumb"));
         System.out.println();
         assertEquals("-fx-base: white", rootNode.getStyle());
+        assertEquals("-fx-base: white", rootNode.lookup("#mainVBox").getStyle());
         clickOn(toggleSwitch.lookup(".thumb"));
         assertEquals("-fx-base: black", rootNode.getStyle());
+        assertEquals("-fx-base: black", rootNode.lookup("#mainVBox").getStyle());
     }
 
     @Test
