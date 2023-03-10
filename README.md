@@ -6,7 +6,7 @@ This process will be encoded in a .mp4 video thanks to the [jcodec](https://gith
 
 
 <figure>
-  <img src="[{{site.url}}/assets/image.jpg](https://i.imgur.com/TMM4fyZ.jpg)" alt="SAVTI home window"/>
+  <img src="https://i.imgur.com/TMM4fyZ.jpg" alt="SAVTI home window"/>
   <figcaption>The main window of SAVTI.</figcaption>
 </figure>
 
