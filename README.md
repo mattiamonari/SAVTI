@@ -1,4 +1,4 @@
-# Sorting Algorithm Visualized Through Images (SAVTI)
+# Sorting Algorithms Visualized Through Images (SAVTI)
 
 SAVTI is a desktop application created for scholastic purpose for the [OOP course from the Università degli Studi di Modena e Reggio Emilia](https://github.com/nbicocchi/ooprogramming). 
 It gives the possibility to randomize an image with a custom precision (which gets splitted in an array of tiles), choose a custom sorting algorithm and reorder it.
